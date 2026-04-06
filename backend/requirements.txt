@@ -1,0 +1,36 @@
+# Core API Framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# LangChain & AI
+langchain>=0.1.0,<0.4.0
+langchain-community>=0.0.30,<0.4.0
+langchain-core>=0.1.40,<0.4.0
+langchain-text-splitters<0.4.0
+langchain-openai<0.4.0
+langchain-ollama
+
+# Database & Vector Opslag
+sqlalchemy
+alembic
+psycopg2-binary
+asyncpg
+pgvector
+
+# Document Loading
+pdfplumber
+pypdf
+docx2txt
+
+# Utilities
+python-dotenv
+python-multipart
+tiktoken
+rank_bm25
+flashrank
+
+# Testing
+pytest
+httpx
