@@ -1,0 +1,78 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+node_modules/
+jspm_packages/
+venv/
+.venv/
+env/
+.env
+
+# TypeScript
+*.tsbuildinfo
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Next.js
+.next/
+out/
+
+# Build outputs
+dist/
+build/
+bin/
+obj/
+
+# Simple-git-hooks
+.simple-git-hooks
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+*.settings/
+*.sublime-workspace
+.vscode/
+*.swp
+*.swo
+
+# MacOS metadata
+.DS_Store
+Thumbs.db
+
+# Environments
+.env*
+!.env.example
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker
+docker-compose.override.yml
+
+# Project Specific Data
+backend/data/
+backend/backend_log.txt
+frontend/.env.local
+frontend/.next/
