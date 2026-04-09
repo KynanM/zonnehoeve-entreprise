@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #059669; /* Emerald 600 - more professional */
+  --color-brand-green-dark: #065f46; /* Emerald 800 */
+  --color-brand-yellow: #f59e0b; /* Amber 500 */
+  --color-brand-yellow-dark: #b45309; /* Amber 700 */
+  --color-earth-50: #fdfdfc; /* Warm paper white */
+  --color-earth-100: #fafaf9; /* Warm stone 50 */
+  --color-earth-200: #f5f5f4; /* Warm stone 100 */
+  --color-earth-800: #292524; /* Stone 800 */
+  --color-earth-900: #1c1917; /* Stone 900 */
+  
+  /* Night Mode / Warmth Colors */
+  --color-night-bg: #0c0a09; /* Stone 950 */
+  --color-night-panel: #1c1917; /* Stone 900 */
+  --color-night-text: #e7e5e4; /* Stone 200 */
+  --color-night-muted: #78716c; /* Stone 500 */
+  --color-night-warm: #44403c; /* Stone 700 */
+}
+
+@layer base {
+  body {
+    background-color: var(--color-earth-50);
+    color: var(--color-earth-800);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
+    transition: background-color 0.5s ease, color 0.5s ease;
+  }
+
+  /* Night Mode overrides */
+  [data-theme='night'] body {
+    background-color: var(--color-night-bg);
+    color: var(--color-night-text);
+  }
+
+  [data-theme='night'] .glass-panel {
+    background: rgba(41, 37, 36, 0.7);
+    border-color: rgba(68, 64, 60, 0.5);
+    color: var(--color-night-text);
+  }
+
+  [data-theme='night'] .bg-white {
+    background-color: var(--color-night-panel) !important;
+    color: var(--color-night-text) !important;
+  }
+
+  [data-theme='night'] .text-earth-900,
+  [data-theme='night'] .text-earth-800 {
+    color: var(--color-night-text) !important;
+  }
+
+  [data-theme='night'] .text-earth-800\/70,
+  [data-theme='night'] .text-earth-800\/60,
+  [data-theme='night'] .text-gray-500 {
+     color: var(--color-night-muted) !important;
+  }
+
+  [data-theme='night'] .border-black\/5 {
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+@layer utilities {
+  .container-wide {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .clean-card {
+    background: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    transition: all 0.3s ease;
+  }
+
+  .clean-card:hover {
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+    border-color: #e0e0e0;
+  }
+
+  .soft-gradient {
+    background: linear-gradient(135deg, var(--color-earth-50) 0%, var(--color-earth-100) 100%);
+  }
+  
+  .premium-shadow {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .chat-text {
+    line-height: 1.8;
+    letter-spacing: 0.01em;
+    font-size: 1.05rem;
+  }
+
+  .ambient-blob {
+    filter: blur(80px);
+    opacity: 0.15;
+    mix-blend-mode: multiply;
+  }
+
+  [data-theme='night'] .ambient-blob {
+    mix-blend-mode: soft-light;
+    opacity: 0.1;
+  }
+}
+
+/* Custom Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #e5e5e5;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #d4d4d4;
+}

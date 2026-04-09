@@ -1,0 +1,42 @@
+{
+  "name": "Zonnehoeve | Living+ Digitale Gids",
+  "short_name": "Digitale Gids",
+  "description": "De professionele digitale gids voor zorgmedewerkers van Zonnehoeve | Living+. Altijd beschikbaar, ook offline.",
+  "start_url": "/gids",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#22c55e",
+  "categories": ["medical", "productivity"],
+  "lang": "nl",
+  "screenshots": [],
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nieuwe vraag",
+      "short_name": "Vraag",
+      "url": "/gids",
+      "description": "Start een nieuwe vraag aan de Digitale Gids"
+    },
+    {
+      "name": "Protocollen",
+      "short_name": "Protocollen",
+      "url": "/gids",
+      "description": "Bekijk alle protocollen en documenten"
+    }
+  ]
+}
