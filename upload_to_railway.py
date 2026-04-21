@@ -2,11 +2,9 @@ import os
 import requests
 from pathlib import Path
 
-# Railway productie URL (Let op: ZONDER trailing slash)
-RAILWAY_URL = "http://127.0.0.1:8000"
-
-# De admin key uit backend/api/auth.py
-ADMIN_API_KEY = "REDACTED_ADMIN_KEY"
+# Config laden uit environment (of gebruik .env file)
+RAILWAY_URL = os.getenv("RAILWAY_URL", "http://127.0.0.1:8000")
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
 # Pad naar lokale PDF/Docx map
 RAW_DATA_PATH = Path("./backend/data/raw_documents")
