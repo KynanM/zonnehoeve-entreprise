@@ -2,11 +2,9 @@ import os
 import requests
 from pathlib import Path
 
-# Railway productie URL (Let op: ZONDER trailing slash)
-RAILWAY_URL = "https://zonnehoeve-entreprise-backend-production.up.railway.app"
-
-# De admin key uit backend/api/auth.py
-ADMIN_API_KEY = "dedriemusketierszonnehoeve"
+# Config laden uit environment (of gebruik .env file)
+RAILWAY_URL = os.getenv("RAILWAY_URL", "https://zonnehoeve-entreprise-backend-production.up.railway.app")
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
 # Pad naar lokale PDF/Docx map
 RAW_DATA_PATH = Path("./backend/data/raw_documents")
