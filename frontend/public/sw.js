@@ -1,29 +1,28 @@
 // Service Worker voor Zonnehoeve Digitale Gids PWA
-// Versie: 2.0 - Fase 4: Offline Support
+// Versie: 3.0 - Verbeterde Cache Strategie (Altijd Nieuwste Versie)
 
-const CACHE_NAME = "zonnehoeve-gids-v2";
-const STATIC_CACHE = "zonnehoeve-static-v2";
+const CACHE_NAME = "zonnehoeve-gids-v3";
+const STATIC_CACHE = "zonnehoeve-static-v3";
 
-// Statische assets die altijd gecached worden
+// Statische assets die bij installatie gecached worden
 const STATIC_ASSETS = [
   "/",
   "/gids",
   "/manifest.json",
   "/logo.png",
-  "/hero-bg.png",
 ];
 
 // Installatie: pre-cache statische assets
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
     })
   );
-  self.skipWaiting();
 });
 
-// Activatie: verwijder oude caches
+// Activatie: verwijder álle oude caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) =>
@@ -37,51 +36,48 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch: Network-first voor API calls, Cache-first voor statische assets
+// Fetch: NETWORK-FIRST STRATEGIE voor alles om altijd de nieuwste versie te hebben
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // API calls: Network-first, dan offline fallback
-  if (url.pathname.startsWith("/api/")) {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache succesvolle GET API responses voor offline gebruik
-          if (request.method === "GET" && response.ok) {
-            const clonedResponse = response.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, clonedResponse);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          // Offline fallback: probeer cached versie
-          return caches.match(request).then(
-            (cached) =>
-              cached ||
-              new Response(
-                JSON.stringify({ error: "Offline — geen verbinding met de server" }),
-                { headers: { "Content-Type": "application/json" } }
-              )
-          );
-        })
-    );
-    return;
+  // EXCLUDE: Documenten niet in de SW cache opslaan (te groot en moeten vers zijn)
+  if (url.pathname.includes("/api/documents/")) {
+    return; // Laat de browser dit direct afhandelen
   }
 
-  // Statische assets: Cache-first
+  // Network-first strategie voor zowel API als statische assets
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const cloned = response.clone();
-          caches.open(STATIC_CACHE).then((cache) => cache.put(request, cloned));
+    fetch(request)
+      .then((response) => {
+        // Als we netwerk hebben, update de cache en geef response terug
+        if (response.ok && request.method === "GET") {
+          const clonedResponse = response.clone();
+          const targetCache = url.pathname.startsWith("/api/") ? CACHE_NAME : STATIC_CACHE;
+          caches.open(targetCache).then((cache) => {
+            cache.put(request, clonedResponse);
+          });
         }
         return response;
-      });
-    })
+      })
+      .catch(() => {
+        // Offline fallback: haal uit cache
+        return caches.match(request).then((cached) => {
+          if (cached) return cached;
+          
+          // Als het een API call is, geef een JSON error terug
+          if (url.pathname.startsWith("/api/")) {
+             return new Response(
+                JSON.stringify({ error: "Je bent offline en deze informatie is niet gecached." }),
+                { headers: { "Content-Type": "application/json" } }
+              );
+          }
+          
+          // Fallback voor navigatie/pagina's
+          if (request.mode === 'navigate') {
+            return caches.match('/gids') || caches.match('/');
+          }
+        });
+      })
   );
 });
