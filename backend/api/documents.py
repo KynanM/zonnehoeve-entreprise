@@ -84,8 +84,9 @@ async def get_document(filename: str, download: bool = False, db: AsyncSession =
 
     if download:
         headers["Content-Disposition"] = f'attachment; filename="{filename}"'
-    # Voor 'inline' (viewing) laten we de Content-Disposition leeg zodat de frontend 
-    # het als Blob kan ophalen zonder dat browsers een download triggeren.
+    else:
+        # Voor 'inline' (viewing) forceren we 'inline' zodat de browser het bestand opent
+        headers["Content-Disposition"] = f'inline; filename="{filename}"'
         
     return StreamingResponse(
         content_stream, 

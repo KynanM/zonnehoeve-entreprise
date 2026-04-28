@@ -123,10 +123,17 @@ async function proxyRequest(req: NextRequest, params: { path: string[] }) {
     });
 
     // Zorg dat het document getoond mag worden in een iframe (SAMEORIGIN of verwijderen voor proxy)
-    // Als de browser X-Frame-Options: DENY ziet van de backend (via de proxy), blokkeert hij de iframe.
     responseHeaders.set("X-Frame-Options", "SAMEORIGIN");
-    // Ook Content-Security-Policy frame-ancestors 'self' kan helpen
     responseHeaders.set("Content-Security-Policy", "frame-ancestors 'self'");
+
+    // Forceren van inline weergave voor documenten om downloads te voorkomen
+    if (path.includes("documents/") && !search.includes("download=true")) {
+      responseHeaders.set("Content-Disposition", "inline");
+      // Zorg dat PDF's altijd het juiste type hebben
+      if (path.toLowerCase().endsWith(".pdf")) {
+        responseHeaders.set("Content-Type", "application/pdf");
+      }
+    }
 
     if (backendRes.status !== 200) {
         console.log(`[PROXY DEBUG] Backend Response headers:`, Object.fromEntries(backendRes.headers.entries()));

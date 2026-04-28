@@ -36,6 +36,19 @@ export default function MarkdownRenderer({ content }: { content: string }) {
                </button>
             );
           }
+          if (props.href?.includes("/api/documents/")) {
+            const parts = props.href.split("/api/documents/");
+            const fullRef = parts[parts.length - 1];
+            return (
+              <button 
+                onClick={() => window.dispatchEvent(new CustomEvent('open-doc', {detail: fullRef}))} 
+                className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold mx-1 hover:bg-emerald-600 hover:text-white transition-all transform active:scale-95 shadow-sm cursor-pointer border border-emerald-500/20"
+              >
+                <span className="opacity-70">📄</span>
+                {props.children}
+              </button>
+            );
+          }
           return <a className="text-brand-green-dark underline font-bold hover:text-brand-green transition-colors" target="_blank" rel="noopener noreferrer" {...props} />
         },
         blockquote: ({ node, ...props }) => <blockquote className="border-l-4 border-brand-green/30 pl-4 py-1 italic text-earth-800/80 my-3" {...props} />,
