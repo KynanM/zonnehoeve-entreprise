@@ -38,6 +38,8 @@ async def test_admin_stats_integration():
     try:
         # 2. Call the endpoint
         transport = httpx.ASGITransport(app=app)
+        from api.auth import verify_admin
+        app.dependency_overrides[verify_admin] = lambda: True
         
         # Mocking the service response for the admin stats to avoid complex DB queries in tests
         with patch("services.stats_service.StatsService.get_dashboard_stats", new_callable=AsyncMock) as mock_get_stats:
@@ -64,6 +66,7 @@ async def test_admin_stats_integration():
             print("\n✅ Admin Stats Integration Test passed!")
             
     finally:
+        app.dependency_overrides.clear()
         # 3. Cleanup (using mocked session)
         async with database.async_session_maker() as db:
             await db.execute(delete(ChatLog).where(ChatLog.thread_id == thread_id))

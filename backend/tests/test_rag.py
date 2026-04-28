@@ -35,7 +35,8 @@ def test_format_docs_duplicates():
 async def test_load_all_chunks_bm25_success(mock_vector_store, sample_documents):
     """Test successful loading of chunks for BM25."""
     # Given
-    mock_vector_store.asimilarity_search.return_value = sample_documents
+    from unittest.mock import AsyncMock
+    mock_vector_store.asimilarity_search = AsyncMock(return_value=sample_documents)
     
     # When
     docs = await _load_all_chunks_for_bm25()

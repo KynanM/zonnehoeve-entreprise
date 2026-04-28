@@ -5,8 +5,7 @@ from unittest.mock import patch, AsyncMock, MagicMock
 from langchain_core.documents import Document
 
 @pytest.mark.anyio
-@patch("api.chat.get_rag_chain")
-async def test_rag_streaming_integration(mock_get_rag_chain):
+async def test_rag_streaming_integration():
     """
     Test the full RAG pipeline via the API endpoint.
     """
@@ -22,7 +21,7 @@ async def test_rag_streaming_integration(mock_get_rag_chain):
     mock_ret = AsyncMock()
     mock_ret.ainvoke.return_value = [Document(page_content="Alcohol beleid...", metadata={"source": "test.pdf"})]
     
-    mock_get_rag_chain.return_value = {
+    app.state.rag_chain = {
         "retrieval": mock_ret,
         "generation": mock_gen
     }

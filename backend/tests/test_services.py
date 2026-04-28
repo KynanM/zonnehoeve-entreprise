@@ -49,7 +49,7 @@ async def test_get_preview_fallback(mock_prompt, mock_vs_get, mock_chat, doc_ser
     mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: None)
     
     mock_vs = MagicMock()
-    mock_vs.similarity_search.return_value = [MagicMock(page_content="Mocked content")]
+    mock_vs.asimilarity_search = AsyncMock(return_value=[MagicMock(page_content="Mocked content")])
     mock_vs_get.return_value = mock_vs
     
     # Mock Chain: prompt | llm | parser
