@@ -17,18 +17,18 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         try:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-            print("✅ pgvector extensie geactiveerd.")
+            print("OK: pgvector extensie geactiveerd.")
         except Exception as e:
-            print(f"⚠️ Kon pgvector extensie niet automatisch laden: {e}")
+            print(f"WARNING: Kon pgvector extensie niet automatisch laden: {e}")
             
         await conn.run_sync(Base.metadata.create_all)
-        print("✅ Database tabellen gecontroleerd/aangemaakt.")
+        print("OK: Database tabellen gecontroleerd/aangemaakt.")
         
     try:
         app.state.rag_chain = await setup_rag_chain()
-        print("✅ RAG Chain vooraf ingeladen.")
+        print("OK: RAG Chain vooraf ingeladen.")
     except Exception as e:
-        print(f"⚠️ RAG Chain faalde om vooraf te laden: {e}")
+        print(f"WARNING: RAG Chain faalde om vooraf te laden: {e}")
         app.state.rag_chain = None
 
     yield

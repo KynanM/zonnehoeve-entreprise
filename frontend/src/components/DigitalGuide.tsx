@@ -116,7 +116,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10 w-full">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10 w-full max-w-full min-h-0">
         <ThreadSidebar 
           threads={threads} 
           activeThreadId={activeThreadId} 
@@ -129,8 +129,8 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
           theme={theme} 
         />
 
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-          <Group orientation="horizontal">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden w-full min-h-0">
+          <Group orientation="horizontal" className="flex-1 w-full h-full">
             {/* Chat Panel */}
             <Panel defaultSize={60} minSize={30}>
               <section className={cn(

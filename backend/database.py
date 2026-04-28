@@ -5,7 +5,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
-raw_url = (os.getenv("DATABASE_URL") or "postgresql://user:password@localhost:5433/zonnehoeve").strip().strip('"').strip("'")
+raw_url = (os.getenv("DATABASE_URL") or "postgresql://postgres:postgres@localhost:5433/zonnehoeve").strip().strip('"').strip("'")
 
 # Railway versterkt soms `postgres://`, dit is verouderd in SQLAlchemy
 if raw_url.startswith("postgres://"):

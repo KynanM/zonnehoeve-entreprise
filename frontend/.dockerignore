@@ -7,5 +7,5 @@ build
 .dockerignore
 README.md
 Dockerfile
-package-lock.json
+
 npm-debug.log

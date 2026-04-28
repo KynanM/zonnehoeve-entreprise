@@ -1,46 +1,56 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
   Users, ShieldCheck, HeartPulse, ArrowRight, MapPin, 
   ChevronRight, CheckCircle2, MessageSquare, Sparkles,
   Command, Layers, Smartphone, WifiOff, Mic, Settings,
-  ArrowUp, HeartHandshake
+  ArrowUp, HeartHandshake, MousePointer2, Zap, Globe, Lock
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import DigitalGuide from "@/components/DigitalGuide";
+import { cn } from "@/lib/utils";
 
 const clusters = [
   {
     title: "Zelfredzaamheid",
     subtitle: "Autonomie & Regie",
-    description: "Wij ondersteunen volwassenen om de regie over hun eigen leven te herwinnen. Samen bouwen we aan autonomie in een inclusieve omgeving waar iedereen meetelt.",
-    url: "https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80&w=800",
+    description: "Wij ondersteunen cliënten bij het herwinnen van hun eigen regie door zinvolle dagbesteding, vrijetijdsactiviteiten en ambulante begeleiding.",
+    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&q=80&w=1200",
     icon: <Users className="text-brand-green" />,
+    color: "brand-green"
   },
   {
     title: "Veilig & Voorspelbaar",
-    subtitle: "Rust & Houvast",
-    description: "Een veilige haven waar structuur en nabijheid zorgen voor emotionele veiligheid. Wij bieden een voorspelbare omgeving die rust en houvast geeft.",
-    url: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&q=80&w=800",
-    icon: <ShieldCheck className="text-blue-600" />,
+    subtitle: "Wonen & Structuur",
+    description: "Van intensieve woonondersteuning in leefgroupsvormen tot zelfstandiger studiowonen. Een veilige basis voor elke bewoner.",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200",
+    icon: <ShieldCheck className="text-accent-blue" />,
+    color: "accent-blue"
   },
   {
     title: "Verzorging",
-    subtitle: "Zorg & Warmte",
-    description: "Kwaliteitsvolle fysieke ondersteuning in een warme, huiselijke sfeer. Hier staat het fysieke en emotionele welzijn van iedere burger op de eerste plaats.",
-    url:    "https://images.unsplash.com/photo-1576091160550-2173dad99991?auto=format&fit=crop&q=80&w=800",
-    icon: <HeartPulse className="text-rose-600" />,
+    subtitle: "Kwaliteit van Leven",
+    description: "Kwaliteitsvolle fysieke en emotionele ondersteuning voor mensen met een verstandelijke of meervoudige beperking, NAH of autisme.",
+    image: "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&q=80&w=1200",
+    icon: <HeartPulse className="text-accent-rose" />,
+    color: "accent-rose"
   },
 ];
 
 export default function OnePager() {
-  const [theme, setTheme] = useState<"light" | "night">("light");
   const [isScrolled, setIsScrolled] = useState(false);
   const [showFab, setShowFab] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   useEffect(() => {
     setMounted(true);
@@ -58,104 +68,133 @@ export default function OnePager() {
   };
 
   return (
-    <div className={`relative min-h-screen text-earth-900 transition-colors duration-700 ${theme === 'night' ? 'bg-[#1a1a1a] text-white' : 'bg-white'}`}>
-      {/* Background is handled in layout.tsx */}
-      
+    <div className="relative min-h-screen bg-earth-50 overflow-x-hidden">
       {/* Dynamic Header */}
       <motion.nav 
-        key={mounted ? "nav-ready" : "nav-init"}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-white/80 dark:bg-black/80 backdrop-blur-xl h-20 border-b border-black/5 shadow-sm' : 'h-24 bg-transparent'}`}
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled ? 'h-20 bg-white/70 backdrop-blur-xl border-b border-black/5 premium-shadow' : 'h-28 bg-transparent'}`}
       >
         <div className="container-wide flex justify-between items-center h-full">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => scrollTo('hero')}>
-            <div className="w-10 h-10 relative bg-white rounded-xl p-1 shadow-md">
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
+            <div className="w-12 h-12 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5 group-hover:rotate-6 transition-transform">
               <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
             </div>
-            <span className="font-black text-xl tracking-tight">Zonnehoeve<span className="text-brand-green-dark font-normal ml-1">| Living+</span></span>
+            <div className="flex flex-col">
+              <span className="font-extrabold text-xl tracking-tight leading-none">Zonnehoeve</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-green">Living+ Eke</span>
+            </div>
           </div>
           
-          <div className="hidden md:flex gap-10 items-center font-bold text-sm uppercase tracking-widest text-earth-800/60 dark:text-white/60">
-            <button onClick={() => scrollTo('vision')} className="hover:text-brand-green transition-colors">Visie</button>
-            <button onClick={() => scrollTo('guide')} className="flex items-center gap-2 hover:text-brand-green transition-all group">
-              <Sparkles size={16} className="group-hover:rotate-12 transition-transform" />
-              Digitale Gids
-            </button>
-            <Link href="/admin" className="hover:text-brand-green transition-colors">Portaal Beheer</Link>
+          <div className="hidden lg:flex gap-8 items-center font-bold text-sm tracking-tight text-earth-800">
+            <button onClick={() => scrollTo('vision')} className="hover:text-brand-green transition-colors">Onze Visie</button>
+            <button onClick={() => scrollTo('services')} className="hover:text-brand-green transition-colors">Diensten</button>
+            <button onClick={() => scrollTo('guide')} className="hover:text-brand-green transition-colors">De Gids</button>
+            <Link href="/admin" className="hover:text-brand-green transition-colors">Portaal</Link>
+            <div className="h-6 w-[1px] bg-black/10 mx-2" />
             <button 
               onClick={() => scrollTo('guide')}
-              className="bg-brand-green text-white px-8 py-3 rounded-full shadow-xl shadow-brand-green/20 hover:scale-105 active:scale-95 transition-all text-xs"
+              className="bg-brand-green text-white px-8 py-3 rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-green/20"
             >
               Start Sessie
             </button>
           </div>
+
+          <button className="lg:hidden w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-black/5">
+            <Command size={20} />
+          </button>
         </div>
       </motion.nav>
 
-      {/* Hero Section - Leaner to allow focus on Guide */}
-      <header id="hero" className="min-h-[70vh] flex flex-col items-center justify-center pt-24 px-6 relative overflow-hidden">
-        <div className="container-wide text-center max-w-5xl mx-auto relative z-10">
-          <motion.div 
-            key={mounted ? "hero-ready" : "hero-init"}
-            initial={{ opacity: 0, y: 20 }} 
-            animate={mounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.8 }}
-          >
-            <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-brand-green/10 text-brand-green font-black uppercase tracking-[0.3em] text-[10px] mb-8 rounded-full border border-brand-green/20">
-              <Sparkles size={14} /> Intelligence Meets Care
-            </span>
-            <h1 className="text-5xl md:text-[7rem] font-black leading-[0.9] mb-8 tracking-tighter">
-              Zonnehoeve <br /> <span className="text-brand-green-dark">Digital Portaal</span>
-            </h1>
-            <p className="text-lg md:text-xl text-earth-800/50 dark:text-white/50 font-medium mb-12 max-w-2xl mx-auto leading-relaxed italic">
-              "Kwaliteitsvolle zorg ondersteund door intelligente technologie."
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <button onClick={() => scrollTo('guide')}
-                className="group w-full sm:w-auto px-10 py-5 bg-brand-green text-white rounded-[1.8rem] font-black text-xl shadow-2xl shadow-brand-green/30 hover:scale-105 transition-all flex items-center justify-center gap-4 border-2 border-white/20">
-                Start de Gids <ArrowRight size={22} className="group-hover:translate-x-2 transition-transform" />
-              </button>
-              <button onClick={() => scrollTo('vision')}
-                className="w-full sm:w-auto px-10 py-5 bg-white/40 backdrop-blur-md text-earth-900 border-2 border-black/5 rounded-[1.8rem] font-black text-xl hover:bg-white/60 transition-all">
-                Onze Visie
-              </button>
-            </div>
-          </motion.div>
+      {/* Hero Section */}
+      <header id="hero" ref={heroRef} className="relative h-screen flex items-center overflow-hidden pt-20">
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
+          <Image 
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000" 
+            alt="Zonnehoeve Living+" 
+            fill 
+            className="object-cover brightness-[0.85]"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-earth-50/10 to-earth-50" />
+        </motion.div>
+
+        <div className="container-wide relative z-10 w-full">
+          <div className="max-w-4xl">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="inline-flex items-center gap-2 py-2 px-5 bg-white/80 backdrop-blur-md rounded-full border border-white/50 premium-shadow mb-8">
+                <MapPin size={14} className="text-brand-green" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green">Zonnestraat 13, Eke-Nazareth</span>
+              </div>
+              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-10 text-earth-900">
+                Zonnehoeve <br />
+                <span className="text-gradient">Living+.</span>
+              </h1>
+              <p className="text-xl md:text-3xl text-earth-800 font-bold max-w-2xl leading-tight mb-12">
+                Een warme thuis en professionele begeleiding voor volwassenen met een beperking, NAH of autisme.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-6">
+                <button onClick={() => scrollTo('guide')} className="group px-12 py-6 bg-brand-green text-white rounded-3xl font-black text-xl shadow-2xl shadow-brand-green/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4">
+                  Open de Gids <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
+                </button>
+                <button onClick={() => scrollTo('vision')} className="px-12 py-6 bg-white text-earth-900 border border-black/5 rounded-3xl font-black text-xl hover:bg-earth-50 transition-all shadow-xl">
+                  Onze Visie
+                </button>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </header>
 
-      {/* Vision & Clusters Section */}
-      <section id="vision" className="py-48 px-6 bg-earth-50 dark:bg-[#1f1f1f]/30 border-y border-black/5">
-        <div className="container-wide mx-auto">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-8">
-            <div className="max-w-3xl">
-              <h2 className="text-5xl md:text-7xl font-black mb-8 leading-[1]">Kracht in <br/>Specialisatie.</h2>
-              <p className="text-2xl text-earth-800/40 font-bold">Wij bouwen aan een portaal dat elke zorgcluster ondersteunt met specifieke kennis.</p>
+      {/* Vision Section */}
+      <section id="vision" className="py-32 bg-white relative z-10">
+        <div className="container-wide">
+          <div className="grid lg:grid-cols-2 gap-20 items-center mb-32">
+            <div>
+              <h2 className="text-5xl md:text-7xl font-black mb-10 leading-tight text-earth-900">Dialooggestuurde <br />Begeleiding.</h2>
+              <p className="text-2xl text-earth-800 font-medium leading-relaxed mb-8">
+                Bij Zonnehoeve staan de noden, wensen en de kwaliteit van leven van de individuele cliënt centraal. Wij bieden zorg voor mensen met een verstandelijke of meervoudige beperking, NAH of autisme.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                 {["NAH Ondersteuning", "Autisme Begeleiding", "Inclusief Wonen", "Zinvolle Dagbesteding"].map((label, i) => (
+                   <span key={i} className="px-4 py-2 bg-earth-50 rounded-xl text-earth-800 font-bold text-sm border border-earth-100">{label}</span>
+                 ))}
+              </div>
             </div>
-            <div className="flex gap-4">
-               {clusters.map((_, i) => (
-                 <div key={i} className="w-3 h-3 rounded-full bg-brand-green/20" />
-               ))}
+            <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
+               <div className="absolute inset-0 bg-gradient-to-br from-brand-green/20 via-earth-50 to-white" />
+               <div className="absolute inset-0 flex items-center justify-center">
+                 <div className="text-brand-green/10">
+                   <Users size={300} strokeWidth={0.5} />
+                 </div>
+               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid md:grid-cols-3 gap-8">
             {clusters.map((cluster, i) => (
               <motion.div 
-                key={i} 
-                whileHover={{ y: -15 }}
-                className="bg-white dark:bg-[#252525] rounded-[3rem] p-12 border border-black/5 shadow-2xl shadow-earth-200/20 dark:shadow-none flex flex-col h-full"
+                key={i}
+                whileHover={{ y: -10 }}
+                className="group relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
               >
-                <div className="w-20 h-20 rounded-[1.8rem] bg-earth-50 dark:bg-black/20 flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                  {cluster.icon}
-                </div>
-                <h3 className="text-3xl font-black mb-6">{cluster.title}</h3>
-                <p className="text-earth-800/70 dark:text-white/60 font-medium leading-relaxed mb-auto">
-                  {cluster.description}
-                </p>
-                <div className="mt-12 flex items-center gap-3 text-brand-green font-black text-xs uppercase tracking-widest">
-                  Ontdek Cluster <ArrowRight size={16} />
+                <Image src={cluster.image} alt={cluster.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-earth-900/90 via-earth-900/40 to-transparent" />
+                
+                <div className="absolute inset-0 p-12 flex flex-col justify-end text-white">
+                  <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-8 shadow-xl">
+                    {cluster.icon}
+                  </div>
+                  <h3 className="text-4xl font-black mb-4">{cluster.title}</h3>
+                  <p className="text-white/70 font-semibold mb-8 text-lg">{cluster.description}</p>
+                  <button className="flex items-center gap-3 font-bold uppercase tracking-widest text-xs">
+                    Lees Meer <ChevronRight size={16} />
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -163,161 +202,133 @@ export default function OnePager() {
         </div>
       </section>
 
-      {/* THE DIGITAL GUIDE PREVIEW - THE MAIN OBJECTIVE */}
-      <section id="guide" className="min-h-screen py-20 px-4 relative z-10 bg-white/10 flex flex-col items-center">
-        <div className="container-wide mx-auto">
-          <div className="mb-16 flex flex-col md:flex-row items-center md:items-end justify-between gap-8 text-center md:text-left">
-            <div className="max-w-3xl">
-              <div className="flex items-center gap-3 mb-4 justify-center md:justify-start">
-                 <div className="w-12 h-12 bg-brand-green rounded-2xl flex items-center justify-center text-white shadow-lg shadow-brand-green/20"><HeartHandshake size={24} /></div>
-                 <span className="font-black text-brand-green uppercase tracking-widest text-xs">Uw Digitale Partner</span>
-              </div>
-              <h2 className="text-5xl md:text-7xl font-black leading-tight">De Digitale Gids <span className="text-brand-green-dark">Workstation.</span></h2>
-              <p className="text-xl md:text-2xl text-earth-800/50 font-bold mt-6 leading-relaxed max-w-2xl">
-                Ervaar de volledige kracht van AI-ondersteunde zorg in een dedicated werkomgeving.
-              </p>
-            </div>
-            
-            <Link 
-              href="/gids"
-              className="group px-12 py-6 bg-brand-green text-white rounded-[2rem] font-black text-2xl shadow-2xl shadow-brand-green/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-4 border-2 border-white/20 mb-4"
-            >
-              Open Volledige Gids
-              <ArrowRight size={28} className="group-hover:translate-x-2 transition-transform" />
-            </Link>
-          </div>
-          
-          {/* THE PREVIEW IMAGE - Mockup of the app */}
-          <motion.div 
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            className="relative w-full max-w-6xl mx-auto rounded-[3.5rem] overflow-hidden shadow-center border-8 border-white dark:border-[#333] group cursor-pointer"
-            onClick={() => window.location.href = "/gids"}
-          >
-             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center backdrop-blur-sm">
-                <div className="bg-white text-earth-900 px-10 py-5 rounded-full font-black text-xl flex items-center gap-3 shadow-2xl scale-75 group-hover:scale-100 transition-transform">
-                   <Sparkles className="text-brand-green" /> Lanceren
+      {/* Services Context */}
+      <section id="services" className="py-32 bg-earth-50">
+        <div className="container-wide">
+           <div className="max-w-4xl mx-auto text-center mb-24">
+              <h2 className="text-5xl font-black mb-8">Wonen & Dagbesteding</h2>
+              <p className="text-xl text-earth-800/60 font-bold">Wij bieden diverse woonvormen en ondersteuning op maat van de cliënt.</p>
+           </div>
+           
+           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                { t: "Woonondersteuning", d: "Intensieve begeleiding in leefgroepen en studiowonen." },
+                { t: "Kortverblijf", d: "Tijdelijke opvang en respijtzorg voor wie het nodig heeft." },
+                { t: "Ambulante Hulp", d: "RTH ondersteuning aan huis of op locatie." },
+                { t: "Dagbesteding", d: "Zinvolle vrijetijdsactiviteiten en tewerkstelling." }
+              ].map((service, i) => (
+                <div key={i} className="bg-white rounded-[2.5rem] border border-black/5 shadow-premium overflow-hidden group">
+                   <div className="p-8">
+                      <div className="w-12 h-12 rounded-2xl bg-brand-green/10 flex items-center justify-center mb-6 text-brand-green">
+                         <CheckCircle2 size={24} />
+                      </div>
+                      <h4 className="text-xl font-black mb-3">{service.t}</h4>
+                      <p className="text-earth-800/50 font-bold text-xs leading-relaxed">{service.d}</p>
+                   </div>
                 </div>
-             </div>
-             
-             <div className="aspect-[16/9] relative scale-[1.02] group-hover:scale-100 transition-transform duration-700">
-                <Image 
-                  src="/mockup_gids.png" 
-                  alt="Digitale Gids Preview" 
-                  fill 
-                  className="object-cover"
-                />
-             </div>
-             
-             {/* Dynamic Badge */}
-             <div className="absolute top-8 right-8 z-20 px-6 py-3 bg-brand-yellow text-brand-yellow-dark rounded-full font-black text-xs shadow-xl flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-brand-yellow-dark animate-ping" />
-                V2.5 LIVE
-             </div>
-          </motion.div>
-          
-          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
-             {[
-               { t: "Focus & Rust", d: "Een afleidingsvrije omgeving voor kritieke protocollen." },
-               { t: "Volledig Scherm", d: "Maximale leesbaarheid van documenten en bijlagen." },
-               { t: "Dossier Integratie", d: "Directe export naar formele dossiers en shift-nota's." }
-             ].map((f, i) => (
-               <div key={i} className="text-center p-8 bg-white/50 backdrop-blur-md rounded-3xl border border-white/20">
-                  <h4 className="font-black text-lg mb-2">{f.t}</h4>
-                  <p className="text-sm font-bold text-earth-800/60">{f.d}</p>
-               </div>
-             ))}
-          </div>
+              ))}
+           </div>
         </div>
       </section>
 
-      {/* Statistics & Impact */}
-      <section className="py-48 px-6 overflow-hidden relative">
-         <div className="container-wide mx-auto relative z-10">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
-               <div className="order-2 lg:order-1">
-                  <h2 className="text-5xl md:text-7xl font-black mb-12">Voorbereid op <br/>de toekomst.</h2>
-                  <div className="grid grid-cols-2 gap-10">
-                    {[
-                      { icon: <WifiOff className="text-brand-green"/>, t: "Offline Eerst", d: "Werkt overal, ook in de kelder." },
-                      { icon: <Mic className="text-brand-yellow-dark"/>, t: "Voice-First", d: "Spreek je vraag hardop uit." },
-                      { icon: <Smartphone className="text-blue-500"/>, t: "PWA Tooling", d: "Installeer op elk device." },
-                      { icon: <Layers className="text-rose-500"/>, t: "RAG Intel", d: "Altijd actuele bronnen." },
-                    ].map((feat, i) => (
-                      <div key={i}>
-                        <div className="w-12 h-12 bg-white dark:bg-[#333] rounded-2xl flex items-center justify-center mb-6 shadow-md">{feat.icon}</div>
-                        <h4 className="text-xl font-black mb-2">{feat.t}</h4>
-                        <p className="text-sm font-medium text-earth-800/60 dark:text-white/60">{feat.d}</p>
+      {/* Digital Guide Section */}
+      <section id="guide" className="py-40 bg-earth-900 text-white relative overflow-hidden">
+        {/* Ambient background glows */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-brand-green/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-accent-blue/10 rounded-full blur-[150px] translate-y-1/2 -translate-x-1/3" />
+
+        <div className="container-wide relative z-10">
+          <div className="text-center max-w-4xl mx-auto mb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-white/10 bg-white/5 mb-8">
+                <HeartHandshake className="text-brand-green" size={20} />
+                <span className="font-bold text-xs uppercase tracking-[0.3em] text-brand-green">Digitale Gids Workstation</span>
+              </div>
+              <h2 className="text-6xl md:text-8xl font-black mb-10 tracking-tighter">De kracht van Kennis, <br /><span className="text-brand-green">altijd binnen handbereik.</span></h2>
+              <p className="text-xl md:text-2xl text-white/50 font-medium leading-relaxed">Ervaar een werkomgeving die afleidingsvrij is en direct toegang biedt tot alle protocollen en dossiers van Zonnehoeve.</p>
+            </motion.div>
+          </div>
+
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="relative max-w-6xl mx-auto"
+          >
+             <div className="relative aspect-[16/10] bg-[#1a1a1a] rounded-[3rem] p-4 border-[10px] border-[#333] shadow-inner overflow-hidden">
+                <div className="relative h-full w-full rounded-[1.8rem] overflow-hidden group">
+                   <Image src="/preview_chatbot.png" alt="Zonnehoeve Chatbot Startpagina" fill className="object-cover" />
+                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onClick={() => window.location.href = "/gids"}>
+                      <div className="bg-brand-green text-white px-12 py-5 rounded-full font-black text-xl flex items-center gap-4 shadow-2xl">
+                         <Sparkles /> Start de Chatbot
                       </div>
-                    ))}
-                  </div>
-               </div>
-               <div className="order-1 lg:order-2 relative aspect-square group">
-                  <div className="absolute inset-0 bg-brand-green rounded-full blur-[120px] opacity-20 group-hover:opacity-40 transition-opacity" />
-                  <div className="relative h-full w-full rounded-[4rem] overflow-hidden border-[12px] border-white dark:border-[#333] shadow-2xl">
-                     <Image 
-                       src="https://images.unsplash.com/photo-1576765608535-5104d416bdf6?auto=format&fit=crop&q=80&w=1200" 
-                       alt="Zonnehoeve Kwaliteit" 
-                       fill 
-                       className="object-cover"
-                     />
-                  </div>
-               </div>
-            </div>
-         </div>
+                   </div>
+                </div>
+
+                {/* Hotspots */}
+                <motion.div 
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity }}
+                  className="absolute top-1/4 left-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
+                >
+                   <p className="text-[10px] font-black text-brand-green uppercase mb-2">Smart Search</p>
+                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Vind elk protocol in minder dan een seconde.</p>
+                </motion.div>
+
+                <motion.div 
+                  animate={{ y: [0, 10, 0] }}
+                  transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                  className="absolute bottom-1/4 right-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
+                >
+                   <p className="text-[10px] font-black text-accent-blue uppercase mb-2">Dossier Sync</p>
+                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Directe integratie met zorgdossiers.</p>
+                </motion.div>
+             </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-earth-900 text-white pt-32 pb-16 px-6">
-        <div className="container-wide mx-auto py-12 text-center">
-            <div className="flex items-center justify-center gap-4 mb-10">
-              <div className="w-12 h-12 relative bg-white rounded-xl p-2 rotate-3">
-                <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
-              </div>
-              <span className="font-black text-3xl tracking-tighter">Zonnehoeve</span>
+      <footer className="bg-earth-100 text-earth-900 pt-40 pb-20 px-6">
+        <div className="container-wide">
+          <div className="grid md:grid-cols-4 gap-20 mb-32">
+            <div className="md:col-span-2">
+               <div className="flex items-center gap-4 mb-10">
+                  <div className="w-14 h-14 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
+                    <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
+                  </div>
+                  <span className="font-extrabold text-4xl tracking-tighter">Zonnehoeve</span>
+               </div>
+               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm">
+                  Een sociale voorziening in Eke-Nazareth voor zorg, begeleiding en tewerkstelling.
+               </p>
             </div>
-            <p className="text-white/40 font-bold mb-12">Samen bouwen we aan 100% levenskwaliteit.</p>
-            <div className="flex justify-center gap-8 text-xs font-black uppercase tracking-[0.3em] text-white/30">
-               <button onClick={() => scrollTo('hero')} className="hover:text-white transition-colors">Start</button>
-               <button onClick={() => scrollTo('vision')} className="hover:text-white transition-colors">Over Ons</button>
-               <button onClick={() => scrollTo('guide')} className="hover:text-white transition-colors">Digital Gids</button>
-               <Link href="/admin" className="hover:text-white transition-colors">Admin</Link>
+            <div>
+               <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Afdelingen</h5>
+               <ul className="space-y-6 text-earth-800/60 font-bold">
+                  <li>Zonnehoeve|Living+</li>
+                  <li>Zonnehoeve|Production</li>
+               </ul>
             </div>
+            <div>
+               <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Contact</h5>
+               <ul className="space-y-6 text-earth-800/60 font-bold">
+                  <li className="flex items-center gap-3"><MapPin size={16}/> Zonnestraat 13, Eke</li>
+                  <li className="flex items-center gap-3"><Globe size={16}/> www.zonnehoeve.be</li>
+               </ul>
+            </div>
+          </div>
+          <div className="pt-10 border-t border-black/5 text-center">
+             <span className="text-xs font-bold text-earth-800/20 uppercase tracking-widest">© 2026 Zonnehoeve Living+ . Alle rechten voorbehouden.</span>
+          </div>
         </div>
       </footer>
-
-      {/* FLOATING ACTION BUTTON */}
-      <AnimatePresence>
-        {showFab && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0, y: 50 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0, opacity: 0, y: 50 }}
-            onClick={() => scrollTo('guide')}
-            className="fixed bottom-10 right-10 z-[100] w-20 h-20 bg-brand-green text-white rounded-[2rem] shadow-2xl shadow-brand-green/40 flex flex-col items-center justify-center gap-1 group active:scale-90 transition-transform"
-          >
-            <Sparkles size={28} className="group-hover:rotate-12 transition-transform" />
-            <span className="text-[10px] font-black uppercase tracking-tighter">Gids</span>
-          </motion.button>
-        )}
-      </AnimatePresence>
-      
-      {/* Scroll to top */}
-      <AnimatePresence>
-         {showFab && (
-           <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => scrollTo('hero')}
-            className="fixed bottom-10 right-36 z-[100] w-20 h-20 bg-white border border-black/10 rounded-[2rem] shadow-2xl flex flex-col items-center justify-center gap-1 active:scale-90 transition-transform text-earth-800/50"
-           >
-             <ArrowUp size={24} />
-             <span className="text-[10px] font-black uppercase tracking-tighter">Top</span>
-           </motion.button>
-         )}
-      </AnimatePresence>
     </div>
   );
 }
+
+
