@@ -1,6 +1,9 @@
 import os
 import requests
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Config laden uit environment (of gebruik .env file)
 RAILWAY_URL = os.getenv("RAILWAY_URL", "http://127.0.0.1:8000")
@@ -29,7 +32,7 @@ def upload_documents():
     url = f"{RAILWAY_URL}/api/documents/upload"
     
     for file_path in files:
-        print(f"\n📤 Uploaden: {file_path.name}")
+        print(f"\n- Uploaden: {file_path.name}")
         
         try:
             with open(file_path, "rb") as f:
@@ -37,11 +40,11 @@ def upload_documents():
                 response = requests.post(url, headers=headers, files=files_data)
                 
             if response.status_code == 200:
-                print(f"✅ Succes! {response.json().get('message')}")
+                print(f"[OK] Succes! {response.json().get('message')}")
             else:
-                print(f"❌ Fout tijdens uploaden ({response.status_code}): {response.text}")
+                print(f"[ERR] Fout tijdens uploaden ({response.status_code}): {response.text}")
         except Exception as e:
-            print(f"⚠️ Fout bij het verzenden van {file_path.name}: {e}")
+            print(f"[WARN] Fout bij het verzenden van {file_path.name}: {e}")
 
 if __name__ == "__main__":
     upload_documents()
