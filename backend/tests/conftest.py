@@ -7,7 +7,7 @@ from langchain_core.documents import Document
 load_dotenv()
 
 @pytest.fixture(scope="function", autouse=True)
-async def setup_test_db():
+def setup_test_db():
     """Voorkomt dat we de echte database gebruiken door de engine en logs te mocken."""
     mock_session = AsyncMock()
     mock_session.__aenter__.return_value = mock_session

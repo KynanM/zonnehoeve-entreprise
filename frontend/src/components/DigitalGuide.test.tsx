@@ -6,6 +6,11 @@ import { useDigitalGuide } from '../hooks/useDigitalGuide'
 // Mocking useDigitalGuide hook
 jest.mock('../hooks/useDigitalGuide')
 
+// Mocking usePdfLoader hook
+jest.mock('../hooks/usePdfLoader', () => ({
+  usePdfLoader: jest.fn(() => ({ pdfBlobUrl: null, isPdfLoading: false }))
+}))
+
 // Mocking next/image
 jest.mock('next/image', () => ({
   __esModule: true,
@@ -51,6 +56,7 @@ jest.mock('./Chat/ThreadSidebar', () => () => <div data-testid="thread-sidebar" 
 jest.mock('./Library/DocumentSidebar', () => () => <div data-testid="document-sidebar" />)
 jest.mock('./Library/OutlineView', () => () => <div data-testid="outline-view" />)
 jest.mock('./Library/DocumentToolbar', () => () => <div data-testid="document-toolbar" />)
+jest.mock('./FourMoments', () => () => <div data-testid="four-moments" />)
 
 // Mocking react-resizable-panels
 jest.mock('react-resizable-panels', () => ({
