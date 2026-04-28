@@ -51,7 +51,6 @@ jest.mock('./Chat/ThreadSidebar', () => () => <div data-testid="thread-sidebar" 
 jest.mock('./Library/DocumentSidebar', () => () => <div data-testid="document-sidebar" />)
 jest.mock('./Library/OutlineView', () => () => <div data-testid="outline-view" />)
 jest.mock('./Library/DocumentToolbar', () => () => <div data-testid="document-toolbar" />)
-jest.mock('./VierMomenten', () => () => <div data-testid="vier-momenten" />)
 
 // Mocking react-resizable-panels
 jest.mock('react-resizable-panels', () => ({

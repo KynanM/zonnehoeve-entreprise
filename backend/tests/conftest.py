@@ -30,7 +30,7 @@ async def setup_test_db():
 @pytest.fixture(scope="function", autouse=True)
 def mock_rag_setup():
     """Voorkomt dat setup_rag_chain de echte vector store aanroept."""
-    with patch("api.chat.setup_rag_chain") as mock_setup:
+    with patch("main.setup_rag_chain", new_callable=AsyncMock) as mock_setup:
         mock_setup.return_value = {
             "retrieval": AsyncMock(),
             "generation": AsyncMock()
