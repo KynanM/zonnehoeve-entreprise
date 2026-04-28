@@ -37,7 +37,6 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showMobileDoc, setShowMobileDoc] = useState(false);
-  const [simpleMode, setSimpleMode] = useState(false);
   const [dossierNote, setDossierNote] = useState("");
   const [feedbackExplainer, setFeedbackExplainer] = useState<{index: number, feedback: string} | null>(null);
   const [explainerText, setExplainerText] = useState("");
@@ -52,7 +51,14 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
     if (docParam) {
       handleDocumentClick(pageParam ? `${docParam}#page=${pageParam}` : docParam);
     }
-  }, []);
+
+    // Listen for custom 'open-doc' event from Markdown citations
+    const handleOpenDoc = (e: any) => {
+      if (e.detail) handleDocumentClick(e.detail);
+    };
+    window.addEventListener('open-doc', handleOpenDoc);
+    return () => window.removeEventListener('open-doc', handleOpenDoc);
+  }, [handleDocumentClick]);
 
 
 
@@ -151,17 +157,6 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                       <h1 className={cn("font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h1>
                     </div>
                   </div>
-                    <button 
-                      onClick={() => setSimpleMode(!simpleMode)}
-                      aria-pressed={simpleMode}
-                      aria-label="Prikkelarme modus inschakelen"
-                      className={cn(
-                        "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm border",
-                        simpleMode ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-stone-100 text-stone-500 hover:bg-stone-50"
-                      )}
-                    >
-                      Prikkelarm
-                    </button>
                 </header>
 
                 <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 custom-scrollbar">
