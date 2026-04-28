@@ -8,7 +8,7 @@ from models import ChatThread, ChatLog
 from sqlalchemy import delete
 from unittest.mock import AsyncMock, patch
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_admin_stats_integration():
     """
     Mocked test for admin stats.

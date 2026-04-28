@@ -4,7 +4,7 @@ from main import app
 from unittest.mock import patch, AsyncMock, MagicMock
 from langchain_core.documents import Document
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("api.chat.get_rag_chain")
 async def test_rag_streaming_integration(mock_get_rag_chain):
     """
@@ -57,7 +57,7 @@ async def test_rag_streaming_integration(mock_get_rag_chain):
         
         print("\n✅ RAG Pipeline Integration Test passed!")
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_search_documents_integration():
     """Verify that the /search endpoint works and is not shadowed by /{filename}."""
     transport = httpx.ASGITransport(app=app)
@@ -71,7 +71,7 @@ async def test_search_documents_integration():
         if len(results) > 0:
             assert isinstance(results[0], str)
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_health_check_integration():
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:

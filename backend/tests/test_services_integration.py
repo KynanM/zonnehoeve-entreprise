@@ -3,7 +3,7 @@ import database
 from services.document_service import DocumentService
 from unittest.mock import AsyncMock
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_document_service_integration():
     """
     Mocked test for DocumentService.
@@ -42,7 +42,7 @@ async def test_document_service_integration():
             assert len(outline) == len(meta.outline)
         print(f"Outline item count: {len(outline)}")
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_document_service_fallback():
     """Test fallback logic when DB metadata is missing."""
     async with database.async_session_maker() as session:

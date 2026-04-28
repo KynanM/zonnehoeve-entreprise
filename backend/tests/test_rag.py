@@ -31,7 +31,7 @@ def test_format_docs_duplicates():
     assert formatted.count("Bron: doc.pdf") == 1
     assert formatted.count("Content A") == 1
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_load_all_chunks_bm25_success(mock_vector_store, sample_documents):
     """Test successful loading of chunks for BM25."""
     # Given
@@ -44,7 +44,7 @@ async def test_load_all_chunks_bm25_success(mock_vector_store, sample_documents)
     assert len(docs) == 2
     assert mock_vector_store.asimilarity_search.call_count >= 1
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_load_all_chunks_bm25_failure(mock_vector_store):
     """Test fallback when vector store fails."""
     # Given
@@ -56,7 +56,7 @@ async def test_load_all_chunks_bm25_failure(mock_vector_store):
     # Assert
     assert docs == []
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("api.rag.ChatOpenAI")
 @patch("api.rag.BM25Retriever")
 @patch("api.rag.EnsembleRetriever")

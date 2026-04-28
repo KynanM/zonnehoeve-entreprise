@@ -11,7 +11,7 @@ def mock_db():
 def doc_service(mock_db):
     return DocumentService(mock_db)
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_get_metadata(doc_service, mock_db):
     # Given
     mock_result = MagicMock()
@@ -25,7 +25,7 @@ async def test_get_metadata(doc_service, mock_db):
     assert meta.filename == "test.pdf"
     mock_db.execute.assert_called_once()
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("services.document_service.ChatOpenAI")
 @patch("services.document_service.get_vector_store")
 async def test_get_preview_with_meta(mock_vs, mock_chat, doc_service, mock_db):
@@ -40,7 +40,7 @@ async def test_get_preview_with_meta(mock_vs, mock_chat, doc_service, mock_db):
     # Assert
     assert preview == "Test summary"
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 @patch("services.document_service.ChatOpenAI")
 @patch("services.document_service.get_vector_store")
 @patch("services.document_service.ChatPromptTemplate.from_messages")
