@@ -1,8 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { useDigitalGuide } from "./useDigitalGuide";
-import { api } from "@/lib/api_client";
+import { api } from "../lib/api_client";
 
-jest.mock("@/lib/api_client", () => ({
+jest.mock("../lib/api_client", () => ({
   api: {
     get: jest.fn().mockResolvedValue([]),
     post: jest.fn().mockResolvedValue({}),

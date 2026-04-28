@@ -11,15 +11,14 @@ async def test_chat_endpoint_invalid_input():
     assert response.status_code == 422 # Pydantic validation error
 
 @pytest.mark.anyio
-@patch("api.chat.get_rag_chain")
-async def test_chat_endpoint_chain_failure(mock_get_rag_chain):
+async def test_chat_endpoint_chain_failure():
     """Test chat endpoint when the RAG chain fails."""
     # Given
     mock_retrieval = AsyncMock()
     mock_retrieval.ainvoke.side_effect = Exception("LLM connection failed")
     
     # We return a dict structured as api.rag returns
-    mock_get_rag_chain.return_value = {
+    app.state.rag_chain = {
         "retrieval": mock_retrieval,
         "generation": AsyncMock()
     }
@@ -37,10 +36,12 @@ async def test_delete_non_existent_thread():
     """Test deleting a thread that doesn't exist."""
     # Mocking get_db dependency to return a session that returns None for the thread
     from api.chat import get_db
+    from api.auth import verify_admin
     mock_session = AsyncMock()
     mock_session.get.return_value = None
     
     app.dependency_overrides[get_db] = lambda: mock_session
+    app.dependency_overrides[verify_admin] = lambda: True
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         response = await ac.delete("/api/chat/threads/non-existent-id")

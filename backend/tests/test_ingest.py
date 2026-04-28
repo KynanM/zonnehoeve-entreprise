@@ -31,7 +31,7 @@ def test_split_text():
     assert len(chunks) > 1
     assert all(len(c.page_content) <= 1000 for c in chunks)
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_update_document_metadata_new_file(tmp_path):
     """Test metadata update for a new document using context managers for robustness."""
     # Given
