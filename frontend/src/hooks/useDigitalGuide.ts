@@ -202,7 +202,9 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
   }, [input, isLoading, cooldown, messages, activeThreadId, showToast]);
 
   const handleDocumentClick = useCallback((fullDocRef: string) => {
-    const [doc, pageHash] = fullDocRef.split('#');
+    // Decodeer de URL-encoded bestandsnaam (bijv. %20 naar spatie)
+    const decodedRef = decodeURIComponent(fullDocRef);
+    const [doc, pageHash] = decodedRef.split('#');
     setActiveDocument(doc);
     setActivePage(pageHash || null);
     setRecentDocs(prev => [doc, ...prev.filter(d => d !== doc)].slice(0, 3));

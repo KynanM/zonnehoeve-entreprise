@@ -23,8 +23,21 @@ export default function MarkdownRenderer({ content }: { content: string }) {
         th: ({ node, ...props }) => <th className="p-3 border-b border-black/10" {...props} />,
         td: ({ node, ...props }) => <td className="p-3 border-b border-black/5 text-earth-800" {...props} />,
         a: ({ node, ...props }) => {
-          if (props.href?.startsWith("zonnehoeve://doc/")) {
-            const fullRef = props.href.replace("zonnehoeve://doc/", "");
+          const isDocLink = 
+            props.href?.startsWith("zonnehoeve://doc/") || 
+            props.href?.includes("/api/documents/") ||
+            props.href?.toLowerCase().endsWith(".pdf") ||
+            props.href?.toLowerCase().includes(".pdf#");
+
+          if (isDocLink && props.href) {
+            let fullRef = props.href;
+            if (fullRef.startsWith("zonnehoeve://doc/")) {
+              fullRef = fullRef.replace("zonnehoeve://doc/", "");
+            } else if (fullRef.includes("/api/documents/")) {
+              const parts = fullRef.split("/api/documents/");
+              fullRef = parts[parts.length - 1];
+            }
+            
             return (
                <button 
                  onClick={() => window.dispatchEvent(new CustomEvent('open-doc', {detail: fullRef}))} 
@@ -34,19 +47,6 @@ export default function MarkdownRenderer({ content }: { content: string }) {
                  <span className="opacity-70">📄</span>
                  {props.children}
                </button>
-            );
-          }
-          if (props.href?.includes("/api/documents/")) {
-            const parts = props.href.split("/api/documents/");
-            const fullRef = parts[parts.length - 1];
-            return (
-              <button 
-                onClick={() => window.dispatchEvent(new CustomEvent('open-doc', {detail: fullRef}))} 
-                className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold mx-1 hover:bg-emerald-600 hover:text-white transition-all transform active:scale-95 shadow-sm cursor-pointer border border-emerald-500/20"
-              >
-                <span className="opacity-70">📄</span>
-                {props.children}
-              </button>
             );
           }
           return <a className="text-brand-green-dark underline font-bold hover:text-brand-green transition-colors" target="_blank" rel="noopener noreferrer" {...props} />
