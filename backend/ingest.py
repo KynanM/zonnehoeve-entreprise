@@ -277,11 +277,11 @@ async def main():
         
         await db_session.commit()
 
-    # 3. Ingest documents into vector store (DISABLED - already done)
-    # docs = load_documents()
-    # if docs:
-    #     chunks = split_text(docs)
-    #     save_to_pgvector(chunks)
+    # 3. Ingest documents into vector store
+    docs = load_documents()
+    if docs:
+        chunks = split_text(docs)
+        save_to_pgvector(chunks)
 
 if __name__ == "__main__":
     asyncio.run(main())
