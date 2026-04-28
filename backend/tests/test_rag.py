@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import MagicMock, patch
 from langchain_core.documents import Document
 from api.rag import _format_docs, _load_all_chunks_for_bm25, setup_rag_chain
@@ -30,40 +31,43 @@ def test_format_docs_duplicates():
     assert formatted.count("Bron: doc.pdf") == 1
     assert formatted.count("Content A") == 1
 
-def test_load_all_chunks_bm25_success(mock_vector_store, sample_documents):
+@pytest.mark.asyncio
+async def test_load_all_chunks_bm25_success(mock_vector_store, sample_documents):
     """Test successful loading of chunks for BM25."""
     # Given
-    mock_vector_store.similarity_search.return_value = sample_documents
+    mock_vector_store.asimilarity_search.return_value = sample_documents
     
     # When
-    docs = _load_all_chunks_for_bm25()
+    docs = await _load_all_chunks_for_bm25()
     
     # Assert
     assert len(docs) == 2
-    assert mock_vector_store.similarity_search.call_count >= 1
+    assert mock_vector_store.asimilarity_search.call_count >= 1
 
-def test_load_all_chunks_bm25_failure(mock_vector_store):
+@pytest.mark.asyncio
+async def test_load_all_chunks_bm25_failure(mock_vector_store):
     """Test fallback when vector store fails."""
     # Given
-    mock_vector_store.similarity_search.side_effect = Exception("DB Connection Error")
+    mock_vector_store.asimilarity_search.side_effect = Exception("DB Connection Error")
     
     # When
-    docs = _load_all_chunks_for_bm25()
+    docs = await _load_all_chunks_for_bm25()
     
     # Assert
     assert docs == []
 
+@pytest.mark.asyncio
 @patch("api.rag.ChatOpenAI")
 @patch("api.rag.BM25Retriever")
 @patch("api.rag.EnsembleRetriever")
-def test_setup_rag_chain_structure(mock_ensemble, mock_bm25, mock_chat, mock_vector_store):
+async def test_setup_rag_chain_structure(mock_ensemble, mock_bm25, mock_chat, mock_vector_store):
     """Test if the RAG chain is correctly initialized and structured."""
     # Given
     mock_vs_retriever = MagicMock()
     mock_vector_store.as_retriever.return_value = mock_vs_retriever
     
     # When
-    chains = setup_rag_chain()
+    chains = await setup_rag_chain()
     
     # Assert
     assert isinstance(chains, dict)
