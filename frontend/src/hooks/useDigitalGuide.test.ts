@@ -2,12 +2,26 @@ import { renderHook, act } from "@testing-library/react";
 import { useDigitalGuide } from "./useDigitalGuide";
 import { api } from "@/lib/api_client";
 
-// Option A: We try to use real API where possible, 
-// but for some state transitions we might need to wait for results.
+jest.mock("@/lib/api_client", () => ({
+  api: {
+    get: jest.fn().mockResolvedValue([]),
+    post: jest.fn().mockResolvedValue({}),
+    delete: jest.fn().mockResolvedValue({}),
+    put: jest.fn().mockResolvedValue({}),
+  }
+}));
 
 describe("useDigitalGuide Hook", () => {
-  it("should initialize with default values", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should initialize with default values", async () => {
     const { result } = renderHook(() => useDigitalGuide());
+    
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
     
     expect(result.current.messages).toEqual([]);
     expect(result.current.input).toBe("");
@@ -15,9 +29,13 @@ describe("useDigitalGuide Hook", () => {
     expect(result.current.activeThreadId).toBeNull();
   });
 
-  it("should update input state", () => {
+  it("should update input state", async () => {
     const { result } = renderHook(() => useDigitalGuide());
     
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
     act(() => {
       result.current.setInput("Hello world");
     });
@@ -26,20 +44,23 @@ describe("useDigitalGuide Hook", () => {
   });
 
   it("should fetch threads on mount", async () => {
-    // This will hit the real backend if it's running
+    (api.get as jest.Mock).mockResolvedValueOnce([{ id: "1", title: "Test" }]);
     const { result } = renderHook(() => useDigitalGuide());
     
-    // Wait for atmospheric effects (data fetching)
     await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 0));
     });
     
     expect(Array.isArray(result.current.threads)).toBe(true);
   });
 
-  it("should handle document selection", () => {
+  it("should handle document selection", async () => {
     const { result } = renderHook(() => useDigitalGuide());
     
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
     act(() => {
       result.current.handleDocumentClick("test.pdf#page=1");
     });
@@ -49,9 +70,13 @@ describe("useDigitalGuide Hook", () => {
     expect(result.current.recentDocs).toContain("test.pdf");
   });
 
-  it("should show toast correctly", () => {
+  it("should show toast correctly", async () => {
     const { result } = renderHook(() => useDigitalGuide());
     
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
     act(() => {
         result.current.showToast("Test message");
     });
