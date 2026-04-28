@@ -134,12 +134,12 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     }
   }, [activeDocument]);
 
-  const showToast = (message: string) => {
+  const showToast = useCallback((message: string) => {
     setToast({ show: true, message });
     setTimeout(() => setToast({ show: false, message: "" }), 3000);
-  };
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent | string) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent | string) => {
     if (typeof e !== "string") e.preventDefault();
     const prompt = typeof e === "string" ? e : input;
     if (!prompt.trim() || isLoading || cooldown > 0) return;
@@ -199,14 +199,14 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
       setIsLoading(false);
       setCooldown(2);
     }
-  };
+  }, [input, isLoading, cooldown, messages, activeThreadId, showToast]);
 
-  const handleDocumentClick = (fullDocRef: string) => {
+  const handleDocumentClick = useCallback((fullDocRef: string) => {
     const [doc, pageHash] = fullDocRef.split('#');
     setActiveDocument(doc);
     setActivePage(pageHash || null);
     setRecentDocs(prev => [doc, ...prev.filter(d => d !== doc)].slice(0, 3));
-  };
+  }, []);
 
   const handleDownload = (doc: string, e?: React.MouseEvent) => {
     if (e) {

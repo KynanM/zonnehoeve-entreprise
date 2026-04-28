@@ -247,11 +247,41 @@ async def main():
         await update_document_metadata_async(db)
         break # get_db is a generator, we only need one session
         
-    # 2. Ingest documents into vector store
-    docs = load_documents()
-    if docs:
-        chunks = split_text(docs)
-        save_to_pgvector(chunks)
+    # 2. Sync raw files to DocumentFile table for the viewer
+    from models import DocumentFile
+    from sqlalchemy import select
+    from database import async_session_maker
+    import mimetypes
+    
+    files = [
+        f for f in os.listdir(RAW_DATA_PATH)
+        if os.path.isfile(os.path.join(RAW_DATA_PATH, f)) and f != ".gitkeep"
+    ]
+    
+    async with async_session_maker() as db_session:
+        for filename in files:
+            # Check if already in DB
+            existing = (await db_session.execute(
+                select(DocumentFile).where(DocumentFile.filename == filename)
+            )).scalar_one_or_none()
+            
+            if not existing:
+                filepath = os.path.join(RAW_DATA_PATH, filename)
+                with open(filepath, "rb") as f:
+                    content = f.read()
+                
+                mime_type = mimetypes.guess_type(filename)[0] or "application/pdf"
+                new_file = DocumentFile(filename=filename, data=content, mime_type=mime_type)
+                db_session.add(new_file)
+                logger.info(f"📂 Bestand geüpload naar database opslag: {filename}")
+        
+        await db_session.commit()
+
+    # 3. Ingest documents into vector store (DISABLED - already done)
+    # docs = load_documents()
+    # if docs:
+    #     chunks = split_text(docs)
+    #     save_to_pgvector(chunks)
 
 if __name__ == "__main__":
     asyncio.run(main())

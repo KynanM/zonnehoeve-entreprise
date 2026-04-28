@@ -9,7 +9,10 @@ export default function ServiceWorkerRegistrar() {
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
     // Registreer de service worker
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -59,6 +62,8 @@ export default function ServiceWorkerRegistrar() {
     setDismissed(true);
     localStorage.setItem("pwa-install-dismissed", "true");
   };
+
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>

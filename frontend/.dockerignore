@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+build
+.git
+.gitignore
+.dockerignore
+README.md
+Dockerfile
+package-lock.json
+npm-debug.log

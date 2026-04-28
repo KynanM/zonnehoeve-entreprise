@@ -11,7 +11,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import DigitalGuide from "@/components/DigitalGuide";
-import AmbientBackground from "@/components/AmbientBackground";
 
 const clusters = [
   {
@@ -32,7 +31,7 @@ const clusters = [
     title: "Verzorging",
     subtitle: "Zorg & Warmte",
     description: "Kwaliteitsvolle fysieke ondersteuning in een warme, huiselijke sfeer. Hier staat het fysieke en emotionele welzijn van iedere burger op de eerste plaats.",
-    url: "https://images.unsplash.com/photo-1576765608535-5104d416bdf6?auto=format&fit=crop&q=80&w=800",
+    url:    "https://images.unsplash.com/photo-1576091160550-2173dad99991?auto=format&fit=crop&q=80&w=800",
     icon: <HeartPulse className="text-rose-600" />,
   },
 ];
@@ -41,8 +40,10 @@ export default function OnePager() {
   const [theme, setTheme] = useState<"light" | "night">("light");
   const [isScrolled, setIsScrolled] = useState(false);
   const [showFab, setShowFab] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
       setShowFab(window.scrollY > 500);
@@ -58,10 +59,11 @@ export default function OnePager() {
 
   return (
     <div className={`relative min-h-screen text-earth-900 transition-colors duration-700 ${theme === 'night' ? 'bg-[#1a1a1a] text-white' : 'bg-white'}`}>
-      <AmbientBackground />
+      {/* Background is handled in layout.tsx */}
       
       {/* Dynamic Header */}
       <motion.nav 
+        key={mounted ? "nav-ready" : "nav-init"}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-white/80 dark:bg-black/80 backdrop-blur-xl h-20 border-b border-black/5 shadow-sm' : 'h-24 bg-transparent'}`}
@@ -94,7 +96,12 @@ export default function OnePager() {
       {/* Hero Section - Leaner to allow focus on Guide */}
       <header id="hero" className="min-h-[70vh] flex flex-col items-center justify-center pt-24 px-6 relative overflow-hidden">
         <div className="container-wide text-center max-w-5xl mx-auto relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div 
+            key={mounted ? "hero-ready" : "hero-init"}
+            initial={{ opacity: 0, y: 20 }} 
+            animate={mounted ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.8 }}
+          >
             <span className="inline-flex items-center gap-2 py-1.5 px-4 bg-brand-green/10 text-brand-green font-black uppercase tracking-[0.3em] text-[10px] mb-8 rounded-full border border-brand-green/20">
               <Sparkles size={14} /> Intelligence Meets Care
             </span>
@@ -144,7 +151,7 @@ export default function OnePager() {
                   {cluster.icon}
                 </div>
                 <h3 className="text-3xl font-black mb-6">{cluster.title}</h3>
-                <p className="text-earth-800/50 dark:text-white/40 font-bold leading-relaxed mb-auto">
+                <p className="text-earth-800/70 dark:text-white/60 font-medium leading-relaxed mb-auto">
                   {cluster.description}
                 </p>
                 <div className="mt-12 flex items-center gap-3 text-brand-green font-black text-xs uppercase tracking-widest">
@@ -218,7 +225,7 @@ export default function OnePager() {
              ].map((f, i) => (
                <div key={i} className="text-center p-8 bg-white/50 backdrop-blur-md rounded-3xl border border-white/20">
                   <h4 className="font-black text-lg mb-2">{f.t}</h4>
-                  <p className="text-sm font-bold text-earth-800/40">{f.d}</p>
+                  <p className="text-sm font-bold text-earth-800/60">{f.d}</p>
                </div>
              ))}
           </div>
@@ -241,7 +248,7 @@ export default function OnePager() {
                       <div key={i}>
                         <div className="w-12 h-12 bg-white dark:bg-[#333] rounded-2xl flex items-center justify-center mb-6 shadow-md">{feat.icon}</div>
                         <h4 className="text-xl font-black mb-2">{feat.t}</h4>
-                        <p className="text-sm font-bold text-earth-800/40 dark:text-white/40">{feat.d}</p>
+                        <p className="text-sm font-medium text-earth-800/60 dark:text-white/60">{feat.d}</p>
                       </div>
                     ))}
                   </div>

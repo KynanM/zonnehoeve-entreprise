@@ -1,32 +1,34 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-green: #059669; /* Emerald 600 - more professional */
-  --color-brand-green-dark: #065f46; /* Emerald 800 */
-  --color-brand-yellow: #f59e0b; /* Amber 500 */
-  --color-brand-yellow-dark: #b45309; /* Amber 700 */
-  --color-earth-50: #fdfdfc; /* Warm paper white */
-  --color-earth-100: #fafaf9; /* Warm stone 50 */
-  --color-earth-200: #f5f5f4; /* Warm stone 100 */
-  --color-earth-800: #292524; /* Stone 800 */
-  --color-earth-900: #1c1917; /* Stone 900 */
+  --color-brand-green: #059669; /* Emerald 600 */
+  --color-brand-green-dark: #064e3b; /* Emerald 900 - better contrast */
+  --color-brand-yellow: #d97706; /* Amber 600 - better contrast */
+  --color-brand-yellow-dark: #92400e; /* Amber 800 */
+  --color-earth-50: #fdfdfc;
+  --color-earth-100: #fafaf9;
+  --color-earth-200: #f5f5f4;
+  --color-earth-800: #292524;
+  --color-earth-900: #1c1917;
   
   /* Night Mode / Warmth Colors */
-  --color-night-bg: #0c0a09; /* Stone 950 */
-  --color-night-panel: #1c1917; /* Stone 900 */
-  --color-night-text: #e7e5e4; /* Stone 200 */
-  --color-night-muted: #78716c; /* Stone 500 */
-  --color-night-warm: #44403c; /* Stone 700 */
+  --color-night-bg: #0c0a09;
+  --color-night-panel: #1c1917;
+  --color-night-text: #f5f5f4; /* Warmer, higher contrast */
+  --color-night-muted: #a8a29e; /* Stone 400 - better contrast */
+  --color-night-warm: #44403c;
 }
 
 @layer base {
   body {
     background-color: var(--color-earth-50);
-    color: var(--color-earth-800);
+    color: var(--color-earth-900);
     font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1.05rem; /* Larger base font */
+    line-height: 1.6; /* Better readability */
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.011em;
     transition: background-color 0.5s ease, color 0.5s ease;
   }
 
