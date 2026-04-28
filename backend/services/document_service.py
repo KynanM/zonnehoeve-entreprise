@@ -103,3 +103,33 @@ class DocumentService:
         except Exception as e:
             logger.error(f"Error generating outline for {filename}: {e}")
             return []
+
+    async def delete_document(self, filename: str) -> bool:
+        """Verwijdert een document uit alle opslaglagen (Files, Metadata, Vector Store)."""
+        from models import DocumentFile, DocumentMetadata
+        from sqlalchemy import delete
+        
+        try:
+            # 1. Verwijder uit DocumentFile (Viewer)
+            await self.db.execute(delete(DocumentFile).where(DocumentFile.filename == filename))
+            
+            # 2. Verwijder uit DocumentMetadata
+            await self.db.execute(delete(DocumentMetadata).where(DocumentMetadata.filename == filename))
+            
+            # 3. Verwijder uit Vector Store
+            # Let op: LangChain PGVector's delete() verwacht IDs.
+            # We kunnen direct SQL gebruiken voor meer efficiëntie bij metadata-filtering.
+            vector_store = get_vector_store()
+            # De tabelnaam is standaard 'langchain_pg_embedding' tenzij anders geconfigureerd.
+            # We filteren op de metadata kolom (jsonb).
+            sql = "DELETE FROM langchain_pg_embedding WHERE cmetadata->>'source' = :filename"
+            from sqlalchemy import text
+            await self.db.execute(text(sql), {"filename": filename})
+            
+            await self.db.commit()
+            logger.info(f"✅ Document '{filename}' succesvol verwijderd uit alle systemen.")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Fout bij verwijderen van document '{filename}': {e}")
+            await self.db.rollback()
+            return False

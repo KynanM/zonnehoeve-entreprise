@@ -27,10 +27,23 @@ async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) 
     ]
 
 @router.get("/")
-async def list_documents(db: AsyncSession = Depends(get_db)) -> List[str]:
-    """Leest bestanden uit de database in plaats van lokale disk."""
-    result = await db.execute(select(DocumentFile.filename))
-    return result.scalars().all()
+async def list_documents(db: AsyncSession = Depends(get_db)):
+    """Leest bestanden uit de database met bijbehorende metadata."""
+    from models import DocumentMetadata
+    result = await db.execute(
+        select(DocumentFile.filename, DocumentFile.uploaded_at, DocumentFile.mime_type, DocumentMetadata.last_ingested)
+        .outerjoin(DocumentMetadata, DocumentFile.filename == DocumentMetadata.filename)
+    )
+    docs = result.all()
+    return [
+        {
+            "filename": d.filename, 
+            "uploaded_at": d.uploaded_at.isoformat() if d.uploaded_at else None,
+            "mime_type": d.mime_type,
+            "is_ingested": d.last_ingested is not None
+        }
+        for d in docs
+    ]
 
 @router.get("/search")
 async def search_documents(q: str, db: AsyncSession = Depends(get_db)) -> List[str]:
@@ -168,3 +181,15 @@ async def upload_document(
     background_tasks.add_task(process_single_file_from_memory, filename, content)
     
     return {"status": "success", "message": f"{filename} succesvol geüpload en in wachtrij gezet voor AI vectorisatie."}
+
+@router.delete("/{filename}", dependencies=[Depends(verify_admin)])
+async def delete_document(filename: str, db: AsyncSession = Depends(get_db)):
+    """Admin endpoint om documenten volledig te verwijderen."""
+    from services.document_service import DocumentService
+    service = DocumentService(db)
+    success = await service.delete_document(filename)
+    
+    if not success:
+        raise HTTPException(status_code=500, detail=f"Kon document {filename} niet volledig verwijderen.")
+        
+    return {"status": "success", "message": f"Document {filename} is verwijderd."}
