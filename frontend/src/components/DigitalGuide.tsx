@@ -142,7 +142,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                   theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100"
                 )}>
                   <div className="flex items-center gap-6">
-                    <Link href="/" className="hover:text-emerald-500 transition-colors text-stone-400">
+                    <Link href="/" aria-label="Terug naar Home" className="hover:text-emerald-500 transition-colors text-stone-400">
                       <Home size={20} />
                     </Link>
                     <div className="w-px h-6 bg-stone-200 dark:bg-stone-800" />
@@ -151,14 +151,17 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                       <h1 className={cn("font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h1>
                     </div>
                   </div>
-                  <button onClick={() => setSimpleMode(!simpleMode)}
-                    className={cn(
-                      "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm border",
-                      simpleMode ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-stone-100 text-stone-500 hover:bg-stone-50"
-                    )}
-                  >
-                    Prikkelarm
-                  </button>
+                    <button 
+                      onClick={() => setSimpleMode(!simpleMode)}
+                      aria-pressed={simpleMode}
+                      aria-label="Prikkelarme modus inschakelen"
+                      className={cn(
+                        "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shadow-sm border",
+                        simpleMode ? "bg-emerald-600 border-emerald-600 text-white" : "bg-white border-stone-100 text-stone-500 hover:bg-stone-50"
+                      )}
+                    >
+                      Prikkelarm
+                    </button>
                 </header>
 
                 <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 custom-scrollbar">
@@ -301,7 +304,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
           <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="fixed inset-0 z-[120] bg-white lg:hidden flex flex-col">
             <div className="p-4 border-b flex items-center justify-between">
               <span className="font-bold truncate">{activeDocument}</span>
-              <button onClick={() => setShowMobileDoc(false)} className="p-2 bg-stone-100 rounded-xl"><X size={20} /></button>
+              <button onClick={() => setShowMobileDoc(false)} aria-label="Sluit document" className="p-2 bg-stone-100 rounded-xl"><X size={20} /></button>
             </div>
             <div className="flex-1 relative bg-white">
               {pdfBlobUrl ? (
