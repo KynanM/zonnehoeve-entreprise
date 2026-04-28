@@ -23,14 +23,15 @@ export default function MarkdownRenderer({ content }: { content: string }) {
         th: ({ node, ...props }) => <th className="p-3 border-b border-black/10" {...props} />,
         td: ({ node, ...props }) => <td className="p-3 border-b border-black/5 text-earth-800" {...props} />,
         a: ({ node, ...props }) => {
+          const href = props.href || "";
           const isDocLink = 
-            props.href?.startsWith("zonnehoeve://doc/") || 
-            props.href?.includes("/api/documents/") ||
-            props.href?.toLowerCase().endsWith(".pdf") ||
-            props.href?.toLowerCase().includes(".pdf#");
+            href.startsWith("zonnehoeve://doc/") || 
+            href.includes("/api/documents/") ||
+            /\.pdf($|[#?])/i.test(href);
 
-          if (isDocLink && props.href) {
-            let fullRef = props.href;
+          if (isDocLink) {
+            let fullRef = href;
+            // Verwijder prefixen om de zuivere bestandsnaam + eventuele pagina over te houden
             if (fullRef.startsWith("zonnehoeve://doc/")) {
               fullRef = fullRef.replace("zonnehoeve://doc/", "");
             } else if (fullRef.includes("/api/documents/")) {
@@ -38,9 +39,15 @@ export default function MarkdownRenderer({ content }: { content: string }) {
               fullRef = parts[parts.length - 1];
             }
             
+            // Verwijder query parameters (zoals ?download=true) maar behoud hashes (#page=1)
+            fullRef = fullRef.split('?')[0];
+
             return (
                <button 
-                 onClick={() => window.dispatchEvent(new CustomEvent('open-doc', {detail: fullRef}))} 
+                 onClick={(e) => {
+                   e.preventDefault();
+                   window.dispatchEvent(new CustomEvent('open-doc', {detail: fullRef}));
+                 }} 
                  className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-700 px-2.5 py-1 rounded-full text-[10px] font-bold mx-1 hover:bg-emerald-600 hover:text-white transition-all transform active:scale-95 shadow-sm cursor-pointer border border-emerald-500/20"
                  title={`Open ${decodeURIComponent(fullRef.split('#')[0])}`}
                >
