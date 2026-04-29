@@ -68,9 +68,19 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
 
   const fetchDocs = async () => {
     try {
-      const data = await api.get<string[]>("/api/documents");
+      const data = await api.get<any[]>("/api/documents");
       if (Array.isArray(data)) {
-        setAvailableDocs(data);
+        // We mappen naar enkel de filenames voor backwards compatibility met de Gids componenten.
+        // We voegen extra checks toe om te garanderen dat we alleen geldige strings overhouden.
+        const filenames = data
+          .map(d => {
+            if (typeof d === 'string') return d;
+            if (d && typeof d === 'object' && d.filename) return d.filename;
+            return null;
+          })
+          .filter((f): f is string => typeof f === 'string');
+          
+        setAvailableDocs(filenames);
       } else {
         setAvailableDocs([]);
       }
