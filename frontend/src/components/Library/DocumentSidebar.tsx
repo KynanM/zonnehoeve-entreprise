@@ -40,7 +40,14 @@ export default function DocumentSidebar({
   const [hoveredDoc, setHoveredDoc] = useState<string | null>(null);
 
   // Sortering: Pinned eerst, dan Alphabetisch
+  // Sortering: Pinned eerst, dan Alphabetisch
   const sortedDocs = [...availableDocs].sort((a, b) => {
+    // Defensieve checks om localeCompare crashes te voorkomen
+    if (typeof a !== 'string' || typeof b !== 'string') {
+      console.warn("DocumentSidebar: Ongeldige data in availableDocs", { a, b });
+      return 0;
+    }
+    
     const aPinned = pinnedDocs.includes(a);
     const bPinned = pinnedDocs.includes(b);
     if (aPinned && !bPinned) return -1;

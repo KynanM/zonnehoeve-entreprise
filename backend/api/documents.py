@@ -29,6 +29,7 @@ async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) 
 @router.get("/")
 async def list_documents(db: AsyncSession = Depends(get_db)):
     """Leest bestanden uit de database met bijbehorende metadata."""
+    logger.info("LIST_DOCUMENTS request received")
     try:
         # We gebruiken mappings() om de resultaten als dictionaries te kunnen benaderen,
         # wat veiliger is bij complexe joins met mogelijke kolomnaam-overlappen.
