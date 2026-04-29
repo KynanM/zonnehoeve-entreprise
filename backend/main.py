@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+import os
 from contextlib import asynccontextmanager
 import uvicorn
 
