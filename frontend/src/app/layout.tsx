@@ -21,7 +21,7 @@ export const viewport = {
 
 export const metadata: Metadata = {
   title: "Zonnehoeve Living+ | Digitale Gids",
-  description: "Het centrale platform voor kennis, protocollen en ondersteuning van Zonnehoeve Zorgboerderij.",
+  description: "Het centrale platform voor kennis, protocollen en ondersteuning van Zonnehoeve Living+.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
