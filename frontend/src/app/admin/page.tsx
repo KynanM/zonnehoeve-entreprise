@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Lock, Clock, ThumbsUp, ThumbsDown, FileText, ArrowLeft,
   TrendingUp, Star, BarChart2, BookOpen, CheckCircle2, AlertTriangle,
@@ -7,10 +8,10 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { api } from "@/lib/api_client";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 const ADMIN_PASSWORD = "REDACTED_ADMIN_KEY";
-
-// ... (MiniBarChart and SatisfactionRing remain the same)
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState("");
@@ -18,6 +19,12 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState<{show: boolean, message: string}>({show: false, message: ""});
+
+  const showToast = (message: string) => {
+    setToast({ show: true, message });
+    setTimeout(() => setToast({ show: false, message: "" }), 3000);
+  };
   const [isDocsLoading, setIsDocsLoading] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"stats" | "docs">("stats");
@@ -131,6 +138,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-earth-50 via-white to-brand-green/5 text-earth-900 font-sans">
+      <AnimatePresence>
+        {toast.show && (
+          <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] bg-brand-green-dark text-white px-8 py-3 rounded-full shadow-2xl font-bold border-2 border-white text-sm">
+            {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Header */}
       <header className="h-16 border-b border-black/5 bg-white/80 backdrop-blur-md flex items-center justify-between px-6 lg:px-10 z-20 shadow-sm sticky top-0">
         <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
