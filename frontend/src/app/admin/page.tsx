@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import {
   Lock, Clock, ThumbsUp, ThumbsDown, FileText, ArrowLeft,
@@ -12,6 +14,42 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 const ADMIN_PASSWORD = "REDACTED_ADMIN_KEY";
+
+const MiniBarChart = ({ data }: { data: any[] }) => {
+  if (!data || data.length === 0) return null;
+  const max = Math.max(...data.map(d => d.count), 1);
+  return (
+    <div className="flex items-end gap-1 h-12 w-full px-1">
+      {data.map((d, i) => (
+        <div 
+          key={i} 
+          className="bg-brand-green/20 rounded-t-sm transition-all hover:bg-brand-green-dark/40"
+          style={{ height: `${(d.count / max) * 100}%`, width: `${100 / data.length}%` }}
+          title={`${d.date}: ${d.count} vragen`}
+        />
+      ))}
+    </div>
+  );
+};
+
+const SatisfactionRing = ({ percentage }: { percentage: number }) => {
+  const radius = 35;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  
+  return (
+    <div className="relative w-24 h-24 flex items-center justify-center">
+      <svg className="w-full h-full transform -rotate-90">
+        <circle cx="48" cy="48" r={radius} stroke="currentColor" strokeWidth="8" fill="transparent" className="text-earth-100" />
+        <circle cx="48" cy="48" r={radius} stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={circumference} style={{ strokeDashoffset }} className="text-brand-green transition-all duration-1000" />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <span className="text-xl font-black text-earth-900">{percentage}%</span>
+        <span className="text-[8px] font-bold text-earth-800/40 uppercase tracking-widest">Score</span>
+      </div>
+    </div>
+  );
+};
 
 export default function AdminDashboard() {
   const [password, setPassword] = useState("");
@@ -247,7 +285,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-earth-800/50">Op basis van feedback</p>
                       </div>
                     </div>
-                    <SatisfactionRing rate={stats.satisfaction_rate} />
+                    <SatisfactionRing percentage={stats.satisfaction_rate} />
                     <div className="flex gap-4 text-sm font-bold">
                       <span className="flex items-center gap-1.5 text-brand-green"><CheckCircle2 size={14}/> {stats.thumbs_up} goed</span>
                       <span className="flex items-center gap-1.5 text-red-400"><AlertTriangle size={14}/> {stats.thumbs_down} slecht</span>
