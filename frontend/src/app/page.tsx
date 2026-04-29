@@ -249,7 +249,7 @@ export default function OnePager() {
                 <span className="font-bold text-xs uppercase tracking-[0.3em] text-brand-green">Digitale Gids Workstation</span>
               </div>
               <h2 className="text-6xl md:text-8xl font-black mb-10 tracking-tighter">De kracht van Kennis, <br /><span className="text-brand-green">altijd binnen handbereik.</span></h2>
-              <p className="text-xl md:text-2xl text-white/50 font-medium leading-relaxed">Ervaar een werkomgeving die afleidingsvrij is en direct toegang biedt tot alle protocollen en dossiers van Zonnehoeve.</p>
+              <p className="text-xl md:text-2xl text-white/50 font-medium leading-relaxed">Ervaar een werkomgeving die afleidingsvrij is en direct toegang biedt tot alle protocollen van Zonnehoeve.</p>
             </motion.div>
           </div>
 
@@ -284,8 +284,8 @@ export default function OnePager() {
                   transition={{ duration: 5, repeat: Infinity, delay: 1 }}
                   className="absolute bottom-1/4 right-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
                 >
-                   <p className="text-[10px] font-black text-accent-blue uppercase mb-2">Dossier Sync</p>
-                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Directe integratie met zorgdossiers.</p>
+                   <p className="text-[10px] font-black text-accent-blue uppercase mb-2">Dossier Export</p>
+                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Exporteer notities direct naar het zorgdossier.</p>
                 </motion.div>
              </div>
           </motion.div>
