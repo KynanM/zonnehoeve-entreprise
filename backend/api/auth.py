@@ -1,5 +1,6 @@
 import os
 import logging
+from fastapi import Header, HTTPException
 
 logger = logging.getLogger(__name__)
 ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
