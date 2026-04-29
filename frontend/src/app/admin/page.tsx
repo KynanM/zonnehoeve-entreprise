@@ -26,12 +26,21 @@ export default function AdminDashboard() {
 
   const fetchStats = async () => {
     setIsLoading(true);
+    setStats(null); // Reset stats before fetching
     try {
       const data = await api.get<any>("/api/admin/stats", {
         headers: { "x-admin-key": password }
       });
-      setStats(data);
-    } catch (e) { console.error(e); }
+      if (data && !data.error) {
+        setStats(data);
+      } else {
+        console.error("Stats API returned error:", data);
+        showToast("Fout bij ophalen statistieken: " + (data?.error || "Onbekende fout"));
+      }
+    } catch (e: any) { 
+      console.error("Connection error in admin stats:", e);
+      showToast("Kan geen verbinding maken met de backend.");
+    }
     finally { setIsLoading(false); }
   };
 

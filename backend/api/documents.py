@@ -29,21 +29,38 @@ async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) 
 @router.get("/")
 async def list_documents(db: AsyncSession = Depends(get_db)):
     """Leest bestanden uit de database met bijbehorende metadata."""
-    from models import DocumentMetadata
-    result = await db.execute(
-        select(DocumentFile.filename, DocumentFile.uploaded_at, DocumentFile.mime_type, DocumentMetadata.last_ingested)
-        .outerjoin(DocumentMetadata, DocumentFile.filename == DocumentMetadata.filename)
-    )
-    docs = result.all()
-    return [
-        {
-            "filename": d.filename, 
-            "uploaded_at": d.uploaded_at.isoformat() if d.uploaded_at else None,
-            "mime_type": d.mime_type,
-            "is_ingested": d.last_ingested is not None
-        }
-        for d in docs
-    ]
+    try:
+        # We gebruiken mappings() om de resultaten als dictionaries te kunnen benaderen,
+        # wat veiliger is bij complexe joins met mogelijke kolomnaam-overlappen.
+        result = await db.execute(
+            select(
+                DocumentFile.filename, 
+                DocumentFile.uploaded_at, 
+                DocumentFile.mime_type, 
+                DocumentMetadata.last_ingested
+            )
+            .outerjoin(DocumentMetadata, DocumentFile.filename == DocumentMetadata.filename)
+        )
+        docs = result.mappings().all()
+        
+        return [
+            {
+                "filename": d["filename"], 
+                "uploaded_at": d["uploaded_at"].isoformat() if d["uploaded_at"] else None,
+                "mime_type": d["mime_type"],
+                "is_ingested": d["last_ingested"] is not None
+            }
+            for d in docs
+        ]
+    except Exception as e:
+        logger.error(f"Fout bij ophalen documentenlijst: {e}")
+        # Fallback naar enkel de filenames uit DocumentFile als de join faalt
+        try:
+            result = await db.execute(select(DocumentFile.filename))
+            filenames = result.scalars().all()
+            return [{"filename": f, "uploaded_at": None, "mime_type": "application/pdf", "is_ingested": False} for f in filenames]
+        except:
+            return []
 
 @router.get("/search")
 async def search_documents(q: str, db: AsyncSession = Depends(get_db)) -> List[str]:
