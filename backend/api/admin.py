@@ -4,9 +4,13 @@ from database import get_db
 from services.stats_service import StatsService
 from api.auth import verify_admin
 
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
 @router.get("/stats", dependencies=[Depends(verify_admin)])
 async def get_stats(db: AsyncSession = Depends(get_db)):
+    logger.info("ADMIN_STATS request received")
     service = StatsService(db)
     return await service.get_dashboard_stats()
