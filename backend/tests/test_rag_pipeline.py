@@ -57,7 +57,7 @@ async def test_rag_streaming_integration():
         print("\n✅ RAG Pipeline Integration Test passed!")
 
 @pytest.mark.anyio
-@patch("vector_store.get_vector_store")
+@patch("api.documents.get_vector_store")
 async def test_search_documents_integration(mock_get_vector_store):
     """Verify that the /search endpoint works and is not shadowed by /{filename}."""
     # Mock the vector store

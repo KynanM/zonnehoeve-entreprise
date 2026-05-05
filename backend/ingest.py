@@ -3,20 +3,23 @@ import hashlib
 import logging
 from datetime import datetime, timezone
 from typing import List, Dict, Type
+import asyncio
+import tempfile
+import mimetypes
 
 from langchain_core.documents import Document
 from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders import PDFPlumberLoader, DirectoryLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import asyncio
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from database import get_db, async_session_maker
-from models import DocumentFile, DocumentMetadata
-
-from vector_store import get_vector_store
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
+
+from database import get_db, async_session_maker
+from models import DocumentFile, DocumentMetadata
+from vector_store import get_vector_store
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
@@ -66,11 +69,8 @@ async def analyze_document_content(text: str) -> Dict:
         logger.error(f"❌ Fout bij document analyse: {e}")
         return {"summary": "Geen samenvatting beschikbaar.", "outline": []}
 
-async def update_document_metadata_async(db_session) -> None:
+async def update_document_metadata_async(db_session: AsyncSession) -> None:
     """Vergelijkt bestandshashes en logt wijzigingen in de DocumentMetadata tabel."""
-    from models import DocumentMetadata
-    from sqlalchemy import select
-
     if not os.path.exists(RAW_DATA_PATH):
         return
 
@@ -151,8 +151,6 @@ def split_text(documents: List[Document]) -> List[Document]:
     logger.info(f"   - Totaal aantal chunks: {len(chunks)}")
     return chunks
 
-import tempfile
-
 def save_to_pgvector(chunks: List[Document]) -> None:
     logger.info("💾 Opslaan in PostgreSQL Vector Database...")
     # Normaliseer bron-paden naar enkel de bestandsnaam voor cross-platform compatibiliteit
@@ -167,9 +165,6 @@ def save_to_pgvector(chunks: List[Document]) -> None:
 async def process_single_file_from_memory(filename: str, content: bytes) -> None:
     """Verwerkt een bestand rechtstreeks vanuit Database BLOB geheugen."""
     logger.info(f"🚀 Start processing tijdelijke file via AI: {filename}")
-    from models import DocumentMetadata
-    from database import async_session_maker
-    from sqlalchemy import select
     
     # 1. Update hash detectie
     sha256 = hashlib.sha256()
@@ -221,14 +216,14 @@ async def process_single_file_from_memory(filename: str, content: bytes) -> None
                 doc_meta = DocumentMetadata(
                     filename=filename,
                     file_hash=current_hash,
-                    last_ingested=datetime.utcnow(),
+                    last_ingested=datetime.now(timezone.utc),
                     summary=analysis.get("summary"),
                     outline=analysis.get("outline")
                 )
                 db_session.add(doc_meta)
             else:
                 existing.file_hash = current_hash
-                existing.last_modified = datetime.utcnow()
+                existing.last_modified = datetime.now(timezone.utc)
                 existing.summary = analysis.get("summary")
                 existing.outline = analysis.get("outline")
             await db_session.commit()
@@ -236,7 +231,7 @@ async def process_single_file_from_memory(filename: str, content: bytes) -> None
         # 5. Save vector chunks
         if docs:
             chunks = split_text(docs)
-            save_to_pgvector(chunks)
+            await asyncio.to_thread(save_to_pgvector, chunks)
             
     finally:
         # Altijd temp file weggooien
@@ -245,17 +240,11 @@ async def process_single_file_from_memory(filename: str, content: bytes) -> None
 
 async def main():
     # 1. Update metadata (hashes, outlines, summaries)
-    from database import get_db
     async for db in get_db():
         await update_document_metadata_async(db)
         break # get_db is a generator, we only need one session
         
     # 2. Sync raw files to DocumentFile table for the viewer
-    from models import DocumentFile
-    from sqlalchemy import select
-    from database import async_session_maker
-    import mimetypes
-    
     files = [
         f for f in os.listdir(RAW_DATA_PATH)
         if os.path.isfile(os.path.join(RAW_DATA_PATH, f)) and f != ".gitkeep"
@@ -284,7 +273,7 @@ async def main():
     docs = load_documents()
     if docs:
         chunks = split_text(docs)
-        save_to_pgvector(chunks)
+        await asyncio.to_thread(save_to_pgvector, chunks)
 
 if __name__ == "__main__":
     asyncio.run(main())

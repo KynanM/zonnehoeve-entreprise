@@ -1,8 +1,9 @@
 import logging
-from datetime import datetime, timedelta
-from typing import Any
+import time
+from datetime import datetime, timedelta, timezone
+from typing import Any, Dict
 
-from sqlalchemy import Date, DateTime, cast, desc, func, select
+from sqlalchemy import Date, cast, desc, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import ChatLog
@@ -11,14 +12,24 @@ logger = logging.getLogger(__name__)
 
 
 class StatsService:
+    # Simpele in-memory cache voor dashboard statistieken
+    _cache: Dict[str, Any] = {}
+    _cache_expiry: float = 0
+    CACHE_DURATION: int = 300  # 5 minuten in seconden
+
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_dashboard_stats(self, days: int = 14) -> dict[str, Any]:
+    async def get_dashboard_stats(self, days: int = 14, force_refresh: bool = False) -> dict[str, Any]:
         """Haalt alle dashboard statistieken op in zo min mogelijk queries."""
+        
+        # Check cache
+        current_time = time.time()
+        if not force_refresh and self._cache_expiry > current_time:
+            logger.info("📊 Dashboard stats opgehaald uit cache.")
+            return self._cache
 
         # 1. Algemene stats (Total, Avg Latency, Feedback counts)
-        # We kunnen dit in één query doen met multiple functions
         base_stats_query = select(
             func.count(ChatLog.id).label("total_questions"),
             func.avg(ChatLog.latency_seconds).label("avg_latency"),
@@ -41,12 +52,12 @@ class StatsService:
         )
 
         # 2. Activiteit per dag
-        since = (datetime.now() - timedelta(days=days)).replace(tzinfo=None, microsecond=0)
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).replace(microsecond=0)
         activity_query = (
             select(
                 cast(ChatLog.timestamp, Date).label("day"), func.count(ChatLog.id).label("count")
             )
-            .where(ChatLog.timestamp >= cast(since, DateTime(timezone=False)))
+            .where(ChatLog.timestamp >= since)
             .group_by(cast(ChatLog.timestamp, Date))
             .order_by(cast(ChatLog.timestamp, Date))
         )
@@ -55,34 +66,37 @@ class StatsService:
             {"day": str(row.day), "count": row.count} for row in activity_res.fetchall()
         ]
 
-        # 3. Top bronnen (Dit is lastiger in SQL omdat retrieved_sources JSON is)
-        # In een volwaardige productie-app zouden we dit joinen met een Document tabel,
-        # maar voor nu optimaliseren we de Python-side loop.
-        sources_query = select(ChatLog.retrieved_sources).where(
-            ChatLog.retrieved_sources.isnot(None)
-        )
-        sources_res = await self.db.execute(sources_query)
-
-        all_sources: dict[str, int] = {}
-        for row in sources_res.scalars():
-            if isinstance(row, list):
-                for s in row:
-                    all_sources[s] = all_sources.get(s, 0) + 1
-
-        top_docs = sorted(all_sources.items(), key=lambda x: x[1], reverse=True)[:8]
+        # 3. Top bronnen (Geoptimaliseerd met SQL jsonb aggregation)
+        # We gebruiken jsonb_array_elements_text om de array in rijen te splitsen
+        sources_sql = text("""
+            SELECT doc_name, COUNT(*) as count
+            FROM chat_logs, jsonb_array_elements_text(retrieved_sources) as doc_name
+            WHERE retrieved_sources IS NOT NULL
+            GROUP BY doc_name
+            ORDER BY count DESC
+            LIMIT 8
+        """)
+        sources_res = await self.db.execute(sources_sql)
+        top_docs = [{"doc": row.doc_name, "count": row.count} for row in sources_res.fetchall()]
 
         # 4. Recente logs
         logs_query = select(ChatLog).order_by(desc(ChatLog.timestamp)).limit(50)
         logs_res = await self.db.execute(logs_query)
         recent_logs = logs_res.scalars().all()
 
-        return {
+        result = {
             "total_questions": total_questions,
             "avg_latency": round(float(avg_latency), 2),
             "thumbs_up": thumbs_up,
             "thumbs_down": thumbs_down,
             "satisfaction_rate": satisfaction_rate,
             "daily_activity": daily_activity,
-            "top_docs": [{"doc": d, "count": c} for d, c in top_docs],
+            "top_docs": top_docs,
             "recent_logs": recent_logs,
         }
+
+        # Update cache
+        StatsService._cache = result
+        StatsService._cache_expiry = current_time + self.CACHE_DURATION
+        
+        return result

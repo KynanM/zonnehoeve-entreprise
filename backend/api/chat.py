@@ -129,7 +129,10 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
                     yield "__sources__:\n" # Lege bronnen
                     rag_chain_data = request.app.state.rag_chain
                     # Robuuste LLM toegang via de state
-                    llm = request.app.state.llm if hasattr(request.app.state, 'llm') else rag_chain_data["generation"].middle[1]
+                    llm = getattr(request.app.state, 'llm', None)
+                    if not llm:
+                        # Fallback indien nodig (maar zou er moeten zijn)
+                        llm = rag_chain_data["generation"].middle[1] if "generation" in rag_chain_data else None
                     prompt_greeting = (
                         "Je bent de Digitale Gids van Zonnehoeve. "
                         "De medewerker begroet je of bedankt je. "
@@ -178,6 +181,20 @@ async def get_threads(db: AsyncSession = Depends(get_db)):
         .order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
     )
     return res.scalars().all()
+
+@router.get("/threads/{thread_id}")
+async def get_thread_history(thread_id: str, db: AsyncSession = Depends(get_db)):
+    """Haalt de volledige geschiedenis van een thread op."""
+    from sqlalchemy.orm import selectinload
+    res = await db.execute(
+        select(ChatThread)
+        .options(selectinload(ChatThread.logs))
+        .filter(ChatThread.id == thread_id)
+    )
+    thread = res.scalar_one_or_none()
+    if not thread:
+        raise HTTPException(status_code=404, detail="Thread niet gevonden")
+    return thread
 
 @router.patch("/threads/{thread_id}/metadata")
 async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, db: AsyncSession = Depends(get_db)):

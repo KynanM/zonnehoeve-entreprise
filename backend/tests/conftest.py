@@ -41,10 +41,12 @@ def mock_rag_setup():
 def mock_vector_store():
     """Mock voor de vector store, gebruikt door de RAG-logic."""
     with patch("vector_store.get_vector_store") as mock_get, \
-         patch("api.rag.get_vector_store") as mock_get_rag:
+         patch("api.rag.get_vector_store") as mock_get_rag, \
+         patch("api.documents.get_vector_store") as mock_get_docs:
         mock_vs = MagicMock()
         mock_get.return_value = mock_vs
         mock_get_rag.return_value = mock_vs
+        mock_get_docs.return_value = mock_vs
         yield mock_vs
 
 @pytest.fixture

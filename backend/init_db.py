@@ -1,7 +1,7 @@
 import asyncio
 from database import engine, Base
 from sqlalchemy import text
-from models import *
+from models import ChatThread, ChatLog, DocumentMetadata, DocumentFile  # noqa: F401
 
 async def init():
     async with engine.begin() as conn:
