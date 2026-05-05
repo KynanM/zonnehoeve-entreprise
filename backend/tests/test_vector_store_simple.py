@@ -1,7 +1,4 @@
-import pytest
-from unittest.mock import patch, MagicMock
-import os
-import importlib
+from unittest.mock import patch
 
 def test_vector_store_getters():
     import vector_store
