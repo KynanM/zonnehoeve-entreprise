@@ -10,15 +10,16 @@ async def test_list_documents_enhanced():
     # Mock database session en resultaten
     mock_db = AsyncMock()
     
-    mock_row = MagicMock()
-    mock_row.filename = "test_protocol.pdf"
-    mock_row.uploaded_at = MagicMock()
-    mock_row.uploaded_at.isoformat.return_value = "2024-01-01T12:00:00"
-    mock_row.mime_type = "application/pdf"
-    mock_row.last_ingested = MagicMock()
+    mock_row = {
+        "filename": "test_protocol.pdf",
+        "uploaded_at": MagicMock(),
+        "mime_type": "application/pdf",
+        "last_ingested": MagicMock()
+    }
+    mock_row["uploaded_at"].isoformat.return_value = "2024-01-01T12:00:00"
     
     mock_result = MagicMock()
-    mock_result.all.return_value = [mock_row]
+    mock_result.mappings.return_value.all.return_value = [mock_row]
     mock_db.execute.return_value = mock_result
     
     # Override get_db dependency

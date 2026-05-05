@@ -57,8 +57,16 @@ async def test_rag_streaming_integration():
         print("\n✅ RAG Pipeline Integration Test passed!")
 
 @pytest.mark.anyio
-async def test_search_documents_integration():
+@patch("vector_store.get_vector_store")
+async def test_search_documents_integration(mock_get_vector_store):
     """Verify that the /search endpoint works and is not shadowed by /{filename}."""
+    # Mock the vector store
+    mock_store = MagicMock()
+    mock_store.similarity_search.return_value = [
+        Document(page_content="Alcohol beleid...", metadata={"source": "test.pdf"})
+    ]
+    mock_get_vector_store.return_value = mock_store
+
     transport = httpx.ASGITransport(app=app)
     async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
         # Searching for a common term
