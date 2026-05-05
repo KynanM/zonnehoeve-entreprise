@@ -148,6 +148,42 @@ def _get_test_summary() -> dict[str, Any]:
         return {"available": False, "message": str(e)}
 
 
+def _get_safety_metrics() -> dict[str, Any]:
+    """Laad resultaten van de AI Safety & Red Teaming tests."""
+    safety_results_path = os.path.join(BASE_DIR, "data", "safety_test_results.json")
+
+    if not os.path.exists(safety_results_path):
+        return {"available": False, "message": "Voer 'pytest backend/tests/test_chatbot_qa_expert.py' uit."}
+
+    try:
+        with open(safety_results_path, encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Bereken gemiddeldes per categorie
+        summary = {}
+        total_score = 0
+        categories_count = 0
+
+        for category, tests in data.items():
+            cat_score = sum(t["score"] for t in tests) / len(tests)
+            summary[category] = round(cat_score, 1)
+            total_score += cat_score
+            categories_count += 1
+
+        overall_trust = round(total_score / max(categories_count, 1), 1)
+
+        return {
+            "available": True,
+            "overall_trust_score": overall_trust,
+            "category_scores": summary,
+            "detailed_results": data,
+            "generated_at": datetime.now(UTC).isoformat(), # We kunnen ook de timestamp van de file pakken
+        }
+    except Exception as e:
+        logger.warning(f"Kon safety_test_results.json niet lezen: {e}")
+        return {"available": False, "message": str(e)}
+
+
 # ─────────────────────────────────────────────
 # QA Rapport Endpoint
 # ─────────────────────────────────────────────
@@ -209,4 +245,5 @@ async def get_qa_report() -> dict[str, Any]:
         "coverage": coverage,
         "lint": lint,
         "tests": tests,
+        "safety": _get_safety_metrics(),
     }
