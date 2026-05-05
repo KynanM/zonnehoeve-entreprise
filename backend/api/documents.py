@@ -1,6 +1,8 @@
 import os
 import logging
+import io
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, BackgroundTasks
+from fastapi.responses import StreamingResponse
 from typing import List
 from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -87,8 +89,7 @@ async def search_documents(q: str, db: AsyncSession = Depends(get_db)) -> List[s
         logger.error(f"Fout bij semantisch zoeken: {e}")
         return []
 
-import io
-from fastapi.responses import StreamingResponse
+
 
 @router.get("/{filename}")
 async def get_document(filename: str, download: bool = False, db: AsyncSession = Depends(get_db)):

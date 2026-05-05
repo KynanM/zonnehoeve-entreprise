@@ -3,19 +3,18 @@ import logging
 import hashlib
 from typing import List
 
-logger = logging.getLogger(__name__)
-
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnableLambda, RunnableParallel, RunnableBranch
-# 1. Imports voor de retrievers
 from langchain.retrievers import EnsembleRetriever, ContextualCompressionRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.documents import Document
 
-
 from vector_store import get_vector_store
+from api.prompts import RAG_SYSTEM_PROMPT, CONTEXTUALIZE_Q_SYSTEM_PROMPT
+
+logger = logging.getLogger(__name__)
 from api.prompts import RAG_SYSTEM_PROMPT, CONTEXTUALIZE_Q_SYSTEM_PROMPT
 
 RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "raw_documents"))

@@ -4,176 +4,23 @@
     "code": "E722",
     "end_location": {
       "column": 15,
-      "row": 63
+      "row": 65
     },
     "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
     "fix": null,
     "location": {
       "column": 9,
-      "row": 63
+      "row": 65
     },
     "message": "Do not use bare `except`",
-    "noqa_row": 63,
+    "noqa_row": 65,
     "url": "https://docs.astral.sh/ruff/rules/bare-except"
   },
   {
     "cell": null,
     "code": "E402",
     "end_location": {
-      "column": 10,
-      "row": 90
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 90
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 90,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 48,
-      "row": 91
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 91
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 91,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 40,
-      "row": 8
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 8
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 8,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 75,
-      "row": 9
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 9
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 9,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 58,
-      "row": 10
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 10
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 10,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 86,
-      "row": 11
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 11
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 11,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 83,
-      "row": 13
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 13
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 13,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 57,
-      "row": 14
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 14
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 14,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 46,
-      "row": 15
-    },
-    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 15
-    },
-    "message": "Module level import not at top of file",
-    "noqa_row": 15,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
-  },
-  {
-    "cell": null,
-    "code": "E402",
-    "end_location": {
-      "column": 42,
+      "column": 73,
       "row": 18
     },
     "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
@@ -188,20 +35,69 @@
   },
   {
     "cell": null,
-    "code": "E402",
+    "code": "F811",
     "end_location": {
-      "column": 73,
-      "row": 19
+      "column": 42,
+      "row": 18
     },
     "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
-    "fix": null,
-    "location": {
-      "column": 1,
-      "row": 19
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 19
+          },
+          "location": {
+            "column": 1,
+            "row": 18
+          }
+        }
+      ],
+      "message": "Remove definition: `RAG_SYSTEM_PROMPT`"
     },
-    "message": "Module level import not at top of file",
-    "noqa_row": 19,
-    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+    "location": {
+      "column": 25,
+      "row": 18
+    },
+    "message": "Redefinition of unused `RAG_SYSTEM_PROMPT` from line 15",
+    "noqa_row": 18,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 73,
+      "row": 18
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 19
+          },
+          "location": {
+            "column": 1,
+            "row": 18
+          }
+        }
+      ],
+      "message": "Remove definition: `CONTEXTUALIZE_Q_SYSTEM_PROMPT`"
+    },
+    "location": {
+      "column": 44,
+      "row": 18
+    },
+    "message": "Redefinition of unused `CONTEXTUALIZE_Q_SYSTEM_PROMPT` from line 15",
+    "noqa_row": 18,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
   },
   {
     "cell": null,
