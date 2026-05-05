@@ -71,10 +71,14 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [qaReport, setQaReport] = useState<any>(null);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isQaLoading, setIsQaLoading] = useState(false);
+  const [isDocsLoading, setIsDocsLoading] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "kwaliteit">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "docs" | "kwaliteit">("dashboard");
+  const [docSearch, setDocSearch] = useState("");
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   const fetchStats = async () => {
     setIsLoading(true);
@@ -97,6 +101,63 @@ export default function AdminDashboard() {
     } catch (e) { console.error(e); }
     finally { setIsQaLoading(false); }
   };
+
+  const fetchDocuments = async () => {
+    setIsDocsLoading(true);
+    try {
+      const data = await api.get<any[]>("/api/documents");
+      setDocuments(data);
+    } catch (e) { console.error(e); }
+    finally { setIsDocsLoading(false); }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (activeTab === "dashboard") fetchStats();
+      if (activeTab === "kwaliteit") fetchQaReport();
+      if (activeTab === "docs") fetchDocuments();
+    }
+  }, [isAuthenticated, activeTab]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await api.post("/api/documents/upload", formData, {
+        headers: { "x-admin-key": password }
+      });
+      alert(`Bestand "${file.name}" succesvol geüpload. De AI verwerking gebeurt op de achtergrond.`);
+      fetchDocuments();
+    } catch (e) {
+      console.error(e);
+      alert("Fout bij uploaden van bestand.");
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleDeleteDocument = async (filename: string) => {
+    if (!confirm(`Weet je zeker dat je "${filename}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) return;
+
+    try {
+      await api.delete(`/api/documents/${filename}`, {
+        headers: { "x-admin-key": password }
+      });
+      setDocuments(docs => docs.filter(d => d.filename !== filename));
+    } catch (e) {
+      console.error(e);
+      alert("Fout bij verwijderen van document.");
+    }
+  };
+
+  const filteredDocs = documents.filter(doc => 
+    doc.filename.toLowerCase().includes(docSearch.toLowerCase())
+  );
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,6 +232,7 @@ export default function AdminDashboard() {
         <div className="flex gap-2 bg-white p-2 rounded-2xl shadow-sm border border-black/5 w-fit">
           {([
             { id: "dashboard", label: "Feedback Inzichten", icon: <BarChart2 size={16} /> },
+            { id: "docs",      label: "Protocollen Beheer",  icon: <FileText size={16} /> },
             { id: "kwaliteit",  label: "QA Rapport",        icon: <Shield size={16} /> },
           ] as const).map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
@@ -555,6 +617,119 @@ export default function AdminDashboard() {
               )}
             </motion.div>
           </AnimatePresence>
+        ) : activeTab === "docs" ? (
+          /* Documenten Tab */
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            {/* Search & Actions */}
+            <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-black/5 flex flex-col md:flex-row items-center gap-4">
+              <div className="relative flex-1 w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-earth-800/30" size={18} />
+                <input
+                  type="text"
+                  placeholder="Zoek in protocollen..."
+                  value={docSearch}
+                  onChange={(e) => setDocSearch(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-earth-50 rounded-2xl text-sm outline-none focus:ring-2 ring-brand-green/20 transition-all font-medium"
+                />
+              </div>
+              <label className="flex items-center gap-3 px-6 py-4 bg-brand-yellow text-earth-900 rounded-2xl font-black text-sm hover:bg-brand-yellow-dark transition-all active:scale-95 cursor-pointer shadow-lg shadow-brand-yellow/10 shrink-0 w-full md:w-auto justify-center">
+                <FileUp size={18} />
+                {uploadingFile ? "Uploaden..." : "Nieuw Protocol"}
+                <input type="file" className="hidden" accept=".pdf,.docx" onChange={handleFileUpload} disabled={uploadingFile} />
+              </label>
+            </div>
+
+            {/* Document List */}
+            <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-black/5">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="text-earth-800/40 text-[10px] uppercase tracking-widest font-extrabold border-b border-black/5 bg-earth-50/50">
+                      <th className="px-6 py-4">Protocol Naam</th>
+                      <th className="px-6 py-4">Toegevoegd op</th>
+                      <th className="px-6 py-4">Type</th>
+                      <th className="px-6 py-4">AI Status</th>
+                      <th className="px-6 py-4 text-right">Acties</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {isDocsLoading ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-20 text-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-4 border-earth-100 border-t-brand-green rounded-full animate-spin" />
+                            <span className="text-sm font-bold text-earth-800/40">Lijst laden...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : filteredDocs.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-20 text-center text-earth-800/30 font-bold">
+                          Geen documenten gevonden.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDocs.map((doc) => (
+                        <tr key={doc.filename} className="border-b border-black/5 hover:bg-earth-50/50 transition-colors text-[13px]">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-earth-100 flex items-center justify-center text-earth-700">
+                                <FileText size={20} />
+                              </div>
+                              <span className="font-bold text-earth-900">{doc.filename}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-earth-800/50 font-medium">
+                            {doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString("nl-BE", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                          </td>
+                          <td className="px-6 py-4 uppercase text-[10px] font-black text-earth-800/30 tracking-widest">
+                            {doc.mime_type?.split("/")[1] || "DOC"}
+                          </td>
+                          <td className="px-6 py-4">
+                            {doc.is_ingested ? (
+                              <div className="flex items-center gap-1.5 text-brand-green font-bold text-[11px]">
+                                <Database size={12} />
+                                Actief in AI
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5 text-brand-yellow-dark font-bold text-[11px]">
+                                <RefreshCw size={12} className="animate-spin" />
+                                Verwerken...
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={() => handleDeleteDocument(doc.filename)}
+                              className="p-2 text-red-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-all"
+                              title="Verwijder Protocol"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Ingestion Info Card */}
+            <div className="bg-brand-green/5 border border-brand-green/10 rounded-[2rem] p-8 flex items-start gap-6">
+              <div className="w-14 h-14 rounded-2xl bg-brand-green/10 flex items-center justify-center text-brand-green-dark shrink-0">
+                <Plus size={28} />
+              </div>
+              <div>
+                <h4 className="text-lg font-black text-earth-900 mb-1">Kennis Uitbreiden</h4>
+                <p className="text-earth-800/60 text-sm leading-relaxed max-w-2xl">
+                  Nieuwe protocollen (PDF of Word) worden direct na upload geanalyseerd door de AI. 
+                  Het systeem maakt automatisch een samenvatting, een inhoudsopgave en verdeelt de tekst in doorzoekbare blokken.
+                  Binnen enkele minuten is het protocol beschikbaar voor vragen in de <strong>Digitale Gids</strong>.
+                </p>
+              </div>
+            </div>
+          </motion.div>
         ) : null}
       </div>
     </div>
