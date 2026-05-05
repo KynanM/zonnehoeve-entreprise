@@ -23,9 +23,12 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────
 
 
+# Basis pad voor rapportages (backend root)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 def _load_coverage_report() -> dict[str, Any]:
     """Laad pytest coverage data uit coverage.xml als die beschikbaar is."""
-    coverage_path = os.path.join(os.path.dirname(__file__), "..", "coverage.xml")
+    coverage_path = os.path.join(BASE_DIR, "coverage.xml")
 
     if not os.path.exists(coverage_path):
         return {"available": False, "message": "Voer 'pytest' uit om coverage te genereren."}
@@ -67,7 +70,7 @@ def _load_coverage_report() -> dict[str, Any]:
 def _load_lint_report() -> dict[str, Any]:
     """Laad Ruff lint resultaten als beschikbaar."""
     # Ruff JSON output pad
-    ruff_output_path = os.path.join(os.path.dirname(__file__), "..", "ruff_report.json")
+    ruff_output_path = os.path.join(BASE_DIR, "ruff_report.json")
 
     if not os.path.exists(ruff_output_path):
         return {
@@ -116,7 +119,7 @@ def _load_lint_report() -> dict[str, Any]:
 
 def _get_test_summary() -> dict[str, Any]:
     """Laad pytest resultaten uit pytest_results.json als beschikbaar."""
-    pytest_output_path = os.path.join(os.path.dirname(__file__), "..", "pytest_results.json")
+    pytest_output_path = os.path.join(BASE_DIR, "pytest_results.json")
 
     if not os.path.exists(pytest_output_path):
         return {

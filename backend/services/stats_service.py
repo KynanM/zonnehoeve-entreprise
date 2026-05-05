@@ -29,17 +29,31 @@ class StatsService:
             logger.info("📊 Dashboard stats opgehaald uit cache.")
             return self._cache
 
-        # 1. Algemene stats (Total, Avg Latency, Feedback counts)
-        base_stats_query = select(
-            func.count(ChatLog.id).label("total_questions"),
-            func.avg(ChatLog.latency_seconds).label("avg_latency"),
-            func.count(ChatLog.id).filter(ChatLog.user_feedback == "thumbs_up").label("thumbs_up"),
-            func.count(ChatLog.id)
-            .filter(ChatLog.user_feedback == "thumbs_down")
-            .label("thumbs_down"),
-        )
-        res = await self.db.execute(base_stats_query)
-        stats = res.mappings().one()
+        try:
+            # 1. Algemene stats (Total, Avg Latency, Feedback counts)
+            base_stats_query = select(
+                func.count(ChatLog.id).label("total_questions"),
+                func.avg(ChatLog.latency_seconds).label("avg_latency"),
+                func.count(ChatLog.id).filter(ChatLog.user_feedback == "thumbs_up").label("thumbs_up"),
+                func.count(ChatLog.id)
+                .filter(ChatLog.user_feedback == "thumbs_down")
+                .label("thumbs_down"),
+            )
+            res = await self.db.execute(base_stats_query)
+            stats = res.mappings().one()
+        except Exception as e:
+            logger.error(f"❌ Fout bij ophalen van basis stats: {e}")
+            return {
+                "total_questions": 0,
+                "avg_latency": 0.0,
+                "thumbs_up": 0,
+                "thumbs_down": 0,
+                "satisfaction_rate": None,
+                "daily_activity": [],
+                "top_docs": [],
+                "recent_logs": [],
+                "error": "Backend database is tijdelijk niet bereikbaar."
+            }
 
         total_questions = stats["total_questions"] or 0
         avg_latency = stats["avg_latency"] or 0.0

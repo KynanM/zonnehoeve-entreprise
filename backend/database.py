@@ -21,7 +21,12 @@ else:
     DATABASE_URL = raw_url
     SYNC_DATABASE_URL = raw_url
 
-engine = create_async_engine(DATABASE_URL, echo=False)
+engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+    connect_args={"command_timeout": 5}
+)
 async_session_maker = sessionmaker(
     engine, class_=AsyncSession, expire_on_commit=False
 )
