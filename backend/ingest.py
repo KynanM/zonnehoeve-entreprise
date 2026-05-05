@@ -1,7 +1,7 @@
 import os
 import hashlib
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Type
 
 from langchain_core.documents import Document
@@ -9,6 +9,9 @@ from langchain_community.document_loaders.base import BaseLoader
 from langchain_community.document_loaders import PDFPlumberLoader, DirectoryLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import asyncio
+from sqlalchemy.ext.asyncio import AsyncSession
+from database import get_db, async_session_maker
+from models import DocumentFile, DocumentMetadata
 
 from vector_store import get_vector_store
 from langchain_openai import ChatOpenAI
@@ -104,7 +107,7 @@ async def update_document_metadata_async(db_session) -> None:
                 doc_meta = DocumentMetadata(
                     filename=filename,
                     file_hash=current_hash,
-                    last_ingested=datetime.utcnow(),
+                    last_ingested=datetime.now(timezone.utc),
                     summary=analysis.get("summary"),
                     outline=analysis.get("outline")
                 )
@@ -112,7 +115,7 @@ async def update_document_metadata_async(db_session) -> None:
                 logger.info(f"📄 Nieuw document geregistreerd en geanalyseerd: {filename}")
             else:
                 existing.file_hash = current_hash
-                existing.last_modified = datetime.utcnow()
+                existing.last_modified = datetime.now(timezone.utc)
                 existing.summary = analysis.get("summary")
                 existing.outline = analysis.get("outline")
                 logger.info(f"🔔 Document bijgewerkt en herberekend: {filename}")
