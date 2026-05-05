@@ -82,15 +82,20 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
         normalized_input = req.input.lower().strip().translate(str.maketrans('', '', '.,!?'))
         is_greeting = any(normalized_input == g for g in greetings) or any(normalized_input == t for t in thanks)
 
-        # 2. Maak alvast de log aan
+        # 2. Maak alvast de log aan (met fallback bij DB errors)
         thread_id = req.thread_id or str(uuid.uuid4())
-        log_id = await create_chat_log(thread_id, req.input)
+        log_id = None
+        try:
+            log_id = await create_chat_log(thread_id, req.input)
+        except Exception as e:
+            logger.error(f"⚠️ Kon chat log niet aanmaken: {e}")
 
         async def stream_generator():
             full_response = ""
             try:
-                # Altijd eerst de log_id sturen voor de frontend
-                yield f"__log_id__:{log_id}\n"
+                # Altijd eerst de log_id sturen voor de frontend (of leeg bij error)
+                if log_id:
+                    yield f"__log_id__:{log_id}\n"
 
                 sources = []
                 if not is_greeting:
@@ -145,15 +150,16 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
                         full_response += content
                         yield content
 
-                # 5. Update de log in de achtergrond
-                latency = time.time() - start_time
-                background_tasks.add_task(
-                    update_chat_log, 
-                    log_id, 
-                    full_response, 
-                    sources,
-                    latency
-                )
+                # 5. Update de log in de achtergrond (indien aangemaakt)
+                if log_id:
+                    latency = time.time() - start_time
+                    background_tasks.add_task(
+                        update_chat_log, 
+                        log_id, 
+                        full_response, 
+                        sources,
+                        latency
+                    )
             except Exception as e:
                 logger.error(f"Fout tijdens streaming: {e}", exc_info=True)
                 yield "\n\n[Systeemfout: Er ging iets mis bij het genereren van het antwoord.]"
