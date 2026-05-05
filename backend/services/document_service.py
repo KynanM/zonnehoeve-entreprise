@@ -119,7 +119,6 @@ class DocumentService:
             # 3. Verwijder uit Vector Store
             # Let op: LangChain PGVector's delete() verwacht IDs.
             # We kunnen direct SQL gebruiken voor meer efficiëntie bij metadata-filtering.
-            vector_store = get_vector_store()
             # De tabelnaam is standaard 'langchain_pg_embedding' tenzij anders geconfigureerd.
             # We filteren op de metadata kolom (jsonb).
             sql = "DELETE FROM langchain_pg_embedding WHERE cmetadata->>'source' = :filename"

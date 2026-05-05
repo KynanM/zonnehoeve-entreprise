@@ -7,7 +7,7 @@ class ChatThread(Base):
     __tablename__ = "chat_threads"
     id = Column(String, primary_key=True)  # UUID
     title = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     is_pinned = Column(Integer, default=0)  # 1 voor gepind, 0 voor niet
     is_archived = Column(Integer, default=0) # 1 voor gearchiveerd, 0 voor niet
     logs = relationship("ChatLog", back_populates="thread", cascade="all, delete-orphan")
@@ -31,7 +31,7 @@ class DocumentMetadata(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     filename = Column(String, nullable=False, unique=True)
     file_hash = Column(String, nullable=False)  # MD5 of SHA256 hash van het bestand
-    last_ingested = Column(DateTime, default=datetime.utcnow)
+    last_ingested = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     last_modified = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     notes = Column(Text, nullable=True)
     outline = Column(JSON, nullable=True)  # Hiërarchische lijst van secties

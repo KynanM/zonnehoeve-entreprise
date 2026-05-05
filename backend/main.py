@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -28,11 +29,14 @@ async def lifespan(app: FastAPI):
         print("✅ Database tabellen gecontroleerd/aangemaakt.")
 
     try:
-        app.state.rag_chain = await setup_rag_chain()
+        rag_data = await setup_rag_chain()
+        app.state.rag_chain = rag_data
+        app.state.llm = rag_data.get("llm")
         print("✅ RAG Chain vooraf ingeladen.")
     except Exception as e:
         print(f"⚠️ RAG Chain faalde om vooraf te laden: {e}")
         app.state.rag_chain = None
+        app.state.llm = None
 
     yield
 
@@ -43,8 +47,6 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
-
-import os
 
 # CORS configuratie
 CORS_ORIGINS_RAW = os.getenv("CORS_ORIGINS", "http://localhost:3000")

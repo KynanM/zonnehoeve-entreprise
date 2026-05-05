@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
 from main import app
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock
 
 @pytest.mark.anyio
 async def test_chat_endpoint_invalid_input():

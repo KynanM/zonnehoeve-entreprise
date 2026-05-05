@@ -3,22 +3,22 @@ import logging
 import io
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, BackgroundTasks
 from fastapi.responses import StreamingResponse
-from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from database import get_db
 from models import DocumentMetadata, DocumentFile
 from api.auth import verify_admin
+from vector_store import get_vector_store
 
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
 logger = logging.getLogger(__name__)
 
 @router.get("/updates/recent")
-async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) -> List[dict]:
+async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) -> list[dict]:
     """Geeft documenten terug die recent zijn gewijzigd."""
-    since = datetime.utcnow() - timedelta(days=days)
+    since = datetime.now(timezone.utc) - timedelta(days=days)
     result = await db.execute(
         select(DocumentMetadata).where(DocumentMetadata.last_modified >= since)
     )
@@ -62,13 +62,12 @@ async def list_documents(db: AsyncSession = Depends(get_db)):
             result = await db.execute(select(DocumentFile.filename))
             filenames = result.scalars().all()
             return [{"filename": f, "uploaded_at": None, "mime_type": "application/pdf", "is_ingested": False} for f in filenames]
-        except:
+        except Exception:
             return []
 
 @router.get("/search")
-async def search_documents(q: str, db: AsyncSession = Depends(get_db)) -> List[str]:
+async def search_documents(q: str, db: AsyncSession = Depends(get_db)) -> list[str]:
     """Zoekt semantisch door alle documentinhoud."""
-    from vector_store import get_vector_store
     try:
         if not q or len(q) < 3:
             result = await db.execute(select(DocumentFile.filename))
@@ -188,7 +187,7 @@ async def upload_document(
     if existing_file:
         existing_file.data = content
         existing_file.mime_type = mime_type
-        existing_file.uploaded_at = datetime.utcnow()
+        existing_file.uploaded_at = datetime.now(timezone.utc)
     else:
         new_file = DocumentFile(filename=filename, data=content, mime_type=mime_type)
         db.add(new_file)

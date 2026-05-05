@@ -15,7 +15,6 @@ from vector_store import get_vector_store
 from api.prompts import RAG_SYSTEM_PROMPT, CONTEXTUALIZE_Q_SYSTEM_PROMPT
 
 logger = logging.getLogger(__name__)
-from api.prompts import RAG_SYSTEM_PROMPT, CONTEXTUALIZE_Q_SYSTEM_PROMPT
 
 RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "raw_documents"))
 
@@ -151,5 +150,6 @@ async def setup_rag_chain() -> dict:
 
     return {
         "generation": rag_chain,
-        "retrieval": retrieval_chain
+        "retrieval": retrieval_chain,
+        "llm": llm
     }
