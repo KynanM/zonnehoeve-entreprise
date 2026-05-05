@@ -6,7 +6,7 @@ import {
   Lock, Clock, ThumbsUp, ThumbsDown, FileText, ArrowLeft,
   TrendingUp, Star, BarChart2, BookOpen, CheckCircle2, AlertTriangle,
   RefreshCw, ChevronDown, ChevronUp, Shield, Activity, Code2,
-  MessageSquare, Zap, TriangleAlert, Info
+  MessageSquare, Zap, TriangleAlert, Info, Search, FileUp, Database, Trash2, Plus
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
