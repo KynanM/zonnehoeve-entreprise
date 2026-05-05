@@ -5,6 +5,7 @@ from typing import List, Optional
 import uuid
 import os
 import logging
+import time
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
@@ -68,7 +69,6 @@ async def update_chat_log(log_id: int, response: str, sources: List[str], latenc
 @router.post("")
 async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, request: Request):
     """Streaming endpoint voor real-time AI antwoorden."""
-    import time
     start_time = time.time()
     try:
         formatted_history = []
@@ -128,7 +128,8 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
                     # Direct antwoord voor begroetingen zonder RAG
                     yield "__sources__:\n" # Lege bronnen
                     rag_chain_data = request.app.state.rag_chain
-                    llm = rag_chain_data["generation"].middle[1] # Haal ChatOpenAI uit de chain
+                    # Robuuste LLM toegang via de state
+                    llm = request.app.state.llm if hasattr(request.app.state, 'llm') else rag_chain_data["generation"].middle[1]
                     prompt_greeting = (
                         "Je bent de Digitale Gids van Zonnehoeve. "
                         "De medewerker begroet je of bedankt je. "
