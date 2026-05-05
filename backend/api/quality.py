@@ -148,48 +148,6 @@ def _get_test_summary() -> dict[str, Any]:
         return {"available": False, "message": str(e)}
 
 
-def _get_architecture_notes() -> list[dict[str, str]]:
-    """Statische lijst van geïdentificeerde technische schuld."""
-    return [
-        {
-            "severity": "ok",
-            "title": "Asynchrone save_to_pgvector() geïmplementeerd",
-            "description": "ingest.py gebruikt nu asyncio.to_thread() voor database operaties, waardoor de event loop niet meer geblokkeerd wordt.",
-            "action": "Afgerond.",
-        },
-        {
-            "severity": "ok",
-            "title": "SQL-side JSON aggregatie actief",
-            "description": "StatsService gebruikt nu PostgreSQL jsonb_array_elements_text() voor efficiente aggregatie.",
-            "action": "Afgerond.",
-        },
-        {
-            "severity": "ok",
-            "title": "Gecentraliseerde LLM toegang",
-            "description": "De LLM instantie wordt nu apart opgeslagen in app.state en direct benaderd zonder fragiele indexering.",
-            "action": "Afgerond.",
-        },
-        {
-            "severity": "ok",
-            "title": "datetime.utcnow() vervangen",
-            "description": "Alle deprecated utcnow() aanroepen zijn vervangen door datetime.now(timezone.utc).",
-            "action": "Afgerond.",
-        },
-        {
-            "severity": "ok",
-            "title": "Caching op admin stats actief",
-            "description": "Dashboard statistieken worden nu 5 minuten gecached in het geheugen.",
-            "action": "Afgerond.",
-        },
-        {
-            "severity": "ok",
-            "title": "Dubbele router decorators opgelost",
-            "description": "chat.py had @router.post('/') en @router.post('') — beide zijn aanwezig voor backward compatibiliteit.",
-            "action": "Geverifieerd.",
-        },
-    ]
-
-
 # ─────────────────────────────────────────────
 # QA Rapport Endpoint
 # ─────────────────────────────────────────────
@@ -204,7 +162,6 @@ async def get_qa_report() -> dict[str, Any]:
     coverage = _load_coverage_report()
     lint = _load_lint_report()
     tests = _get_test_summary()
-    tech_debt = _get_architecture_notes()
 
     # Bereken overall QA score (0-100)
     score_components = []
@@ -252,10 +209,4 @@ async def get_qa_report() -> dict[str, Any]:
         "coverage": coverage,
         "lint": lint,
         "tests": tests,
-        "tech_debt": tech_debt,
-        "tech_debt_counts": {
-            "warning": sum(1 for t in tech_debt if t["severity"] == "warning"),
-            "info": sum(1 for t in tech_debt if t["severity"] == "info"),
-            "ok": sum(1 for t in tech_debt if t["severity"] == "ok"),
-        },
     }
