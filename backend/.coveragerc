@@ -1,0 +1,13 @@
+[run]
+source = .
+omit =
+    tests/*
+    init_db.py
+    migrate_metadata.py
+    verify_production.py
+    loadtests/*
+    */__init__.py
+
+[report]
+show_missing = True
+precision = 1

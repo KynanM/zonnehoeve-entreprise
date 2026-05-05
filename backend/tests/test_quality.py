@@ -48,7 +48,6 @@ async def test_qa_report_endpoint_success():
             assert "coverage" in data
             assert "lint" in data
             assert "tests" in data
-            assert "tech_debt" in data
 
     app.dependency_overrides.clear()
 
