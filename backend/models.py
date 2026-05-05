@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, JSON, Text, LargeBinary
 from sqlalchemy.orm import relationship
 from database import Base
@@ -16,7 +16,7 @@ class ChatLog(Base):
     __tablename__ = "chat_logs"
     id = Column(Integer, primary_key=True, autoincrement=True)
     thread_id = Column(String, ForeignKey("chat_threads.id"))
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     user_prompt = Column(String, nullable=False)
     bot_response = Column(String, nullable=False)
     latency_seconds = Column(Float)
@@ -32,7 +32,7 @@ class DocumentMetadata(Base):
     filename = Column(String, nullable=False, unique=True)
     file_hash = Column(String, nullable=False)  # MD5 of SHA256 hash van het bestand
     last_ingested = Column(DateTime, default=datetime.utcnow)
-    last_modified = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_modified = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     notes = Column(Text, nullable=True)
     outline = Column(JSON, nullable=True)  # Hiërarchische lijst van secties
     summary = Column(Text, nullable=True)  # Korte samenvatting van het document
@@ -44,4 +44,4 @@ class DocumentFile(Base):
     filename = Column(String, nullable=False, unique=True)
     mime_type = Column(String, nullable=False, default="application/pdf")
     data = Column(LargeBinary, nullable=False)
-    uploaded_at = Column(DateTime, default=datetime.utcnow)
+    uploaded_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))

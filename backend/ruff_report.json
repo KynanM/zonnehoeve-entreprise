@@ -1,0 +1,686 @@
+[
+  {
+    "cell": null,
+    "code": "E722",
+    "end_location": {
+      "column": 15,
+      "row": 63
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 63
+    },
+    "message": "Do not use bare `except`",
+    "noqa_row": 63,
+    "url": "https://docs.astral.sh/ruff/rules/bare-except"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 10,
+      "row": 90
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 90
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 90,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 48,
+      "row": 91
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\documents.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 91
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 91,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 40,
+      "row": 8
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 8
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 8,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 75,
+      "row": 9
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 9
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 9,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 58,
+      "row": 10
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 10
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 10,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 86,
+      "row": 11
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 11
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 11,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 83,
+      "row": 13
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 13
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 13,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 57,
+      "row": 14
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 14
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 14,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 46,
+      "row": 15
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 15
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 15,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 42,
+      "row": 18
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 18
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 18,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 73,
+      "row": 19
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\api\\rag.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 19
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 19,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 48,
+      "row": 12
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 13
+          },
+          "location": {
+            "column": 1,
+            "row": 12
+          }
+        }
+      ],
+      "message": "Remove unused import: `sqlalchemy.ext.asyncio.AsyncSession`"
+    },
+    "location": {
+      "column": 36,
+      "row": 12
+    },
+    "message": "`sqlalchemy.ext.asyncio.AsyncSession` imported but unused",
+    "noqa_row": 12,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 28,
+      "row": 13
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 14
+          },
+          "location": {
+            "column": 1,
+            "row": 13
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 22,
+      "row": 13
+    },
+    "message": "`database.get_db` imported but unused",
+    "noqa_row": 13,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 49,
+      "row": 13
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 14
+          },
+          "location": {
+            "column": 1,
+            "row": 13
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 30,
+      "row": 13
+    },
+    "message": "`database.async_session_maker` imported but unused",
+    "noqa_row": 13,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 32,
+      "row": 14
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 15
+          },
+          "location": {
+            "column": 1,
+            "row": 14
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 20,
+      "row": 14
+    },
+    "message": "`models.DocumentFile` imported but unused",
+    "noqa_row": 14,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 50,
+      "row": 14
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 15
+          },
+          "location": {
+            "column": 1,
+            "row": 14
+          }
+        }
+      ],
+      "message": "Remove unused import"
+    },
+    "location": {
+      "column": 34,
+      "row": 14
+    },
+    "message": "`models.DocumentMetadata` imported but unused",
+    "noqa_row": 14,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 40,
+      "row": 71
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 72
+          },
+          "location": {
+            "column": 1,
+            "row": 71
+          }
+        }
+      ],
+      "message": "Remove definition: `DocumentMetadata`"
+    },
+    "location": {
+      "column": 24,
+      "row": 71
+    },
+    "message": "Redefinition of unused `DocumentMetadata` from line 14",
+    "noqa_row": 71,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 16,
+      "row": 154
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 154
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 154,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 40,
+      "row": 170
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 171
+          },
+          "location": {
+            "column": 1,
+            "row": 170
+          }
+        }
+      ],
+      "message": "Remove definition: `DocumentMetadata`"
+    },
+    "location": {
+      "column": 24,
+      "row": 170
+    },
+    "message": "Redefinition of unused `DocumentMetadata` from line 14",
+    "noqa_row": 170,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 45,
+      "row": 171
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 172
+          },
+          "location": {
+            "column": 1,
+            "row": 171
+          }
+        }
+      ],
+      "message": "Remove definition: `async_session_maker`"
+    },
+    "location": {
+      "column": 26,
+      "row": 171
+    },
+    "message": "Redefinition of unused `async_session_maker` from line 13",
+    "noqa_row": 171,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 32,
+      "row": 248
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 249
+          },
+          "location": {
+            "column": 1,
+            "row": 248
+          }
+        }
+      ],
+      "message": "Remove definition: `get_db`"
+    },
+    "location": {
+      "column": 26,
+      "row": 248
+    },
+    "message": "Redefinition of unused `get_db` from line 13",
+    "noqa_row": 248,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 36,
+      "row": 254
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 255
+          },
+          "location": {
+            "column": 1,
+            "row": 254
+          }
+        }
+      ],
+      "message": "Remove definition: `DocumentFile`"
+    },
+    "location": {
+      "column": 24,
+      "row": 254
+    },
+    "message": "Redefinition of unused `DocumentFile` from line 14",
+    "noqa_row": 254,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F811",
+    "end_location": {
+      "column": 45,
+      "row": 256
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\ingest.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 1,
+            "row": 257
+          },
+          "location": {
+            "column": 1,
+            "row": 256
+          }
+        }
+      ],
+      "message": "Remove definition: `async_session_maker`"
+    },
+    "location": {
+      "column": 26,
+      "row": 256
+    },
+    "message": "Redefinition of unused `async_session_maker` from line 13",
+    "noqa_row": 256,
+    "url": "https://docs.astral.sh/ruff/rules/redefined-while-unused"
+  },
+  {
+    "cell": null,
+    "code": "F403",
+    "end_location": {
+      "column": 21,
+      "row": 4
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\init_db.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 4
+    },
+    "message": "`from models import *` used; unable to detect undefined names",
+    "noqa_row": 4,
+    "url": "https://docs.astral.sh/ruff/rules/undefined-local-with-import-star"
+  },
+  {
+    "cell": null,
+    "code": "E402",
+    "end_location": {
+      "column": 10,
+      "row": 47
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\main.py",
+    "fix": null,
+    "location": {
+      "column": 1,
+      "row": 47
+    },
+    "message": "Module level import not at top of file",
+    "noqa_row": 47,
+    "url": "https://docs.astral.sh/ruff/rules/module-import-not-at-top-of-file"
+  },
+  {
+    "cell": null,
+    "code": "F841",
+    "end_location": {
+      "column": 25,
+      "row": 122
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\services\\document_service.py",
+    "fix": {
+      "applicability": "unsafe",
+      "edits": [
+        {
+          "content": "",
+          "end_location": {
+            "column": 28,
+            "row": 122
+          },
+          "location": {
+            "column": 13,
+            "row": 122
+          }
+        }
+      ],
+      "message": "Remove assignment to unused variable `vector_store`"
+    },
+    "location": {
+      "column": 13,
+      "row": 122
+    },
+    "message": "Local variable `vector_store` is assigned to but never used",
+    "noqa_row": 122,
+    "url": "https://docs.astral.sh/ruff/rules/unused-variable"
+  },
+  {
+    "cell": null,
+    "code": "F401",
+    "end_location": {
+      "column": 32,
+      "row": 4
+    },
+    "filename": "C:\\Users\\kynan\\Documents\\zonnehoeve-entreprise\\backend\\tests\\test_edge_cases.py",
+    "fix": {
+      "applicability": "safe",
+      "edits": [
+        {
+          "content": "from unittest.mock import AsyncMock",
+          "end_location": {
+            "column": 43,
+            "row": 4
+          },
+          "location": {
+            "column": 1,
+            "row": 4
+          }
+        }
+      ],
+      "message": "Remove unused import: `unittest.mock.patch`"
+    },
+    "location": {
+      "column": 27,
+      "row": 4
+    },
+    "message": "`unittest.mock.patch` imported but unused",
+    "noqa_row": 4,
+    "url": "https://docs.astral.sh/ruff/rules/unused-import"
+  }
+]
