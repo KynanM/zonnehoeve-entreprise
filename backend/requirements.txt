@@ -31,6 +31,22 @@ tiktoken
 rank_bm25
 flashrank
 
-# Testing
+# Testing — Unit & Integration
 pytest
+pytest-asyncio
+pytest-anyio
+anyio[trio]
 httpx
+pytest-cov
+pytest-json-report
+
+# Static Analysis
+ruff
+
+# Load Testing
+locust
+
+# Benchmarking & Profiling
+memory-profiler
+psutil
+
