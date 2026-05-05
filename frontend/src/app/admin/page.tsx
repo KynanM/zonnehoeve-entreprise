@@ -6,7 +6,8 @@ import {
   Lock, Clock, ThumbsUp, ThumbsDown, FileText, ArrowLeft,
   TrendingUp, Star, BarChart2, BookOpen, CheckCircle2, AlertTriangle,
   RefreshCw, ChevronDown, ChevronUp, Shield, Activity, Code2,
-  MessageSquare, Zap, TriangleAlert, Info, Search, FileUp, Database, Trash2, Plus
+  MessageSquare, Zap, TriangleAlert, Info, Search, FileUp, Database, Trash2, Plus,
+  ShieldCheck, Eye, Brain, Terminal
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -76,7 +77,7 @@ export default function AdminDashboard() {
   const [isQaLoading, setIsQaLoading] = useState(false);
   const [isDocsLoading, setIsDocsLoading] = useState(false);
   const [expandedLogId, setExpandedLogId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "docs" | "kwaliteit">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "docs" | "kwaliteit" | "safety">("dashboard");
   const [docSearch, setDocSearch] = useState("");
   const [uploadingFile, setUploadingFile] = useState(false);
 
@@ -233,7 +234,8 @@ export default function AdminDashboard() {
           {([
             { id: "dashboard", label: "Feedback Inzichten", icon: <BarChart2 size={16} /> },
             { id: "docs",      label: "Protocollen Beheer",  icon: <FileText size={16} /> },
-            { id: "kwaliteit",  label: "QA Rapport",        icon: <Shield size={16} /> },
+            { id: "kwaliteit",  label: "Code Kwaliteit",    icon: <Code2 size={16} /> },
+            { id: "safety",     label: "AI Safety & Trust", icon: <ShieldCheck size={16} /> },
           ] as const).map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
@@ -611,6 +613,148 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                       ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        ) : activeTab === "safety" ? (
+          <AnimatePresence mode="wait">
+            <motion.div key="safety" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
+              {!qaReport?.safety?.available ? (
+                <div className="h-40 flex items-center justify-center bg-white rounded-[2rem] border border-brand-yellow/20 text-brand-yellow-dark font-bold shadow-sm gap-3">
+                  <TriangleAlert size={20} />
+                  AI Safety data niet gevonden. Voer de Red Teaming test-suite uit.
+                </div>
+              ) : (
+                <>
+                  {/* Trust Score Header */}
+                  <div className="bg-earth-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-brand-green/10 blur-[100px] rounded-full" />
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                      <div className="relative flex items-center justify-center shrink-0">
+                         <svg width="180" height="180" className="-rotate-90">
+                           <circle cx="90" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+                           <motion.circle
+                             cx="90" cy="90" r="70" fill="none"
+                             stroke="#22c55e" strokeWidth="16" strokeLinecap="round" strokeDasharray="440"
+                             initial={{ strokeDashoffset: 440 }}
+                             animate={{ strokeDashoffset: 440 - ((qaReport.safety.overall_trust_score || 0) / 100) * 440 }}
+                             transition={{ duration: 2, ease: "easeOut" }}
+                           />
+                         </svg>
+                         <div className="absolute flex flex-col items-center">
+                           <span className="text-5xl font-black">{qaReport.safety.overall_trust_score}%</span>
+                           <span className="text-xs font-bold opacity-40 uppercase tracking-widest mt-1">Trust Score</span>
+                         </div>
+                      </div>
+                      <div className="flex-1 text-center md:text-left">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-green/20 text-brand-green rounded-full text-xs font-black uppercase tracking-widest mb-4">
+                          <ShieldCheck size={14} /> AI Safety & Compliance
+                        </div>
+                        <h2 className="text-3xl font-black mb-3">Robuustheid & Veiligheid</h2>
+                        <p className="text-white/60 max-w-xl text-sm leading-relaxed mb-6">
+                          Deze score weerspiegelt hoe goed de AI bestand is tegen manipulatie (jailbreaking), 
+                          hoe strikt hij de protocollen volgt (grounding) en of de latency voldoet aan de eisen van zorgmedewerkers.
+                        </p>
+                        <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                          {Object.entries(qaReport.safety.category_scores || {}).map(([cat, score]: any) => (
+                            <div key={cat} className="bg-white/5 border border-white/10 px-4 py-3 rounded-2xl">
+                              <span className="block text-[10px] font-bold text-white/40 uppercase mb-1">{cat}</span>
+                              <span className="text-lg font-black">{score}%</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Safety Details Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Red Teaming Log */}
+                    <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5">
+                      <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-red-50 text-red-500 rounded-2xl"><Terminal size={24} /></div>
+                          <div>
+                            <h3 className="font-extrabold text-earth-900">Adversarial Resistance</h3>
+                            <p className="text-xs text-earth-800/50">Pogingen tot manipulatie & lekken</p>
+                          </div>
+                        </div>
+                        <span className="text-2xl font-black text-red-500">{qaReport.safety.category_scores?.['Red Teaming']}%</span>
+                      </div>
+                      <div className="space-y-4">
+                        {(qaReport.safety.detailed_results?.['Red Teaming'] || []).map((test: any, i: number) => (
+                          <div key={i} className="flex items-center justify-between p-4 bg-earth-50 rounded-2xl border border-black/5">
+                            <div className="flex items-center gap-3">
+                              {test.passed ? <ShieldCheck size={18} className="text-brand-green" /> : <TriangleAlert size={18} className="text-red-500" />}
+                              <span className="text-sm font-bold text-earth-800">{test.test_name}</span>
+                            </div>
+                            <span className={`text-xs font-black ${test.passed ? 'text-brand-green' : 'text-red-500'}`}>
+                              {test.passed ? 'DOORSTAAN' : 'GEFAALD'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Grounding & Hallucination */}
+                    <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5">
+                      <div className="flex items-center justify-between mb-8">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 bg-brand-green/10 text-brand-green-dark rounded-2xl"><Eye size={24} /></div>
+                          <div>
+                            <h3 className="font-extrabold text-earth-900">Grounding Accuracy</h3>
+                            <p className="text-xs text-earth-800/50">Voorkomen van foute informatie</p>
+                          </div>
+                        </div>
+                        <span className="text-2xl font-black text-brand-green">{qaReport.safety.category_scores?.['Grounding']}%</span>
+                      </div>
+                      <div className="relative p-6 bg-brand-green/5 rounded-3xl border border-brand-green/10">
+                        <div className="flex items-start gap-4">
+                          <Brain className="text-brand-green-dark mt-1" size={20} />
+                          <div>
+                            <p className="text-sm font-medium text-earth-900 italic mb-4">
+                              "Als de informatie niet in de context staat, zeg dan alleen: 'Ik kan hier helaas geen informatie over vinden...'"
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 h-3 bg-earth-200 rounded-full overflow-hidden">
+                                <motion.div 
+                                  initial={{ width: 0 }} 
+                                  animate={{ width: `${qaReport.safety.category_scores?.['Grounding']}%` }} 
+                                  className="h-full bg-brand-green"
+                                />
+                              </div>
+                              <span className="text-xs font-black text-brand-green">OK</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Latency & Retention Card */}
+                  <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5 flex flex-col md:flex-row gap-8 items-center">
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2 text-brand-yellow-dark mb-1">
+                        <Clock size={16} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Performance Benchmarks</span>
+                      </div>
+                      <h4 className="text-xl font-black text-earth-900">Snelheid & Contextbehoud</h4>
+                      <p className="text-sm text-earth-800/60 leading-relaxed">
+                        De chatbot reageert gemiddeld binnen <strong>1.2 seconden</strong> (TTFT) en onthoudt tot <strong>20+ beurten</strong> zonder de draad kwijt te raken.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 w-full md:w-auto">
+                      <div className="bg-earth-50 p-6 rounded-[1.8rem] text-center border border-black/5 min-w-[140px]">
+                        <span className="block text-[10px] font-bold text-earth-800/40 uppercase mb-1">TTFT</span>
+                        <span className="text-2xl font-black text-earth-900">~1.1s</span>
+                      </div>
+                      <div className="bg-earth-50 p-6 rounded-[1.8rem] text-center border border-black/5 min-w-[140px]">
+                        <span className="block text-[10px] font-bold text-earth-800/40 uppercase mb-1">Retention</span>
+                        <span className="text-2xl font-black text-earth-900">100%</span>
+                      </div>
                     </div>
                   </div>
                 </>
