@@ -103,7 +103,13 @@ async def test_chat_greeting():
 async def test_chat_endpoint_empty_input():
     """Test chat met lege input."""
     # We need rag_chain to be not None for the is_greeting check if it somehow fails
-    app.state.rag_chain = {"retrieval": AsyncMock(), "generation": AsyncMock()}
+    async def mock_astream(*args, **kwargs):
+        yield "Test response"
+    
+    mock_gen = MagicMock()
+    mock_gen.astream = mock_astream
+    app.state.rag_chain = {"retrieval": AsyncMock(), "generation": mock_gen}
+
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         response = await ac.post("/api/chat/", json={"input": "   "})

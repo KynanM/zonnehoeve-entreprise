@@ -82,33 +82,55 @@ export const api = {
         
         buffer += decoder.decode(value, { stream: true });
         
-        // Match meta-markers in the buffer and strip them
-        // 1. Log ID
-        const logIdMatch = buffer.match(/__log_id__:(\d+)\n/);
-        if (logIdMatch) {
-          if (onLogId) onLogId(parseInt(logIdMatch[1]));
-          buffer = buffer.replace(logIdMatch[0], "");
+        let foundMarker = true;
+        while (foundMarker) {
+          foundMarker = false;
+          
+          // 1. Log ID (__log_id__:123\n)
+          const logIdMatch = buffer.match(/__log_id__:(\d+)\n/);
+          if (logIdMatch) {
+            if (onLogId) onLogId(parseInt(logIdMatch[1]));
+            buffer = buffer.replace(logIdMatch[0], "");
+            foundMarker = true;
+          }
+          
+          // 2. Sources (__sources__:a.pdf,b.pdf\n)
+          const sourcesMatch = buffer.match(/__sources__:([^\n]*)\n/);
+          if (sourcesMatch) {
+            const sources = sourcesMatch[1] ? sourcesMatch[1].split(',').filter(s => s) : [];
+            if (onSources) onSources(sources);
+            buffer = buffer.replace(sourcesMatch[0], "");
+            foundMarker = true;
+          }
+
+          // 3. Fallback JSON (|JSON|{"log_id":...})
+          const jsonMatch = buffer.match(/\|JSON\|(\{.*\})/);
+          if (jsonMatch) {
+            try {
+              const data = JSON.parse(jsonMatch[1]);
+              if (data.log_id && onLogId) onLogId(data.log_id);
+              if (data.sources && onSources) onSources(data.sources);
+            } catch (e) { /* ignore partial json */ }
+            buffer = buffer.replace(jsonMatch[0], "");
+            foundMarker = true;
+          }
         }
         
-        // 2. Sources
-        const sourcesMatch = buffer.match(/__sources__:([^\n]*)\n/);
-        if (sourcesMatch) {
-          const sources = sourcesMatch[1] ? sourcesMatch[1].split(',').filter(s => s) : [];
-          if (onSources) onSources(sources);
-          buffer = buffer.replace(sourcesMatch[0], "");
-        }
+        // Stuur alleen tekst door als het GEEN deel is van een marker
+        // We wachten met doorsturen als de buffer eindigt op iets wat een marker kan worden
+        const potentialMarkers = ["__", "__log", "__sources", "|", "|JSON"];
+        const isPotentialMarker = potentialMarkers.some(m => m.startsWith(buffer) || buffer.endsWith(m.substring(0, 2)));
         
-        // If there's anything left in the buffer and it doesn't look like a partial marker, send it
-        // We check if it's potentially a partial marker to avoid sending "__log" before the rest arrives
-        if (buffer && !buffer.endsWith("__") && !buffer.endsWith("__log_id__:") && !buffer.endsWith("__sources__:")) {
+        if (buffer && !isPotentialMarker) {
           onChunk(buffer);
           buffer = "";
         }
       }
       // Final flush
-      if (buffer) {
+      if (buffer && !buffer.startsWith("__") && !buffer.startsWith("|")) {
         onChunk(buffer);
       }
+
     }
   }
 };
