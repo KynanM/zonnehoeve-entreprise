@@ -117,6 +117,14 @@ export default function AdminDashboard() {
       if (activeTab === "dashboard") fetchStats();
       if (activeTab === "kwaliteit") fetchQaReport();
       if (activeTab === "docs") fetchDocuments();
+
+      // Real-time updates: poll every 30 seconds
+      const interval = setInterval(() => {
+        if (activeTab === "dashboard") fetchStats();
+        if (activeTab === "kwaliteit") fetchQaReport();
+      }, 30000);
+
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated, activeTab]);
 
