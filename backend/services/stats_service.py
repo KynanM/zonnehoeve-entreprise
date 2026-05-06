@@ -53,7 +53,8 @@ class StatsService:
             )
 
             # 2. Activiteit per dag
-            since = (datetime.now(timezone.utc) - timedelta(days=days)).replace(microsecond=0)
+            # Gebruik naive UTC datetime voor vergelijking met DB
+            since = (datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)).replace(microsecond=0)
             activity_query = (
                 select(
                     cast(ChatLog.timestamp, Date).label("day"), func.count(ChatLog.id).label("count")
@@ -70,7 +71,7 @@ class StatsService:
             # 3. Top bronnen (Geoptimaliseerd met SQL jsonb aggregation)
             sources_sql = text("""
                 SELECT doc_name, COUNT(*) as count
-                FROM chat_logs, jsonb_array_elements_text(retrieved_sources) as doc_name
+                FROM chat_logs, jsonb_array_elements_text(retrieved_sources::jsonb) as doc_name
                 WHERE retrieved_sources IS NOT NULL
                 GROUP BY doc_name
                 ORDER BY count DESC
