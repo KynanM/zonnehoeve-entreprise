@@ -150,6 +150,8 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
                         full_response += content
                         yield content
 
+
+                
                 # 5. Update de log in de achtergrond (indien aangemaakt)
                 if log_id:
                     latency = time.time() - start_time
@@ -160,6 +162,11 @@ async def chat_endpoint(req: ChatRequest, background_tasks: BackgroundTasks, req
                         sources,
                         latency
                     )
+                
+                # 6. Stuur log_id en bronnen naar de client voor feedback & citaties (REDUNDANT, AL VERZONDEN AAN BEGIN)
+                # yield f"|JSON|{json.dumps({'log_id': log_id, 'sources': sources})}"
+
+
             except Exception as e:
                 logger.error(f"Fout tijdens streaming: {e}", exc_info=True)
                 yield "\n\n[Systeemfout: Er ging iets mis bij het genereren van het antwoord.]"

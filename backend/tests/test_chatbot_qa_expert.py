@@ -4,7 +4,8 @@ import asyncio
 import time
 import json
 import os
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
+
 from main import app
 from httpx import AsyncClient, ASGITransport
 
@@ -33,13 +34,7 @@ async def initialize_app():
         app.state.llm = rag_data.get("llm")
     except Exception as e:
         # Fallback naar mocks voor CI/omgevingen zonder keys
-        mock_chain = {
-            "generation": AsyncMock(),
-            "retrieval": AsyncMock(),
-            "llm": AsyncMock()
-        }
         
-        # Configureer de mock voor grounding tests
         async def mock_astream(input_data):
             # Als de vraag 'Jan' of 'afdeling B' bevat (voor context test)
             prompt = str(input_data.get("input", "")).lower()
@@ -51,10 +46,20 @@ async def initialize_app():
         async def mock_retrieval_invoke(input_data):
             return []
 
-        mock_chain["generation"].astream = mock_astream
-        mock_chain["retrieval"].ainvoke = mock_retrieval_invoke
-        app.state.rag_chain = mock_chain
-        app.state.llm = mock_chain["llm"]
+        mock_gen = MagicMock()
+        mock_gen.astream = mock_astream
+        
+        mock_retrieval = AsyncMock()
+        mock_retrieval.ainvoke = mock_retrieval_invoke
+        
+        app.state.rag_chain = {
+            "generation": mock_gen,
+            "retrieval": mock_retrieval,
+            "llm": AsyncMock()
+        }
+        app.state.llm = app.state.rag_chain["llm"]
+
+
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_results_dir():

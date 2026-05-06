@@ -81,10 +81,10 @@ export default function AdminDashboard() {
   const [docSearch, setDocSearch] = useState("");
   const [uploadingFile, setUploadingFile] = useState(false);
 
-  const fetchStats = async () => {
+  const fetchStats = async (force: boolean = false) => {
     setIsLoading(true);
     try {
-      const data = await api.get<any>("/api/admin/stats", {
+      const data = await api.get<any>(`/api/admin/stats${force ? "?force=true" : ""}`, {
         headers: { "x-admin-key": password }
       });
       setStats(data);
@@ -230,7 +230,7 @@ export default function AdminDashboard() {
               <p className="text-earth-800/50 text-sm font-medium mt-0.5">Systeemgebruik, kwaliteitsmonitoring & QA-rapport</p>
             </div>
           </div>
-          <button onClick={() => { fetchStats(); fetchQaReport(); }} disabled={isLoading || isQaLoading}
+          <button onClick={() => { fetchStats(true); fetchQaReport(); }} disabled={isLoading || isQaLoading}
             className="flex items-center gap-2 px-5 py-3 bg-brand-green text-white rounded-xl font-bold text-sm hover:bg-brand-green-dark transition-all active:scale-95 disabled:opacity-60 shadow-lg shadow-brand-green/20 shrink-0">
             <RefreshCw size={16} className={(isLoading || isQaLoading) ? "animate-spin" : ""} />
             {(isLoading || isQaLoading) ? "Laden..." : "Ververs"}

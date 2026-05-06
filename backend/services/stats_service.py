@@ -15,7 +15,8 @@ class StatsService:
     # Simpele in-memory cache voor dashboard statistieken
     _cache: Dict[str, Any] = {}
     _cache_expiry: float = 0
-    CACHE_DURATION: int = 300  # 5 minuten in seconden
+    CACHE_DURATION: int = 30  # 30 seconden (vroeger 5 min)
+
 
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -53,13 +54,11 @@ class StatsService:
             )
 
             # 2. Activiteit per dag
-            # Gebruik naive UTC datetime voor vergelijking met DB
-            since = (datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)).replace(microsecond=0)
             activity_query = (
                 select(
                     cast(ChatLog.timestamp, Date).label("day"), func.count(ChatLog.id).label("count")
                 )
-                .where(ChatLog.timestamp >= since)
+                .where(ChatLog.timestamp >= func.now() - text(f"interval '{days} days'"))
                 .group_by(cast(ChatLog.timestamp, Date))
                 .order_by(cast(ChatLog.timestamp, Date))
             )
