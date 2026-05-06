@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, AlertTriangle, Sparkles, ClipboardList, Home } from "lucide-react";
+import { X, FileText, AlertTriangle, Sparkles, ClipboardList, Home, ThumbsUp, ThumbsDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
@@ -63,7 +63,9 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
 
 
   const handleFeedbackClick = (index: number, feedback: string) => {
-    setFeedbackExplainer({ index, feedback });
+    // Map 'up'/'down' to 'thumbs_up'/'thumbs_down' for backend compatibility
+    const backendFeedback = feedback === "up" ? "thumbs_up" : "thumbs_down";
+    setFeedbackExplainer({ index, feedback: backendFeedback });
   };
 
   const submitFeedbackExplainer = async () => {
@@ -287,6 +289,33 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
               <div className="flex gap-3">
                 <button onClick={handlePrintDossier} className="flex-1 bg-emerald-600 text-white font-bold py-4 rounded-2xl">Exporteer & Print</button>
                 <button onClick={() => setDossierModal(null)} className="px-8 py-4 bg-stone-100 rounded-2xl">Sluiten</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {feedbackExplainer && (
+          <div className="fixed inset-0 z-[110] bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[2.5rem] p-10 max-w-lg w-full shadow-2xl border border-stone-100">
+              <div className="flex items-center gap-3 mb-4">
+                <div className={cn("p-2 rounded-xl", feedbackExplainer.feedback === "thumbs_up" ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600")}>
+                  {feedbackExplainer.feedback === "thumbs_up" ? <ThumbsUp size={20} /> : <ThumbsDown size={20} />}
+                </div>
+                <h3 className="text-xl font-black">Bedankt voor je feedback!</h3>
+              </div>
+              <p className="text-stone-500 text-sm mb-6 font-medium">Wil je kort toelichten waarom dit antwoord {feedbackExplainer.feedback === "thumbs_up" ? "nuttig" : "niet nuttig"} was? Dit helpt ons de gids te verbeteren.</p>
+              <textarea 
+                value={explainerText} 
+                onChange={e => setExplainerText(e.target.value)} 
+                placeholder="Toelichting (optioneel)..."
+                className="w-full border-2 border-stone-100 p-5 rounded-2xl mb-6 h-32 outline-none focus:border-emerald-500 transition-colors text-sm font-medium" 
+              />
+              <div className="flex gap-3">
+                <button onClick={submitFeedbackExplainer} className="flex-1 bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition-colors active:scale-95 shadow-lg shadow-emerald-600/20">Versturen</button>
+                <button onClick={() => setFeedbackExplainer(null)} className="px-8 py-4 bg-stone-100 text-stone-600 font-bold rounded-2xl hover:bg-stone-200 transition-colors">Later</button>
               </div>
             </motion.div>
           </div>
