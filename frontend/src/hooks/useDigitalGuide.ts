@@ -261,6 +261,38 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     setPinnedDocs(prev => prev.includes(doc) ? prev.filter(d => d !== doc) : [...prev, doc]);
   };
 
+  const fetchThreadHistory = useCallback(async (threadId: string) => {
+    setIsLoading(true);
+    try {
+      const data = await api.get<any>(`/api/chat/threads/${threadId}`);
+      if (data && data.logs) {
+        // Mappen van database logs naar frontend Message formaat
+        const formattedMessages = data.logs.flatMap((log: any) => [
+          { role: "user", content: log.user_prompt },
+          { 
+            role: "assistant", 
+            content: log.bot_response, 
+            retrieved_sources: log.retrieved_sources,
+            log_id: log.id,
+            feedback: log.user_feedback
+          }
+        ]);
+        setMessages(formattedMessages);
+      }
+    } catch (e) {
+      console.error("Failed to fetch thread history", e);
+      setMessages([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeThreadId) {
+      fetchThreadHistory(activeThreadId);
+    }
+  }, [activeThreadId, fetchThreadHistory]);
+
   const deleteThread = async (id: string) => {
     try {
       await api.delete(`/api/chat/threads/${id}`, {

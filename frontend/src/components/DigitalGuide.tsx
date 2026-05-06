@@ -126,7 +126,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
         <ThreadSidebar 
           threads={threads} 
           activeThreadId={activeThreadId} 
-          onThreadSelect={(id) => { setActiveThreadId(id); setMessages([]); }} 
+          onThreadSelect={(id) => { setActiveThreadId(id); }} 
           onThreadDelete={deleteThread} 
           onThreadPin={pinThread}
           onThreadRename={renameThread}
