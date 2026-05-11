@@ -10,79 +10,87 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
   const [isConnected, setIsConnected] = useState(false);
   const [connectionMode, setConnectionMode] = useState<"websocket" | "polling" | "disconnected">("disconnected");
   const socketRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const wsFailedRef = useRef(false);
+  const inPollingModeRef = useRef(false);
   const mountedRef = useRef(true);
 
-  // HTTP Polling fallback: poll /api/admin/stats elke 15 seconden
-  const startPolling = useCallback(() => {
-    if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
+  // Eenmalige cleanup van polling
+  const stopPolling = useCallback(() => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  }, []);
+
+  // HTTP Polling fallback — PERMANENT, geen WS-reconnects meer daarna
+  const startPollingPermanently = useCallback(() => {
+    if (inPollingModeRef.current) return; // Voorkom dubbele polling
+    inPollingModeRef.current = true;
+    
+    stopPolling();
+    
+    if (!mountedRef.current) return;
     setConnectionMode("polling");
     setIsConnected(true);
-    console.log("📡 WebSocket niet beschikbaar — Polling modus actief (15s interval)");
+    console.log("📡 Polling modus actief (30s interval) — WebSocket niet beschikbaar");
     
-    // Onmiddellijk een refresh sturen
+    // Stuur direct een refresh
     onMessage({ type: "refresh_stats" });
     
     pollingIntervalRef.current = setInterval(() => {
       if (mountedRef.current) {
         onMessage({ type: "refresh_stats" });
       }
-    }, 15000);
-  }, [onMessage]);
+    }, 30000);
+  }, [onMessage, stopPolling]);
 
-  const connect = useCallback(() => {
+  useEffect(() => {
+    mountedRef.current = true;
     if (!password) return;
+
+    // Bepaal de backend URL voor WebSocket.
+    // NEXT_PUBLIC_API_URL moet de volledige backend URL zijn (bijv. https://...railway.app).
+    // Als dit niet ingesteld is (undefined), skip WebSocket direct en ga naar polling.
+    const backendApiUrl = process.env.NEXT_PUBLIC_API_URL;
     
-    // Stop bestaande polling
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
+    if (!backendApiUrl || backendApiUrl.includes("localhost") || backendApiUrl.includes("127.0.0.1")) {
+      // Geen geldige productie backend URL → ga direct naar polling
+      console.log("ℹ️ Geen backend URL geconfigureerd voor WebSocket — direct polling starten");
+      startPollingPermanently();
+      return;
     }
 
-    // Bepaal de WebSocket URL op basis van de backend URL.
-    // NEXT_PUBLIC_API_URL is de Railway-variabele voor de backend.
-    // WebSocket gaat NIET via de Next.js proxy — we verbinden rechtstreeks met de backend.
-    const backendApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const cleanHost = backendApiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
     const protocol = backendApiUrl.startsWith("https") ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${cleanHost}/ws/admin?token=${password}`;
 
-    console.log("🔌 Verbinden met WebSocket:", wsUrl);
-    
+    console.log("🔌 Eenmalige WebSocket poging:", wsUrl);
+
     let ws: WebSocket;
     try {
       ws = new WebSocket(wsUrl);
     } catch (e) {
-      console.warn("⚠️ WebSocket aanmaken mislukt, overschakelen naar polling:", e);
-      wsFailedRef.current = true;
-      startPolling();
+      console.warn("⚠️ WebSocket aanmaken mislukt, start polling:", e);
+      startPollingPermanently();
       return;
     }
 
-    // Als WebSocket na 6 seconden nog niet verbonden is, val terug op polling
-    const wsTimeoutId = setTimeout(() => {
+    // Timeout: als niet verbonden binnen 8 seconden → polling (GEEN herpoging)
+    const wsTimeout = setTimeout(() => {
       if (ws.readyState !== WebSocket.OPEN) {
-        console.warn("⏱️ WebSocket timeout — overschakelen naar polling modus");
+        console.warn("⏱️ WebSocket timeout — permanent naar polling");
         ws.close();
-        wsFailedRef.current = true;
-        startPolling();
+        startPollingPermanently();
       }
-    }, 6000);
+    }, 8000);
 
     ws.onopen = () => {
-      clearTimeout(wsTimeoutId);
+      clearTimeout(wsTimeout);
+      if (!mountedRef.current) { ws.close(); return; }
       console.log("✅ WebSocket verbonden");
-      wsFailedRef.current = false;
-      if (mountedRef.current) {
-        setIsConnected(true);
-        setConnectionMode("websocket");
-      }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
+      setIsConnected(true);
+      setConnectionMode("websocket");
+      socketRef.current = ws;
     };
 
     ws.onmessage = (event) => {
@@ -95,58 +103,41 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
     };
 
     ws.onclose = (event) => {
-      clearTimeout(wsTimeoutId);
-      console.log("🔌 WebSocket gesloten:", event.code, event.reason);
-      if (mountedRef.current) {
-        setIsConnected(false);
-        socketRef.current = null;
-      }
+      clearTimeout(wsTimeout);
+      socketRef.current = null;
+      if (!mountedRef.current) return;
       
-      // Als WebSocket eerder al gefaald heeft of code 1006 (abnormal closure), ga naar polling
-      if (wsFailedRef.current || event.code === 1006 || event.code === 1015) {
-        startPolling();
-        return;
-      }
+      console.log("🔌 WebSocket gesloten:", event.code);
+      setIsConnected(false);
       
-      // Normale reconnect poging na 4 seconden
-      if (!reconnectTimeoutRef.current && mountedRef.current) {
-        reconnectTimeoutRef.current = setTimeout(() => {
-          console.log("🔄 Opnieuw proberen te verbinden...");
-          reconnectTimeoutRef.current = null;
-          connect();
-        }, 4000);
-      }
+      // Bij elke sluiting: permanent naar polling, GEEN herverbinding
+      startPollingPermanently();
     };
 
-    ws.onerror = (error) => {
-      clearTimeout(wsTimeoutId);
-      console.error("❌ WebSocket fout:", error);
-      wsFailedRef.current = true;
-      ws.close();
+    ws.onerror = () => {
+      // Fout wordt afgehandeld in onclose
     };
 
-    socketRef.current = ws;
-  }, [password, onMessage, startPolling]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    connect();
     return () => {
       mountedRef.current = false;
-      if (socketRef.current) {
-        socketRef.current.close();
+      clearTimeout(wsTimeout);
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        ws.close();
       }
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-      }
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
+      stopPolling();
     };
-  }, [connect]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [password]); // Bewust geen reconnect dependencies — éénmalige setup
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      stopPolling();
+    };
+  }, [stopPolling]);
 
   const sendMessage = (msg: any) => {
-    if (socketRef.current && isConnected && connectionMode === "websocket") {
+    if (socketRef.current?.readyState === WebSocket.OPEN) {
       socketRef.current.send(typeof msg === "string" ? msg : JSON.stringify(msg));
     }
   };

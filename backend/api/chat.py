@@ -75,12 +75,24 @@ async def submit_feedback(req: FeedbackRequest, db: AsyncSession = Depends(get_d
 
 @router.get("/threads")
 async def get_threads(db: AsyncSession = Depends(get_db)):
-    res = await db.execute(
-        select(ChatThread)
-        .where(ChatThread.is_archived.is_(False))
-        .order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
-    )
-    return res.scalars().all()
+    try:
+        res = await db.execute(
+            select(ChatThread)
+            .where(ChatThread.is_archived.is_(False))
+            .order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
+        )
+        return res.scalars().all()
+    except Exception as e:
+        # Fallback: als kolommen nog niet bestaan in de DB, gebruik simpele query
+        logger.warning(f"get_threads geavanceerde query mislukt ({e}), terugval naar simpele query")
+        try:
+            await db.rollback()
+            res = await db.execute(select(ChatThread).order_by(ChatThread.created_at.desc()))
+            return res.scalars().all()
+        except Exception as e2:
+            logger.error(f"get_threads ook simpele query mislukt: {e2}")
+            return []
+
 
 @router.get("/threads/{thread_id}")
 async def get_thread_history(thread_id: str, db: AsyncSession = Depends(get_db)):
