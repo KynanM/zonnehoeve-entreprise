@@ -65,6 +65,9 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
   const handleFeedbackClick = (index: number, feedback: string) => {
     // Map 'up'/'down' to 'thumbs_up'/'thumbs_down' for backend compatibility
     const backendFeedback = feedback === "up" ? "thumbs_up" : "thumbs_down";
+    // Sla de feedback DIRECT op — UI bijwerken en naar backend sturen zonder modal te vereisen
+    handleFeedback(index, backendFeedback);
+    // Toon de explainer-modal optioneel voor extra toelichting
     setFeedbackExplainer({ index, feedback: backendFeedback });
   };
 

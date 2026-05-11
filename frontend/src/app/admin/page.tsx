@@ -73,9 +73,9 @@ export default function AdminDashboard() {
     finally { setIsDocsLoading(false); }
   }, []);
 
-  // WebSocket voor real-time updates
-  const { isConnected } = useAdminSocket(isAuthenticated ? password : "", (msg) => {
-    console.log("📨 WebSocket bericht ontvangen:", msg);
+  // WebSocket voor real-time updates (met automatische HTTP polling fallback)
+  const { isConnected, connectionMode } = useAdminSocket(isAuthenticated ? password : "", (msg) => {
+    console.log("📨 Bericht ontvangen:", msg);
     if (msg.type === "refresh_stats") {
       fetchStats(false, currentPage);
     } else if (msg.type === "new_log") {
@@ -174,9 +174,17 @@ export default function AdminDashboard() {
           <span className="font-extrabold text-lg text-earth-900">Zonnehoeve<span className="text-brand-green-dark font-normal ml-1">| Living+</span></span>
         </Link>
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${isConnected ? 'bg-green-50 text-brand-green' : 'bg-red-50 text-red-500'}`}>
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-brand-green animate-pulse' : 'bg-red-500'}`} />
-            {isConnected ? 'Real-time Live' : 'Offline'}
+          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+            connectionMode === 'websocket' ? 'bg-green-50 text-brand-green' :
+            connectionMode === 'polling' ? 'bg-blue-50 text-blue-600' :
+            'bg-red-50 text-red-500'
+          }`}>
+            <div className={`w-2 h-2 rounded-full ${
+              connectionMode === 'websocket' ? 'bg-brand-green animate-pulse' :
+              connectionMode === 'polling' ? 'bg-blue-500 animate-pulse' :
+              'bg-red-500'
+            }`} />
+            {connectionMode === 'websocket' ? 'Real-time Live' : connectionMode === 'polling' ? 'Polling Actief' : 'Offline'}
           </div>
         </div>
       </header>
