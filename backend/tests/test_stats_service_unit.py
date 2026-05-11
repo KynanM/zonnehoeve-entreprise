@@ -30,6 +30,10 @@ async def test_stats_service_get_dashboard_stats():
         MagicMock(doc_name="protocol.pdf", count=10)
     ]
     
+    # Mock total logs count for pagination
+    mock_total_logs_res = MagicMock()
+    mock_total_logs_res.scalar.return_value = 10
+    
     # Mock recent logs
     mock_logs_res = MagicMock()
     mock_logs_res.scalars.return_value.all.return_value = []
@@ -38,6 +42,7 @@ async def test_stats_service_get_dashboard_stats():
         mock_stats_res,
         mock_activity_res,
         mock_docs_res,
+        mock_total_logs_res,
         mock_logs_res
     ]
     

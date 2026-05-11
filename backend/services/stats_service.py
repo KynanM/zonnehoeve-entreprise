@@ -21,7 +21,7 @@ class StatsService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def get_dashboard_stats(self, days: int = 14, force_refresh: bool = False) -> dict[str, Any]:
+    async def get_dashboard_stats(self, days: int = 14, force_refresh: bool = False, page: int = 1, page_size: int = 50) -> dict[str, Any]:
         """Haalt alle dashboard statistieken op in zo min mogelijk queries."""
         
         # Check cache
@@ -79,8 +79,12 @@ class StatsService:
             sources_res = await self.db.execute(sources_sql)
             top_docs = [{"doc": row.doc_name, "count": row.count} for row in sources_res.fetchall()]
 
-            # 4. Recente logs
-            logs_query = select(ChatLog).order_by(desc(ChatLog.timestamp)).limit(50)
+            # 4. Recente logs (Gepagineerd)
+            total_logs_res = await self.db.execute(select(func.count(ChatLog.id)))
+            total_logs_count = total_logs_res.scalar() or 0
+            
+            offset = (page - 1) * page_size
+            logs_query = select(ChatLog).order_by(desc(ChatLog.timestamp)).limit(page_size).offset(offset)
             logs_res = await self.db.execute(logs_query)
             recent_logs = logs_res.scalars().all()
 
@@ -93,6 +97,12 @@ class StatsService:
                 "daily_activity": daily_activity,
                 "top_docs": top_docs,
                 "recent_logs": recent_logs,
+                "pagination": {
+                    "total": total_logs_count,
+                    "page": page,
+                    "page_size": page_size,
+                    "total_pages": (total_logs_count + page_size - 1) // page_size
+                }
             }
 
             # Update cache

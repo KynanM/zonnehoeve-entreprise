@@ -35,7 +35,7 @@ async def test_chat_llm_fallback():
     mock_request.app.state.llm = None # Trigger fallback
     
     req = ChatRequest(input="hallo", chat_history=[])
-    with patch("api.chat.create_chat_log", return_value=1):
+    with patch("services.chat_service.ChatService.create_chat_log", return_value=1):
         response = await chat_endpoint(req, MagicMock(), mock_request)
         async for chunk in response.body_iterator:
             pass

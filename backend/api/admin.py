@@ -9,6 +9,11 @@ router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
 
 @router.get("/stats", dependencies=[Depends(verify_admin)])
-async def get_stats(force: bool = False, db: AsyncSession = Depends(get_db)):
+async def get_stats(
+    force: bool = False, 
+    page: int = 1, 
+    page_size: int = 50, 
+    db: AsyncSession = Depends(get_db)
+):
     service = StatsService(db)
-    return await service.get_dashboard_stats(force_refresh=force)
+    return await service.get_dashboard_stats(force_refresh=force, page=page, page_size=page_size)
