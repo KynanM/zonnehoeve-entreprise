@@ -266,64 +266,246 @@ export default function AdminDashboard() {
           />
         )}
 
-        {/* Kwaliteit & Safety Tabs - Versimpelde weergave of integratie uit oude code */}
-        {activeTab === "kwaliteit" && qaReport && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-             <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5 flex flex-col md:flex-row items-center gap-8">
-                <div className="w-24 h-24 rounded-full bg-brand-green/10 flex items-center justify-center text-3xl font-black text-brand-green">
-                  {qaReport.overall_score}
+        {/* ── KWALITEIT TAB ── */}
+        {activeTab === "kwaliteit" && (
+          <AnimatePresence mode="wait">
+            {isQaLoading ? (
+              <motion.div key="qa-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-64 flex flex-col items-center justify-center gap-4 text-earth-800/40">
+                <div className="w-10 h-10 border-4 border-earth-100 border-t-brand-green rounded-full animate-spin" />
+                <p className="font-bold">Kwaliteitsrapport laden...</p>
+              </motion.div>
+            ) : !qaReport ? (
+              <motion.div key="qa-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-64 flex flex-col items-center justify-center gap-4 text-earth-800/40">
+                <AlertTriangle size={40} className="text-earth-200" />
+                <p className="font-bold text-center max-w-xs">Geen kwaliteitsdata beschikbaar. Klik op &quot;Ververs&quot; om het rapport op te halen.</p>
+              </motion.div>
+            ) : (
+              <motion.div key="qa-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                {/* Score Header */}
+                <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
+                  <div className="absolute right-0 top-0 w-64 h-64 bg-brand-yellow/5 blur-3xl rounded-full pointer-events-none" />
+                  <div className={`w-28 h-28 rounded-full flex items-center justify-center text-4xl font-black shrink-0 ${
+                    qaReport.overall_score >= 80 ? "bg-brand-green/10 text-brand-green" :
+                    qaReport.overall_score >= 60 ? "bg-yellow-50 text-yellow-600" :
+                    qaReport.overall_score >= 40 ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
+                  }`}>
+                    {qaReport.overall_score}
+                  </div>
+                  <div className="flex-1">
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 ${
+                      qaReport.score_color === "green" ? "bg-brand-green/10 text-brand-green" :
+                      qaReport.score_color === "yellow" ? "bg-yellow-50 text-yellow-600" :
+                      qaReport.score_color === "orange" ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
+                    }`}>
+                      <CheckCircle2 size={12} /> {qaReport.score_label}
+                    </div>
+                    <h2 className="text-2xl font-black text-earth-900 mb-1">Code Kwaliteitsrapport</h2>
+                    <p className="text-earth-800/50 text-sm">Gegenereerd op {qaReport.generated_at ? new Date(qaReport.generated_at).toLocaleString("nl-BE") : "—"}</p>
+                    <div className="mt-4 h-2.5 bg-earth-100 rounded-full overflow-hidden max-w-sm">
+                      <div className={`h-full rounded-full transition-all duration-1000 ${
+                        qaReport.overall_score >= 80 ? "bg-brand-green" :
+                        qaReport.overall_score >= 60 ? "bg-yellow-400" :
+                        qaReport.overall_score >= 40 ? "bg-orange-400" : "bg-red-400"
+                      }`} style={{ width: `${qaReport.overall_score}%` }} />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-black text-earth-900">Code Kwaliteit: {qaReport.score_label}</h2>
-                  <p className="text-earth-800/50 mt-2">Gezondheidsscore op basis van tests, linting en coverage.</p>
+
+                {/* 3 Hoofdmetrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  {/* Tests */}
+                  <div className="bg-white rounded-[2rem] p-7 border border-black/5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-brand-green/10 rounded-xl text-brand-green"><Activity size={18} /></div>
+                      <h3 className="font-extrabold text-earth-900">Tests</h3>
+                    </div>
+                    {qaReport.tests?.available ? (
+                      <>
+                        <div className="text-4xl font-black text-earth-900">{qaReport.tests.pass_rate}%<span className="text-base font-bold text-earth-800/30 ml-1">pass rate</span></div>
+                        <div className="h-2 bg-earth-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-brand-green rounded-full" style={{ width: `${qaReport.tests.pass_rate}%` }} />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          {[
+                            { label: "Geslaagd", val: qaReport.tests.passed, color: "text-brand-green" },
+                            { label: "Mislukt", val: qaReport.tests.failed, color: "text-red-500" },
+                            { label: "Totaal", val: qaReport.tests.total, color: "text-earth-900" },
+                            { label: "Duur", val: `${qaReport.tests.duration}s`, color: "text-earth-900" },
+                          ].map(s => (
+                            <div key={s.label} className="bg-earth-50 rounded-xl p-3">
+                              <div className="text-xs font-black text-earth-800/30 uppercase mb-1">{s.label}</div>
+                              <div className={`font-black ${s.color}`}>{s.val}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.tests?.message || "Voer pytest uit om testresultaten te genereren."}</p>
+                    )}
+                  </div>
+
+                  {/* Coverage */}
+                  <div className="bg-white rounded-[2rem] p-7 border border-black/5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-accent-blue/10 rounded-xl" style={{ color: "var(--accent-blue, #3b82f6)" }}><Zap size={18} /></div>
+                      <h3 className="font-extrabold text-earth-900">Coverage</h3>
+                    </div>
+                    {qaReport.coverage?.available ? (
+                      <>
+                        <div className="text-4xl font-black text-earth-900">{qaReport.coverage.line_coverage}%<span className="text-base font-bold text-earth-800/30 ml-1">lines</span></div>
+                        <div className="h-2 bg-earth-100 rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full ${qaReport.coverage.passes_threshold ? "bg-blue-500" : "bg-orange-400"}`} style={{ width: `${qaReport.coverage.line_coverage}%` }} />
+                        </div>
+                        <div className="text-xs font-bold text-earth-800/40 flex items-center gap-2">
+                          {qaReport.coverage.passes_threshold
+                            ? <><CheckCircle2 size={12} className="text-brand-green" /> Drempel van {qaReport.coverage.threshold}% gehaald</>
+                            : <><AlertTriangle size={12} className="text-orange-400" /> Onder drempel van {qaReport.coverage.threshold}%</>}
+                        </div>
+                        {qaReport.coverage.packages?.length > 0 && (
+                          <div className="space-y-2">
+                            <p className="text-[10px] font-black uppercase text-earth-800/30 tracking-widest">Laagste Coverage</p>
+                            {qaReport.coverage.packages.slice(0, 5).map((pkg: any, i: number) => (
+                              <div key={i} className="flex items-center gap-2">
+                                <div className="flex-1 h-1.5 bg-earth-100 rounded-full overflow-hidden">
+                                  <div className={`h-full rounded-full ${pkg.coverage >= 70 ? "bg-brand-green" : "bg-orange-400"}`} style={{ width: `${pkg.coverage}%` }} />
+                                </div>
+                                <span className="text-[10px] font-bold text-earth-800/40 w-10 text-right">{pkg.coverage}%</span>
+                                <span className="text-[10px] font-bold text-earth-800/60 truncate max-w-[80px]" title={pkg.name}>{pkg.name}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.coverage?.message || "Voer pytest --cov uit om coverage te meten."}</p>
+                    )}
+                  </div>
+
+                  {/* Lint */}
+                  <div className="bg-white rounded-[2rem] p-7 border border-black/5 shadow-sm space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 bg-brand-yellow/10 rounded-xl text-brand-yellow-dark"><Code2 size={18} /></div>
+                      <h3 className="font-extrabold text-earth-900">Linting</h3>
+                    </div>
+                    {qaReport.lint?.available ? (
+                      <>
+                        <div className="flex items-end gap-2">
+                          <div className="text-4xl font-black text-earth-900">{qaReport.lint.total_issues}</div>
+                          <span className="text-base font-bold text-earth-800/30 mb-1">issues</span>
+                          {qaReport.lint.is_clean && <span className="text-xs font-black text-brand-green bg-brand-green/10 px-2 py-0.5 rounded-full mb-1">Clean ✓</span>}
+                        </div>
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          {[
+                            { label: "Errors", val: qaReport.lint.severity?.error ?? 0, color: "text-red-500" },
+                            { label: "Warnings", val: qaReport.lint.severity?.warning ?? 0, color: "text-orange-400" },
+                            { label: "Info", val: qaReport.lint.severity?.info ?? 0, color: "text-blue-400" },
+                          ].map(s => (
+                            <div key={s.label} className="bg-earth-50 rounded-xl p-2">
+                              <div className={`text-lg font-black ${s.color}`}>{s.val}</div>
+                              <div className="text-[9px] font-black text-earth-800/30 uppercase">{s.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {qaReport.lint.top_rule_violations?.length > 0 && (
+                          <div className="space-y-1.5">
+                            <p className="text-[10px] font-black uppercase text-earth-800/30 tracking-widest">Top Overtredingen</p>
+                            {qaReport.lint.top_rule_violations.slice(0, 5).map((v: any, i: number) => (
+                              <div key={i} className="flex items-center justify-between text-xs">
+                                <span className="font-black text-earth-800/60 bg-earth-50 px-2 py-0.5 rounded font-mono">{v.code}</span>
+                                <span className="font-bold text-earth-800/40">{v.count}×</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {qaReport.lint.most_issues_in?.length > 0 && (
+                          <div className="space-y-1.5">
+                            <p className="text-[10px] font-black uppercase text-earth-800/30 tracking-widest">Meeste Issues In</p>
+                            {qaReport.lint.most_issues_in.slice(0, 3).map((f: any, i: number) => (
+                              <div key={i} className="flex items-center justify-between text-xs">
+                                <span className="font-bold text-earth-800/60 truncate max-w-[140px]">{f.file}</span>
+                                <span className="font-black text-earth-800/40">{f.count}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.lint?.message || "Voer ruff check . --output-format=json > ruff_report.json uit."}</p>
+                    )}
+                  </div>
                 </div>
-             </div>
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-[1.8rem] border border-black/5">
-                   <h4 className="text-xs font-black uppercase text-earth-800/30 mb-4 flex items-center gap-2"><Activity size={14}/> Tests</h4>
-                   <div className="text-3xl font-black">{qaReport.tests?.pass_rate}% Pass Rate</div>
-                </div>
-                <div className="bg-white p-6 rounded-[1.8rem] border border-black/5">
-                   <h4 className="text-xs font-black uppercase text-earth-800/30 mb-4 flex items-center gap-2"><Code2 size={14}/> Lint Issues</h4>
-                   <div className="text-3xl font-black">{qaReport.lint?.total_issues} issues</div>
-                </div>
-                <div className="bg-white p-6 rounded-[1.8rem] border border-black/5">
-                   <h4 className="text-xs font-black uppercase text-earth-800/30 mb-4 flex items-center gap-2"><Zap size={14}/> Coverage</h4>
-                   <div className="text-3xl font-black">{qaReport.coverage?.line_coverage}%</div>
-                </div>
-             </div>
-          </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
 
-        {activeTab === "safety" && qaReport?.safety && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-             <div className="bg-earth-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
-                <div className="relative z-10">
-                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-green/20 text-brand-green rounded-full text-[10px] font-black uppercase mb-4">
-                     <ShieldCheck size={12} /> AI Safety & Compliance
-                   </div>
-                   <h2 className="text-3xl font-black mb-3">AI Trust Score: {qaReport.safety.overall_trust_score}%</h2>
-                   <p className="text-white/60 max-w-xl text-sm">Validatie van grounding, adversarial resistance en latency.</p>
+        {/* ── SAFETY TAB ── */}
+        {activeTab === "safety" && (
+          <AnimatePresence mode="wait">
+            {isQaLoading ? (
+              <motion.div key="safety-loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-64 flex flex-col items-center justify-center gap-4 text-earth-800/40">
+                <div className="w-10 h-10 border-4 border-earth-100 border-t-brand-green rounded-full animate-spin" />
+                <p className="font-bold">Safety rapport laden...</p>
+              </motion.div>
+            ) : !qaReport?.safety?.available ? (
+              <motion.div key="safety-empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+                <div className="bg-earth-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-green/20 text-brand-green rounded-full text-[10px] font-black uppercase mb-4">
+                    <ShieldCheck size={12} /> AI Safety & Compliance
+                  </div>
+                  <h2 className="text-2xl font-black mb-3">Safety-testresultaten niet beschikbaar</h2>
+                  <p className="text-white/50 text-sm max-w-lg">{qaReport?.safety?.message || "Voer 'pytest tests/test_chatbot_qa_expert.py' uit om safety-metrics te genereren."}</p>
                 </div>
-             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-8 rounded-[2rem] border border-black/5">
-                   <div className="flex items-center gap-3 mb-6">
-                      <Terminal size={20} className="text-red-500" />
-                      <h3 className="font-bold">Red Teaming Resistance</h3>
-                   </div>
-                   <div className="text-4xl font-black text-earth-900">{qaReport.safety.category_scores?.['Red Teaming']}%</div>
+              </motion.div>
+            ) : (
+              <motion.div key="safety-content" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+                {/* Trust Score Header */}
+                <div className="bg-earth-900 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-brand-green/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 pointer-events-none" />
+                  <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-8">
+                    <div className="w-24 h-24 rounded-full bg-brand-green/20 border-2 border-brand-green/30 flex items-center justify-center shrink-0">
+                      <span className="text-3xl font-black text-brand-green">{qaReport.safety.overall_trust_score}%</span>
+                    </div>
+                    <div>
+                      <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-green/20 text-brand-green rounded-full text-[10px] font-black uppercase mb-3">
+                        <ShieldCheck size={12} /> AI Safety & Compliance
+                      </div>
+                      <h2 className="text-3xl font-black mb-2">AI Trust Score</h2>
+                      <p className="text-white/50 text-sm max-w-lg">Validatie van grounding, adversarial resistance, context-coherentie en latency op basis van expert QA-tests.</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-white p-8 rounded-[2rem] border border-black/5">
-                   <div className="flex items-center gap-3 mb-6">
-                      <Brain size={20} className="text-brand-green" />
-                      <h3 className="font-bold">Grounding Accuracy</h3>
-                   </div>
-                   <div className="text-4xl font-black text-earth-900">{qaReport.safety.category_scores?.['Grounding']}%</div>
-                </div>
-             </div>
-          </motion.div>
+
+                {/* Categorie Scores */}
+                {qaReport.safety.category_scores && Object.keys(qaReport.safety.category_scores).length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {Object.entries(qaReport.safety.category_scores).map(([cat, score]: [string, any]) => {
+                      const pct = typeof score === "number" ? score : parseFloat(score);
+                      return (
+                        <div key={cat} className="bg-white p-7 rounded-[2rem] border border-black/5 shadow-sm space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2.5 rounded-xl ${pct >= 80 ? "bg-brand-green/10 text-brand-green" : pct >= 60 ? "bg-yellow-50 text-yellow-600" : "bg-red-50 text-red-500"}`}>
+                                <ShieldCheck size={18} />
+                              </div>
+                              <h3 className="font-extrabold text-earth-900">{cat}</h3>
+                            </div>
+                            <span className={`text-2xl font-black ${pct >= 80 ? "text-brand-green" : pct >= 60 ? "text-yellow-600" : "text-red-500"}`}>{pct}%</span>
+                          </div>
+                          <div className="h-2.5 bg-earth-100 rounded-full overflow-hidden">
+                            <div className={`h-full rounded-full transition-all duration-1000 ${pct >= 80 ? "bg-brand-green" : pct >= 60 ? "bg-yellow-400" : "bg-red-400"}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <p className="text-xs font-bold text-earth-800/30 text-center">Gegenereerd op {qaReport.safety.generated_at ? new Date(qaReport.safety.generated_at).toLocaleString("nl-BE") : "—"}</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
+
       </div>
     </div>
   );

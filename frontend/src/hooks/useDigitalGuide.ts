@@ -175,11 +175,13 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
         });
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
       }, (logId) => {
-        setMessages(prev => {
-          const next = [...prev];
-          next[next.length - 1].log_id = logId;
-          return next;
-        });
+        if (logId !== null) {
+          setMessages(prev => {
+            const next = [...prev];
+            next[next.length - 1].log_id = logId;
+            return next;
+          });
+        }
       }, (sources) => {
         setMessages(prev => {
           const next = [...prev];
@@ -188,7 +190,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
         });
       });
 
-      if (!activeThreadId) fetchThreads();
+      // fetchThreads wordt uitgevoerd in finally zodat het altijd loopt na de volledige stream
     } catch (error: any) {
       console.error("Chat error:", error);
       const errorMsg = error?.message?.includes("500") 
@@ -208,6 +210,8 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     } finally {
       setIsLoading(false);
       setCooldown(2);
+      // Altijd threads herladen na een bericht, zodat nieuwe threads in de sidebar verschijnen
+      fetchThreads();
     }
   }, [input, isLoading, cooldown, messages, activeThreadId, showToast]);
 

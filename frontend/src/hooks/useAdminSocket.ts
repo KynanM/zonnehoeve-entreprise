@@ -14,13 +14,13 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
   const connect = useCallback(() => {
     if (!password) return;
 
-    // Bepaal de websocket URL op basis van de huidige window location
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = process.env.NEXT_PUBLIC_BACKEND_URL 
-      ? process.env.NEXT_PUBLIC_BACKEND_URL.replace(/^https?:\/\//, "")
-      : window.location.host.includes("localhost") ? "localhost:8000" : window.location.host;
-    
-    const wsUrl = `${protocol}//${host}/ws/admin?token=${password}`;
+    // Bepaal de WebSocket URL op basis van de backend URL.
+    // NEXT_PUBLIC_API_URL is de Railway-variabele voor de backend.
+    // WebSocket gaat NIET via de Next.js proxy — we verbinden rechtstreeks met de backend.
+    const backendApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const cleanHost = backendApiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    const protocol = backendApiUrl.startsWith("https") ? "wss:" : "ws:";
+    const wsUrl = `${protocol}//${cleanHost}/ws/admin?token=${password}`;
 
     console.log("🔌 Verbinden met WebSocket:", wsUrl);
     const ws = new WebSocket(wsUrl);

@@ -124,21 +124,21 @@ export default function MessageItem({
                   onClick={() => onFeedback(index, "up")}
                   className={cn(
                     "p-2 rounded-xl transition-colors",
-                    message.feedback === "up" ? "text-emerald-500 bg-emerald-50" : "text-stone-400 hover:text-emerald-500 hover:bg-emerald-50"
+                    message.feedback === "thumbs_up" ? "text-emerald-500 bg-emerald-50" : "text-stone-400 hover:text-emerald-500 hover:bg-emerald-50"
                   )}
                   title="Nuttig"
                 >
-                  <ThumbsUp size={16} fill={message.feedback === "up" ? "currentColor" : "none"} />
+                  <ThumbsUp size={16} fill={message.feedback === "thumbs_up" ? "currentColor" : "none"} />
                 </button>
                 <button 
                   onClick={() => onFeedback(index, "down")}
                   className={cn(
                     "p-2 rounded-xl transition-colors",
-                    message.feedback === "down" ? "text-rose-500 bg-rose-50" : "text-stone-400 hover:text-rose-500 hover:bg-rose-50"
+                    message.feedback === "thumbs_down" ? "text-rose-500 bg-rose-50" : "text-stone-400 hover:text-rose-500 hover:bg-rose-50"
                   )}
                   title="Niet nuttig"
                 >
-                  <ThumbsDown size={16} fill={message.feedback === "down" ? "currentColor" : "none"} />
+                  <ThumbsDown size={16} fill={message.feedback === "thumbs_down" ? "currentColor" : "none"} />
                 </button>
               </div>
             )}
