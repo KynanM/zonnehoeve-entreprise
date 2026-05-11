@@ -149,6 +149,18 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     setTimeout(() => setToast({ show: false, message: "" }), 3000);
   }, []);
 
+  const startNewChat = useCallback(() => {
+    setActiveThreadId(null);
+    setMessages([{ 
+      role: "assistant", 
+      content: "Hallo! Ik ben je Digitale Gids. Waarmee kan ik je vandaag helpen?",
+      timestamp: new Date().toISOString()
+    }]);
+    setActiveDocument(null);
+    setActivePage(null);
+    setSuggestedQuestions([]);
+  }, []);
+
   const handleSubmit = useCallback(async (e: React.FormEvent | string) => {
     if (typeof e !== "string") e.preventDefault();
     const prompt = typeof e === "string" ? e : input;
@@ -316,17 +328,14 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
       });
       fetchThreads();
       if (activeThreadId === id) {
-        setMessages([]);
-        setActiveThreadId(null);
+        startNewChat();
       }
     } catch (e) { console.error(e); }
   };
 
-  const finishNewChat = () => { setMessages([]); setActiveThreadId(null); };
-
   const pinThread = async (id: string, isPinned: boolean) => {
     try {
-      await api.patch(`/api/chat/threads/${id}/metadata`, { is_pinned: isPinned ? 1 : 0 });
+      await api.patch(`/api/chat/threads/${id}/metadata`, { is_pinned: isPinned });
       fetchThreads();
     } catch (e) { console.error(e); }
   };
@@ -359,7 +368,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     showUpdateBanner, setShowUpdateBanner, dossierModal, setDossierModal, pinnedNotes, setPinnedNotes,
     messagesEndRef,
     // Handlers
-    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, finishNewChat, 
+    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, startNewChat, 
     showToast, fetchPreview, pinThread, renameThread, deleteAllThreads
   };
 }
