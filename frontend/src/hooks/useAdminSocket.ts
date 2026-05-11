@@ -60,7 +60,10 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
       return;
     }
 
-    const cleanHost = backendApiUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    const cleanHost = backendApiUrl
+      .replace(/^https?:\/\//, "")
+      .replace(/\/$/, "")
+      .replace(/\/api$/, "");
     const protocol = backendApiUrl.startsWith("https") ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${cleanHost}/ws/admin?token=${password}`;
 
