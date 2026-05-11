@@ -61,7 +61,8 @@ export const api = {
     body: any, 
     onChunk: (chunk: string) => void, 
     onLogId?: (id: number | null) => void,
-    onSources?: (sources: string[]) => void
+    onSources?: (sources: string[]) => void,
+    onThreadId?: (threadId: string) => void
   ) => {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       method: "POST",
@@ -95,6 +96,14 @@ export const api = {
             foundMarker = true;
           }
           
+          // 1b. Thread ID (__thread_id__:uuid\n)
+          const threadIdMatch = buffer.match(/__thread_id__:([^\n]+)\n/);
+          if (threadIdMatch) {
+            if (onThreadId) onThreadId(threadIdMatch[1].trim());
+            buffer = buffer.replace(threadIdMatch[0], "");
+            foundMarker = true;
+          }
+          
           // 2. Sources (__sources__:a.pdf,b.pdf\n)
           const sourcesMatch = buffer.match(/__sources__:([^\n]*)\n/);
           if (sourcesMatch) {
@@ -117,16 +126,18 @@ export const api = {
           }
         }
         
-        // Stuur tekst door als de buffer geen markers meer bevat aan het begin
-        const cleanChunk = buffer.replace(/__log_id__:(?:\d+|None)\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g, "");
+        // Stuur tekst door als de buffer geen markers meer bevat
+        const MARKER_REGEX = /__log_id__:(?:\d+|None)\n|__thread_id__:[^\n]+\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g;
+        const cleanChunk = buffer.replace(MARKER_REGEX, "");
         if (cleanChunk) {
           onChunk(cleanChunk);
           buffer = buffer.replace(cleanChunk, "");
         }
       }
       // Final flush
+      const MARKER_REGEX = /__log_id__:(?:\d+|None)\n|__thread_id__:[^\n]+\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g;
       if (buffer) {
-        onChunk(buffer.replace(/__log_id__:(?:\d+|None)\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g, ""));
+        onChunk(buffer.replace(MARKER_REGEX, ""));
       }
     }
   }

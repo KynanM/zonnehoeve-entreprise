@@ -36,6 +36,7 @@ class ChatService:
             try:
                 log_id = await self.create_chat_log(thread_id, user_input)
                 yield f"__log_id__:{log_id}\n"
+                yield f"__thread_id__:{thread_id}\n"
             except Exception as e:
                 logger.error(f"Error creating chat log: {e}")
                 yield "__log_id__:None\n"

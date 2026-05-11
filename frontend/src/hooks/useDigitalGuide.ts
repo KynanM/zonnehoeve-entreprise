@@ -188,6 +188,10 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
           next[next.length - 1].retrieved_sources = sources;
           return next;
         });
+      }, (threadId) => {
+        // Sla de thread_id op zodat vervolgberichten in dezelfde thread komen
+        // en zodat fetchThreads() de juiste thread kan terugvinden in de sidebar
+        setActiveThreadId(threadId);
       });
 
       // fetchThreads wordt uitgevoerd in finally zodat het altijd loopt na de volledige stream
