@@ -34,6 +34,10 @@ async def lifespan(app: FastAPI):
         migration_statements = [
             "ALTER TABLE chat_threads ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;",
             "ALTER TABLE chat_threads ADD COLUMN IF NOT EXISTS is_archived BOOLEAN DEFAULT FALSE;",
+            "ALTER TABLE document_metadata ADD COLUMN IF NOT EXISTS last_modified TIMESTAMP WITH TIME ZONE DEFAULT NOW();",
+            "ALTER TABLE document_metadata ADD COLUMN IF NOT EXISTS last_ingested TIMESTAMP WITH TIME ZONE DEFAULT NOW();",
+            "ALTER TABLE document_metadata ADD COLUMN IF NOT EXISTS summary TEXT;",
+            "ALTER TABLE document_metadata ADD COLUMN IF NOT EXISTS outline JSONB;",
         ]
         for stmt in migration_statements:
             try:

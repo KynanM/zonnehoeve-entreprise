@@ -18,15 +18,19 @@ logger = logging.getLogger(__name__)
 @router.get("/updates/recent")
 async def get_recent_updates(days: int = 3, db: AsyncSession = Depends(get_db)) -> list[dict]:
     """Geeft documenten terug die recent zijn gewijzigd."""
-    since = datetime.now(timezone.utc) - timedelta(days=days)
-    result = await db.execute(
-        select(DocumentMetadata).where(DocumentMetadata.last_modified >= since)
-    )
-    changed = result.scalars().all()
-    return [
-        {"filename": d.filename, "last_modified": d.last_modified.isoformat()}
-        for d in changed
-    ]
+    try:
+        since = datetime.now(timezone.utc) - timedelta(days=days)
+        result = await db.execute(
+            select(DocumentMetadata).where(DocumentMetadata.last_modified >= since)
+        )
+        changed = result.scalars().all()
+        return [
+            {"filename": d.filename, "last_modified": d.last_modified.isoformat()}
+            for d in changed
+        ]
+    except Exception as e:
+        logger.warning(f"get_recent_updates mislukt ({e}), database mogelijk nog niet bijgewerkt.")
+        return []
 
 @router.get("/")
 async def list_documents(db: AsyncSession = Depends(get_db)):
