@@ -77,7 +77,7 @@ async def submit_feedback(req: FeedbackRequest, db: AsyncSession = Depends(get_d
 async def get_threads(db: AsyncSession = Depends(get_db)):
     res = await db.execute(
         select(ChatThread)
-        .where(ChatThread.is_archived == False)
+        .where(ChatThread.is_archived.is_(False))
         .order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
     )
     return res.scalars().all()

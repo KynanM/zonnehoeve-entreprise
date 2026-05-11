@@ -74,7 +74,7 @@ export default function ThreadSidebar({
 
   return (
     <aside className={cn(
-      "w-full lg:w-[320px] flex flex-col hidden lg:flex relative overflow-hidden shrink-0 border-r transition-all duration-500",
+      "w-full lg:w-[320px] hidden lg:flex lg:flex-col relative overflow-hidden shrink-0 border-r transition-all duration-500",
       theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200 shadow-none"
     )}>
       {/* Header */}

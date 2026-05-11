@@ -60,7 +60,7 @@ export const api = {
     path: string, 
     body: any, 
     onChunk: (chunk: string) => void, 
-    onLogId?: (id: number) => void,
+    onLogId?: (id: number | null) => void,
     onSources?: (sources: string[]) => void
   ) => {
     const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -86,10 +86,11 @@ export const api = {
         while (foundMarker) {
           foundMarker = false;
           
-          // 1. Log ID (__log_id__:123\n)
-          const logIdMatch = buffer.match(/__log_id__:(\d+)\n/);
+          // 1. Log ID (__log_id__:123\n or __log_id__:None\n)
+          const logIdMatch = buffer.match(/__log_id__:(?:\d+|None)\n/);
           if (logIdMatch) {
-            if (onLogId) onLogId(parseInt(logIdMatch[1]));
+            const rawVal = logIdMatch[0].split(':')[1].trim();
+            if (onLogId) onLogId(rawVal === 'None' ? null : parseInt(rawVal));
             buffer = buffer.replace(logIdMatch[0], "");
             foundMarker = true;
           }
@@ -108,29 +109,25 @@ export const api = {
           if (jsonMatch) {
             try {
               const data = JSON.parse(jsonMatch[1]);
-              if (data.log_id && onLogId) onLogId(data.log_id);
-              if (data.sources && onSources) onSources(data.sources);
+              if (onLogId) onLogId(data.log_id ?? null);
+              if (onSources) onSources(data.sources ?? []);
             } catch (e) { /* ignore partial json */ }
             buffer = buffer.replace(jsonMatch[0], "");
             foundMarker = true;
           }
         }
         
-        // Stuur alleen tekst door als het GEEN deel is van een marker
-        // We wachten met doorsturen als de buffer eindigt op iets wat een marker kan worden
-        const potentialMarkers = ["__", "__log", "__sources", "|", "|JSON"];
-        const isPotentialMarker = potentialMarkers.some(m => m.startsWith(buffer) || buffer.endsWith(m.substring(0, 2)));
-        
-        if (buffer && !isPotentialMarker) {
-          onChunk(buffer);
-          buffer = "";
+        // Stuur tekst door als de buffer geen markers meer bevat aan het begin
+        const cleanChunk = buffer.replace(/__log_id__:(?:\d+|None)\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g, "");
+        if (cleanChunk) {
+          onChunk(cleanChunk);
+          buffer = buffer.replace(cleanChunk, "");
         }
       }
       // Final flush
-      if (buffer && !buffer.startsWith("__") && !buffer.startsWith("|")) {
-        onChunk(buffer);
+      if (buffer) {
+        onChunk(buffer.replace(/__log_id__:(?:\d+|None)\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g, ""));
       }
-
     }
   }
 };
