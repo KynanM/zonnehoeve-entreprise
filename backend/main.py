@@ -28,6 +28,19 @@ async def lifespan(app: FastAPI):
 
         await conn.run_sync(Base.metadata.create_all)
         print("✅ Database tabellen gecontroleerd/aangemaakt.")
+        
+        # Expliciete kolommigratie: create_all voegt geen kolommen toe aan bestaande tabellen.
+        # Deze ALTER TABLE statements zijn idempotent (IF NOT EXISTS).
+        migration_statements = [
+            "ALTER TABLE chat_threads ADD COLUMN IF NOT EXISTS is_pinned BOOLEAN DEFAULT FALSE;",
+            "ALTER TABLE chat_threads ADD COLUMN IF NOT EXISTS is_archived BOOLEAN DEFAULT FALSE;",
+        ]
+        for stmt in migration_statements:
+            try:
+                await conn.execute(text(stmt))
+            except Exception as e:
+                print(f"⚠️ Migratie overgeslagen ({stmt[:40]}...): {e}")
+        print("✅ Kolommigraties uitgevoerd.")
 
     try:
         rag_data = await setup_rag_chain()

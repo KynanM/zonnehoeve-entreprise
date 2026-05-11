@@ -170,7 +170,9 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
         assistantContent += chunk;
         setMessages(prev => {
           const next = [...prev];
-          next[next.length - 1].content = assistantContent;
+          // Guard: zorg dat er een assistant bericht is om in te schrijven
+          if (next.length === 0 || next[next.length - 1].role !== "assistant") return prev;
+          next[next.length - 1] = { ...next[next.length - 1], content: assistantContent };
           return next;
         });
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -178,14 +180,16 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
         if (logId !== null) {
           setMessages(prev => {
             const next = [...prev];
-            next[next.length - 1].log_id = logId;
+            if (next.length === 0 || next[next.length - 1].role !== "assistant") return prev;
+            next[next.length - 1] = { ...next[next.length - 1], log_id: logId };
             return next;
           });
         }
       }, (sources) => {
         setMessages(prev => {
           const next = [...prev];
-          next[next.length - 1].retrieved_sources = sources;
+          if (next.length === 0 || next[next.length - 1].role !== "assistant") return prev;
+          next[next.length - 1] = { ...next[next.length - 1], retrieved_sources: sources };
           return next;
         });
       }, (threadId) => {
