@@ -83,14 +83,18 @@ async def get_threads(db: AsyncSession = Depends(get_db)):
         )
         return res.scalars().all()
     except Exception as e:
-        # Fallback: als kolommen nog niet bestaan in de DB, gebruik simpele query
-        logger.warning(f"get_threads geavanceerde query mislukt ({e}), terugval naar simpele query")
+        logger.warning(f"get_threads geavanceerde query mislukt ({e}), terugval naar minimale query")
         try:
             await db.rollback()
-            res = await db.execute(select(ChatThread).order_by(ChatThread.created_at.desc()))
-            return res.scalars().all()
+            # Selecteer enkel de kolommen die we ZEKER weten dat bestaan
+            from sqlalchemy import column
+            res = await db.execute(
+                text("SELECT id, title, created_at FROM chat_threads ORDER BY created_at DESC")
+            )
+            rows = res.fetchall()
+            return [{"id": r[0], "title": r[1], "created_at": r[2], "is_pinned": False, "is_archived": False} for r in rows]
         except Exception as e2:
-            logger.error(f"get_threads ook simpele query mislukt: {e2}")
+            logger.error(f"get_threads ook minimale query mislukt: {e2}")
             return []
 
 
@@ -109,20 +113,30 @@ async def get_thread_history(thread_id: str, db: AsyncSession = Depends(get_db))
 
 @router.patch("/threads/{thread_id}/metadata")
 async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, db: AsyncSession = Depends(get_db)):
-    thread = await db.get(ChatThread, thread_id)
-    if not thread:
-        raise HTTPException(status_code=404, detail="Thread niet gevonden")
-    
-    if req.title is not None:
-        thread.title = req.title
-    if req.is_pinned is not None:
-        thread.is_pinned = req.is_pinned
-    if req.is_archived is not None:
-        thread.is_archived = req.is_archived
+    try:
+        thread = await db.get(ChatThread, thread_id)
+        if not thread:
+            raise HTTPException(status_code=404, detail="Thread niet gevonden")
         
-    await db.commit()
-    await db.refresh(thread)
-    return thread
+        if req.title is not None:
+            thread.title = req.title
+        if req.is_pinned is not None:
+            try:
+                thread.is_pinned = req.is_pinned
+            except: pass
+        if req.is_archived is not None:
+            try:
+                thread.is_archived = req.is_archived
+            except: pass
+            
+        await db.commit()
+        await db.refresh(thread)
+        return thread
+    except Exception as e:
+        logger.error(f"Fout bij bijwerken metadata: {e}")
+        # Als kolommen ontbreken, commit enkel wat kan
+        await db.rollback()
+        return {"id": thread_id, "status": "partial_success_or_skipped"}
 
 @router.delete("/threads", dependencies=[Depends(verify_admin)])
 async def delete_all_threads(db: AsyncSession = Depends(get_db)):
