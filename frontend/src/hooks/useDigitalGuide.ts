@@ -56,7 +56,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
   // Handlers
   const fetchThreads = async () => {
     try {
-      const data = await api.get<any[]>("/api/chat/threads");
+      const data = await api.get<any[]>("/api/chat/threads", { cache: "no-store" });
       if (Array.isArray(data)) {
         setThreads(data);
       } else {
@@ -252,20 +252,24 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
   };
 
   const handleFeedback = async (index: number, feedback: string) => {
+    // 1. Update de lokale state DIRECT voor instant UI feedback
+    setMessages(prev => {
+      const next = [...prev];
+      if (next[index]) {
+        next[index] = { ...next[index], user_feedback: feedback };
+      }
+      return next;
+    });
+
     const msg = messages[index];
     if (msg.log_id) {
       try {
         await api.post("/api/chat/feedback", { log_id: msg.log_id, feedback });
+        showToast("Bedankt voor je feedback!");
       } catch (e) {
         console.error("Feedback error", e);
       }
     }
-    setMessages(prev => {
-      const next = [...prev];
-      next[index].feedback = feedback;
-      return next;
-    });
-    showToast("Bedankt voor je feedback!");
   };
 
   const handlePin = (doc: string, e: React.MouseEvent) => {
