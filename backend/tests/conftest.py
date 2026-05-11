@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
+from sqlalchemy.ext.asyncio import AsyncSession
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 
@@ -9,9 +10,11 @@ load_dotenv()
 @pytest.fixture(scope="function", autouse=True)
 def setup_test_db():
     """Voorkomt dat we de echte database gebruiken door de engine en logs te mocken."""
-    mock_session = AsyncMock()
+    mock_session = AsyncMock(spec=AsyncSession)
     mock_session.__aenter__.return_value = mock_session
     mock_session.__aexit__.return_value = None
+    
+    mock_session.add = MagicMock() # Sync method
     
     mock_session_maker = MagicMock()
     mock_session_maker.return_value = mock_session
@@ -21,10 +24,7 @@ def setup_test_db():
 
     with patch("database.engine"), \
          patch("database.AsyncSession"), \
-         patch("database.async_session_maker", mock_session_maker), \
-         patch("api.chat.create_chat_log", new_callable=AsyncMock) as mock_create_log, \
-         patch("api.chat.update_chat_log", new_callable=AsyncMock):
-        mock_create_log.return_value = 1
+         patch("database.async_session_maker", mock_session_maker):
         yield mock_session
 
 @pytest.fixture(scope="function", autouse=True)

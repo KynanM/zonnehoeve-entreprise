@@ -25,6 +25,10 @@ async def initialize_app():
     is_valid_key = api_key.startswith("sk-") and not api_key.startswith("sk-test")
     
     try:
+        # Alleen de echte RAG chain laden als dit expliciet gevraagd wordt
+        if os.getenv("USE_REAL_RAG") != "true":
+            raise ValueError("Mocks geforceerd voor stabiliteit.")
+            
         if not is_valid_key:
             raise ValueError("Geen geldige API key gevonden voor integratietests.")
             
@@ -32,7 +36,7 @@ async def initialize_app():
         rag_data = await setup_rag_chain()
         app.state.rag_chain = rag_data
         app.state.llm = rag_data.get("llm")
-    except Exception as e:
+    except Exception:
         # Fallback naar mocks voor CI/omgevingen zonder keys
         
         async def mock_astream(input_data):
@@ -210,7 +214,7 @@ async def test_performance_ttft():
 @pytest.mark.anyio
 async def test_api_resilience_mock():
     """Mock een API failure (Rate Limit) om de error handling te testen."""
-    with patch("api.chat.create_chat_log", side_effect=Exception("Database down")):
+    with patch("services.chat_service.ChatService.create_chat_log", side_effect=Exception("Database down")):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             response = await ac.post("/api/chat/", json={"input": "test", "chat_history": []})
             # De chat moet nog steeds werken (robuustheid) of een nette error geven

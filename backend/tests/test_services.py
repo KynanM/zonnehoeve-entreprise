@@ -26,9 +26,7 @@ async def test_get_metadata(doc_service, mock_db):
     mock_db.execute.assert_called_once()
 
 @pytest.mark.anyio
-@patch("services.document_service.ChatOpenAI")
-@patch("services.document_service.get_vector_store")
-async def test_get_preview_with_meta(mock_vs, mock_chat, doc_service, mock_db):
+async def test_get_preview_with_meta(doc_service, mock_db):
     # Given
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = DocumentMetadata(filename="test.pdf", summary="Test summary")
@@ -41,10 +39,9 @@ async def test_get_preview_with_meta(mock_vs, mock_chat, doc_service, mock_db):
     assert preview == "Test summary"
 
 @pytest.mark.anyio
-@patch("services.document_service.ChatOpenAI")
 @patch("services.document_service.get_vector_store")
-@patch("services.document_service.ChatPromptTemplate.from_messages")
-async def test_get_preview_fallback(mock_prompt, mock_vs_get, mock_chat, doc_service, mock_db):
+@patch("services.analysis_service.AnalysisService.analyze_document", new_callable=AsyncMock)
+async def test_get_preview_fallback(mock_analyze, mock_vs_get, doc_service, mock_db):
     # Given
     mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: None)
     
@@ -52,10 +49,7 @@ async def test_get_preview_fallback(mock_prompt, mock_vs_get, mock_chat, doc_ser
     mock_vs.asimilarity_search = AsyncMock(return_value=[MagicMock(page_content="Mocked content")])
     mock_vs_get.return_value = mock_vs
     
-    # Mock Chain: prompt | llm | parser
-    mock_chain = MagicMock()
-    mock_chain.ainvoke = AsyncMock(return_value="Generated summary")
-    mock_prompt.return_value.__or__.return_value.__or__.return_value = mock_chain
+    mock_analyze.return_value = {"summary": "Generated summary"}
     
     # When
     preview = await doc_service.get_preview("test.pdf")

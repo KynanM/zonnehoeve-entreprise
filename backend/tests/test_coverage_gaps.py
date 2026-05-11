@@ -1,59 +1,93 @@
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
-from api.chat import create_chat_log, update_chat_log
+from services.chat_service import ChatService
+from services.ingestion_service import IngestionService
+from models import ChatThread, ChatLog, DocumentMetadata
 
 @pytest.mark.anyio
 async def test_create_chat_log_new_thread():
-    mock_session = AsyncMock()
+    mock_session = MagicMock()
+    mock_session.execute = AsyncMock()
+    mock_session.commit = AsyncMock()
+    mock_session.flush = AsyncMock()
+    mock_session.refresh = AsyncMock()
+    mock_session.add = MagicMock() # Sync method
+    
     mock_res = MagicMock()
     mock_res.scalar_one_or_none.return_value = None # New thread
     mock_session.execute.return_value = mock_res
     
-    with patch("api.chat.async_session_maker") as mock_maker:
-        mock_maker.return_value.__aenter__.return_value = mock_session
-        await create_chat_log("t1", "Hello")
-        assert mock_session.add.called
-        assert mock_session.commit.called
+    service = ChatService(mock_session, MagicMock())
+    await service.create_chat_log("t1", "Hello")
+    
+    assert mock_session.add.called
+    assert mock_session.commit.called
 
 @pytest.mark.anyio
 async def test_update_chat_log_success():
-    mock_session = AsyncMock()
-    mock_log = MagicMock()
+    mock_session = MagicMock()
+    mock_session.get = AsyncMock()
+    mock_session.commit = AsyncMock()
+    
+    # Use a real object to avoid mock attribute issues
+    from models import ChatLog
+    mock_log = ChatLog(id=1, bot_response="old")
     mock_session.get.return_value = mock_log
     
-    with patch("api.chat.async_session_maker") as mock_maker:
-        mock_maker.return_value.__aenter__.return_value = mock_session
-        await update_chat_log(1, "Response", ["src.pdf"], 1.0)
-        assert mock_log.bot_response == "Response"
-        assert mock_session.commit.called
-
-@pytest.mark.anyio
-async def test_ingest_update_branch(tmp_path):
-    from ingest import update_document_metadata_async
-    mock_db = AsyncMock()
-    from models import DocumentMetadata
-    mock_existing = DocumentMetadata(filename="test.pdf", file_hash="old")
-    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: mock_existing)
+    service = ChatService(mock_session, MagicMock())
+    await service.update_chat_log(1, "Response", ["src.pdf"], 1.0)
     
-    with patch("ingest.compute_file_hash", return_value="new"), \
-         patch("ingest.analyze_document_content", new_callable=AsyncMock) as mock_analyze, \
-         patch("ingest.PDFPlumberLoader") as mock_loader, \
-         patch("ingest.RAW_DATA_PATH", str(tmp_path)):
-        
-        test_file = tmp_path / "test.pdf"
-        test_file.write_bytes(b"content")
-        mock_analyze.return_value = {"summary": "Updated", "outline": []}
-        mock_loader.return_value.load.return_value = [MagicMock(page_content="text")]
-        
-        await update_document_metadata_async(mock_db)
-        assert mock_existing.file_hash == "new"
-        assert mock_existing.summary == "Updated"
+    assert mock_log.bot_response == "Response"
+    assert mock_session.commit.called
 
 @pytest.mark.anyio
-async def test_ingest_load_documents(tmp_path):
-    from ingest import load_documents
-    with patch("ingest.RAW_DATA_PATH", str(tmp_path)), \
-         patch("ingest.DirectoryLoader") as mock_dir_loader:
-        mock_dir_loader.return_value.load.return_value = [MagicMock()]
-        docs = load_documents()
-        assert len(docs) > 0
+async def test_ingest_process_file_new(tmp_path):
+    mock_db = MagicMock()
+    mock_db.execute = AsyncMock()
+    mock_db.commit = AsyncMock()
+    mock_db.add = MagicMock() # Sync method
+    
+    mock_res = MagicMock()
+    mock_res.scalar_one_or_none.return_value = None
+    mock_db.execute.return_value = mock_res
+    
+    with patch("services.analysis_service.AnalysisService.analyze_document", new_callable=AsyncMock) as mock_analyze, \
+         patch("services.ingestion_service.get_vector_store") as mock_vs_getter:
+        
+        mock_analyze.return_value = {"summary": "New", "outline": []}
+        mock_vs = MagicMock()
+        mock_vs_getter.return_value = mock_vs
+        
+        # Mock the loader instance and class
+        mock_loader_instance = MagicMock()
+        mock_loader_instance.load.return_value = [MagicMock(page_content="text", metadata={})]
+        mock_loader_cls = MagicMock(return_value=mock_loader_instance)
+        
+        service = IngestionService(mock_db)
+        # Manually override the loader mapping for the test
+        service.LOADER_MAPPING = {".pdf": mock_loader_cls}
+        
+        await service.process_file("test.pdf", b"content")
+        
+        assert mock_db.add.called
+        assert mock_db.commit.called
+        assert mock_vs.add_documents.called
+
+@pytest.mark.anyio
+async def test_ingest_sync_local_directory(tmp_path):
+    mock_db = MagicMock()
+    mock_db.execute = AsyncMock()
+    mock_db.commit = AsyncMock()
+    mock_db.add = MagicMock() # Sync method
+    
+    mock_res = MagicMock()
+    mock_res.scalar_one_or_none.return_value = None
+    mock_db.execute.return_value = mock_res
+    
+    test_file = tmp_path / "test.pdf"
+    test_file.write_bytes(b"content")
+    
+    with patch("services.ingestion_service.IngestionService.process_file", new_callable=AsyncMock) as mock_process:
+        service = IngestionService(mock_db)
+        await service.sync_local_directory(str(tmp_path))
+        assert mock_process.called

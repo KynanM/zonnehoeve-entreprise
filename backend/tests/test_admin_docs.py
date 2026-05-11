@@ -85,37 +85,38 @@ async def test_get_document_not_found(mock_db):
 
 @pytest.mark.anyio
 async def test_get_document_preview(mock_db):
-    mock_meta = DocumentMetadata(filename="test.pdf", summary="Summary text")
-    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: mock_meta)
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/documents/test.pdf/preview")
-    assert response.status_code == 200
-    assert response.json() == "Summary text"
+    with patch("services.document_service.DocumentService.get_preview", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = "Summary text"
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            response = await ac.get("/api/documents/test.pdf/preview")
+        assert response.status_code == 200
+        assert response.json() == "Summary text"
 
 @pytest.mark.anyio
 async def test_get_document_outline(mock_db):
-    mock_meta = DocumentMetadata(filename="test.pdf", outline=[{"title": "H1", "page": 1}])
-    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: mock_meta)
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/documents/test.pdf/outline")
-    assert response.status_code == 200
-    assert response.json()[0]["title"] == "H1"
+    with patch("services.document_service.DocumentService.get_outline", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = [{"title": "H1", "page": 1}]
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            response = await ac.get("/api/documents/test.pdf/outline")
+        assert response.status_code == 200
+        assert response.json()[0]["title"] == "H1"
 
 @pytest.mark.anyio
 async def test_suggest_questions(mock_db):
-    mock_meta = DocumentMetadata(filename="test.pdf", summary="Summary")
-    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: mock_meta)
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/documents/test.pdf/suggest-questions")
-    assert response.status_code == 200
-    assert len(response.json()) == 3
+    with patch("services.document_service.DocumentService.get_suggestions", new_callable=AsyncMock) as mock_get:
+        mock_get.return_value = ["Q1", "Q2", "Q3"]
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            response = await ac.get("/api/documents/test.pdf/suggest-questions")
+        assert response.status_code == 200
+        assert len(response.json()) == 3
 
 @pytest.mark.anyio
 async def test_upload_document_new(mock_db, mock_admin):
+    mock_db.add = MagicMock()
     mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: None)
     
     files = {"file": ("test.pdf", b"content", "application/pdf")}
-    with patch("ingest.process_single_file_from_memory"):
+    with patch("services.ingestion_service.IngestionService.process_file", new_callable=AsyncMock):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
             response = await ac.post("/api/documents/upload", files=files)
         

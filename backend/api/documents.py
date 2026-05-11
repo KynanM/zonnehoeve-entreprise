@@ -125,49 +125,29 @@ async def get_document(filename: str, download: bool = False, db: AsyncSession =
         headers=headers
     )
 
+from services.document_service import DocumentService
+from services.ingestion_service import IngestionService
+
 @router.get("/{filename}/preview")
 async def get_document_preview(filename: str, db: AsyncSession = Depends(get_db)):
     """Geeft de samenvatting van het document terug (voor de preview pane)."""
-    result = await db.execute(
-        select(DocumentMetadata).where(DocumentMetadata.filename == filename)
-    )
-    metadata = result.scalar_one_or_none()
-    if not metadata or not metadata.summary:
-        return "Geen samenvatting beschikbaar."
-    return metadata.summary
+    service = DocumentService(db)
+    preview = await service.get_preview(filename)
+    return preview
 
 @router.get("/{filename}/outline")
 async def get_document_outline(filename: str, db: AsyncSession = Depends(get_db)):
     """Geeft de inhoudsopgave van het document terug."""
-    result = await db.execute(
-        select(DocumentMetadata).where(DocumentMetadata.filename == filename)
-    )
-    metadata = result.scalar_one_or_none()
-    if not metadata or not metadata.outline:
-        return []
-    return metadata.outline
+    service = DocumentService(db)
+    outline = await service.get_outline(filename)
+    return outline
 
 @router.get("/{filename}/suggest-questions")
 async def suggest_questions(filename: str, db: AsyncSession = Depends(get_db)):
     """Genereert 3 relevante vragen die een gebruiker over dit document kan stellen."""
-    result = await db.execute(
-        select(DocumentMetadata).where(DocumentMetadata.filename == filename)
-    )
-    metadata = result.scalar_one_or_none()
-    
-    # Standaard vragen als we geen metadata hebben
-    default_questions = [
-        f"Wat zijn de belangrijkste punten van {filename}?",
-        "Welke procedures worden hier beschreven?",
-        "Zijn er specifieke actiepunten voor personeel?"
-    ]
-    
-    if not metadata or not metadata.summary:
-        return default_questions
-        
-    # In een ideale wereld vragen we het LLM hier, maar voor snelheid en stabiliteit 
-    # vallen we terug op deze defaults of we kunnen ze in de toekomst opslaan in de DB.
-    return default_questions
+    service = DocumentService(db)
+    questions = await service.get_suggestions(filename)
+    return questions
 
 @router.post("/upload", dependencies=[Depends(verify_admin)])
 async def upload_document(
@@ -178,32 +158,19 @@ async def upload_document(
     """Admin endpoint om documenten live in Railway database en vector-store op te slaan!"""
     filename = file.filename
     content = await file.read()
-    mime_type = file.content_type or "application/octet-stream"
     
+    ingest_service = IngestionService(db)
     # 1. Update / Insert the BLOB in database
-    result = await db.execute(select(DocumentFile).where(DocumentFile.filename == filename))
-    existing_file = result.scalar_one_or_none()
+    await ingest_service._ensure_document_file(filename, content)
     
-    if existing_file:
-        existing_file.data = content
-        existing_file.mime_type = mime_type
-        existing_file.uploaded_at = datetime.now(timezone.utc)
-    else:
-        new_file = DocumentFile(filename=filename, data=content, mime_type=mime_type)
-        db.add(new_file)
-        
-    await db.commit()
-    
-    # 2. Start achtergrondtaak om het in de vector database (ingest.py) op te nemen
-    from ingest import process_single_file_from_memory
-    background_tasks.add_task(process_single_file_from_memory, filename, content)
+    # 2. Start achtergrondtaak voor parsing & vectorisatie
+    background_tasks.add_task(ingest_service.process_file, filename, content)
     
     return {"status": "success", "message": f"{filename} succesvol geüpload en in wachtrij gezet voor AI vectorisatie."}
 
 @router.delete("/{filename}", dependencies=[Depends(verify_admin)])
 async def delete_document(filename: str, db: AsyncSession = Depends(get_db)):
     """Admin endpoint om documenten volledig te verwijderen."""
-    from services.document_service import DocumentService
     service = DocumentService(db)
     success = await service.delete_document(filename)
     

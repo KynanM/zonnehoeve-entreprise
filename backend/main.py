@@ -8,6 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.admin import router as admin_router
+from api.admin_ws import router as admin_ws_router
 from api.chat import router as chat_router
 from api.documents import router as documents_router
 from api.quality import router as quality_router
@@ -91,6 +92,7 @@ async def health_check(db: AsyncSession = Depends(get_db)):
 
 app.include_router(chat_router)
 app.include_router(admin_router)
+app.include_router(admin_ws_router)
 app.include_router(documents_router)
 app.include_router(quality_router)
 
