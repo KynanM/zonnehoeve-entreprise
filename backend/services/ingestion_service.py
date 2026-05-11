@@ -39,6 +39,7 @@ class IngestionService:
 
     async def process_file(self, filename: str, content: bytes) -> None:
         """Processes a file from memory: hashing, analysis, DB sync, and vectorization."""
+        filename = filename.strip()
         logger.info(f"🚀 Processing document: {filename}")
         
         # 1. Hashing & Deduplication
@@ -144,6 +145,7 @@ class IngestionService:
 
     async def _ensure_document_file(self, filename: str, content: bytes) -> None:
         """Ensures the document binary is in the DocumentFile table."""
+        filename = filename.strip()
         result = await self.db.execute(select(DocumentFile).where(DocumentFile.filename == filename))
         existing = result.scalar_one_or_none()
         

@@ -156,7 +156,7 @@ async def upload_document(
     db: AsyncSession = Depends(get_db)
 ):
     """Admin endpoint om documenten live in Railway database en vector-store op te slaan!"""
-    filename = file.filename
+    filename = file.filename.strip()
     content = await file.read()
     
     ingest_service = IngestionService(db)
