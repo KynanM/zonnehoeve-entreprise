@@ -132,6 +132,8 @@ async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, db: 
         await db.commit()
         await db.refresh(thread)
         return thread
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Fout bij bijwerken metadata: {e}")
         # Als kolommen ontbreken, commit enkel wat kan

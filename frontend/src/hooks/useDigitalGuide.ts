@@ -153,12 +153,11 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     setActiveThreadId(null);
     setMessages([{ 
       role: "assistant", 
-      content: "Hallo! Ik ben je Digitale Gids. Waarmee kan ik je vandaag helpen?",
-      timestamp: new Date().toISOString()
+      content: "Hallo! Ik ben je Digitale Gids. Waarmee kan ik je vandaag helpen?"
     }]);
     setActiveDocument(null);
     setActivePage(null);
-    setSuggestedQuestions([]);
+    setSuggestions([]);
   }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent | string) => {
@@ -268,7 +267,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
     setMessages(prev => {
       const next = [...prev];
       if (next[index]) {
-        next[index] = { ...next[index], user_feedback: feedback };
+        next[index] = { ...next[index], feedback };
       }
       return next;
     });

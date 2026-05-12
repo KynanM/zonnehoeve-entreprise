@@ -31,7 +31,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
     showUpdateBanner, setShowUpdateBanner, dossierModal, setDossierModal,
     messagesEndRef,
     // Handlers
-    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, finishNewChat, 
+    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, startNewChat, 
     showToast, fetchPreview, pinThread, renameThread, deleteAllThreads
   } = useDigitalGuide(initialTheme, onThemeChange);
 
@@ -136,7 +136,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
           onThreadPin={pinThread}
           onThreadRename={renameThread}
           onDeleteAll={deleteAllThreads}
-          onNewChat={finishNewChat} 
+          onNewChat={startNewChat} 
           theme={theme} 
         />
 
