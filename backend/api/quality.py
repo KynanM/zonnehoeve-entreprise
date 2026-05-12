@@ -67,6 +67,39 @@ def _load_coverage_report() -> dict[str, Any]:
         return {"available": False, "message": str(e)}
 
 
+def _safe_load_json(path: str, default_if_empty: Any = None) -> Any:
+    """
+    Laadt JSON op een robuuste manier. 
+    Handelt lege bestanden, ongeldige JSON en Ruff-specifieke tekst af.
+    """
+    if not os.path.exists(path):
+        return None
+
+    try:
+        with open(path, encoding="utf-8") as f:
+            content = f.read().strip()
+            
+        if not content:
+            return default_if_empty
+
+        # Speciaal geval voor Ruff: "All checks passed!" is geen geldige JSON
+        if "All checks passed!" in content:
+            # Als er verder geen JSON-achtige tekens zijn, is het waarschijnlijk de platte tekst output
+            if not (content.startswith("[") or content.startswith("{")):
+                return default_if_empty if default_if_empty is not None else []
+
+        return json.loads(content)
+    except json.JSONDecodeError as e:
+        logger.warning(f"JSON decodeerfout in {path}: {e}")
+        # Als we een lijst verwachten, wees vergevingsgezind
+        if isinstance(default_if_empty, list):
+            return default_if_empty
+        raise e
+    except Exception as e:
+        logger.warning(f"Fout bij lezen van {path}: {e}")
+        raise e
+
+
 def _load_lint_report() -> dict[str, Any]:
     """Laad Ruff lint resultaten als beschikbaar."""
     # Ruff JSON output pad
@@ -79,8 +112,13 @@ def _load_lint_report() -> dict[str, Any]:
         }
 
     try:
-        with open(ruff_output_path, encoding="utf-8") as f:
-            issues = json.load(f)
+        issues = _safe_load_json(ruff_output_path, default_if_empty=[])
+        
+        if issues is None:
+            return {
+                "available": False,
+                "message": "Kon ruff_report.json niet vinden.",
+            }
 
         # Aggregeer per categorie
         by_code: dict[str, int] = {}
@@ -114,7 +152,7 @@ def _load_lint_report() -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Kon ruff_report.json niet lezen: {e}")
-        return {"available": False, "message": str(e)}
+        return {"available": False, "message": "Fout bij laden lint-rapport. Is het bestand geldig?"}
 
 
 def _get_test_summary() -> dict[str, Any]:
@@ -128,8 +166,13 @@ def _get_test_summary() -> dict[str, Any]:
         }
 
     try:
-        with open(pytest_output_path, encoding="utf-8") as f:
-            data = json.load(f)
+        data = _safe_load_json(pytest_output_path)
+        
+        if data is None:
+            return {
+                "available": False,
+                "message": "Kon pytest_results.json niet vinden.",
+            }
 
         summary = data.get("summary", {})
         return {
@@ -145,7 +188,7 @@ def _get_test_summary() -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Kon pytest_results.json niet lezen: {e}")
-        return {"available": False, "message": str(e)}
+        return {"available": False, "message": "Fout bij laden testresultaten. Is het bestand geldig?"}
 
 
 def _get_safety_metrics() -> dict[str, Any]:
@@ -156,8 +199,10 @@ def _get_safety_metrics() -> dict[str, Any]:
         return {"available": False, "message": "Voer 'pytest backend/tests/test_chatbot_qa_expert.py' uit."}
 
     try:
-        with open(safety_results_path, encoding="utf-8") as f:
-            data = json.load(f)
+        data = _safe_load_json(safety_results_path)
+        
+        if data is None:
+            return {"available": False, "message": "Kon safety_test_results.json niet vinden."}
 
         # Bereken gemiddeldes per categorie
         summary = {}
@@ -181,7 +226,7 @@ def _get_safety_metrics() -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Kon safety_test_results.json niet lezen: {e}")
-        return {"available": False, "message": str(e)}
+        return {"available": False, "message": "Fout bij laden safety-metrics. Is het bestand geldig?"}
 
 
 # ─────────────────────────────────────────────
