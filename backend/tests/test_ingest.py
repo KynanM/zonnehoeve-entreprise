@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import patch, AsyncMock
 from services.hash_service import HashService
 from services.ingestion_service import IngestionService
 from langchain_core.documents import Document

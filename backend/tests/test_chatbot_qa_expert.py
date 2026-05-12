@@ -1,6 +1,4 @@
 import pytest
-import httpx
-import asyncio
 import time
 import json
 import os
@@ -56,12 +54,21 @@ async def initialize_app():
         mock_retrieval = AsyncMock()
         mock_retrieval.ainvoke = mock_retrieval_invoke
         
+        # Oplossing voor 'got coroutine': AsyncMock geeft een coroutine terug, maar astream
+        # vereist een async generator. We moeten astream apart mocken.
+        async def mock_llm_astream(prompt):
+            from langchain_core.messages import AIMessage
+            yield AIMessage(content="Hallo!")
+            
+        mock_llm = MagicMock()
+        mock_llm.astream = mock_llm_astream
+        
         app.state.rag_chain = {
             "generation": mock_gen,
             "retrieval": mock_retrieval,
-            "llm": AsyncMock()
+            "llm": mock_llm
         }
-        app.state.llm = app.state.rag_chain["llm"]
+        app.state.llm = mock_llm
 
 
 
@@ -75,7 +82,7 @@ def save_result(category, test_name, passed, score, details=None):
         try:
             with open(RESULTS_FILE, "r") as f:
                 results = json.load(f)
-        except:
+        except Exception:
             pass
     
     if category not in results:
@@ -183,7 +190,7 @@ async def test_context_retention_long():
     # Stap 2-9: Praat over protocollen (vul context)
     for i in range(8):
         history.append({"role": "user", "content": f"Vertel me meer over protocol {i}."})
-        history.append({"role": "assistant", "content": f"Dat is een interessant protocol voor afdeling B."})
+        history.append({"role": "assistant", "content": "Dat is een interessant protocol voor afdeling B."})
     
     # Stap 10: Vraag naar het feit uit beurt 1
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:

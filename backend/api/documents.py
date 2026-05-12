@@ -11,6 +11,8 @@ from database import get_db
 from models import DocumentMetadata, DocumentFile
 from api.auth import verify_admin
 from vector_store import get_vector_store
+from services.document_service import DocumentService
+from services.ingestion_service import IngestionService
 
 router = APIRouter(prefix="/api/documents", tags=["Documents"])
 logger = logging.getLogger(__name__)
@@ -129,8 +131,6 @@ async def get_document(filename: str, download: bool = False, db: AsyncSession =
         headers=headers
     )
 
-from services.document_service import DocumentService
-from services.ingestion_service import IngestionService
 
 @router.get("/{filename}/preview")
 async def get_document_preview(filename: str, db: AsyncSession = Depends(get_db)):

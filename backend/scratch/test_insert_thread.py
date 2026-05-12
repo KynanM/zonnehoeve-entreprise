@@ -4,8 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import asyncio
 import uuid
-from sqlalchemy import select
-from database import engine, async_session_maker
+from database import async_session_maker
 from models import ChatThread
 
 async def run():

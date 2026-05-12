@@ -1,4 +1,3 @@
-import os
 import logging
 from typing import List, Dict, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
