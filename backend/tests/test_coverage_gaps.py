@@ -2,7 +2,7 @@ import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
 from services.chat_service import ChatService
 from services.ingestion_service import IngestionService
-from models import ChatThread, ChatLog, DocumentMetadata
+from models import ChatLog
 
 @pytest.mark.anyio
 async def test_create_chat_log_new_thread():
@@ -30,7 +30,6 @@ async def test_update_chat_log_success():
     mock_session.commit = AsyncMock()
     
     # Use a real object to avoid mock attribute issues
-    from models import ChatLog
     mock_log = ChatLog(id=1, bot_response="old")
     mock_session.get.return_value = mock_log
     

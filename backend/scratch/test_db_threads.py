@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import asyncio
 from sqlalchemy import select, text
-from database import engine, get_db
+from database import engine
 from models import ChatThread
 
 async def run():

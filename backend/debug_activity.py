@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 sys.path.append(os.getcwd())
 from database import async_session_maker
 from models import ChatLog
-from sqlalchemy import select, func, cast, Date
+from sqlalchemy import select, func
 
 async def check():
     async with async_session_maker() as db:

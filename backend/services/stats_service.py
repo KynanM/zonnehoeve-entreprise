@@ -63,9 +63,18 @@ class StatsService:
                 .order_by(cast(ChatLog.timestamp, Date))
             )
             activity_res = await self.db.execute(activity_query)
-            daily_activity = [
-                {"day": str(row.day), "count": row.count} for row in activity_res.fetchall()
-            ]
+            db_activity = {str(row.day): row.count for row in activity_res.fetchall()}
+            
+            # Vul aan met nullen voor de laatste 'days' dagen
+            daily_activity = []
+            today = datetime.now(timezone.utc).date()
+            for i in range(days - 1, -1, -1):
+                day_date = today - timedelta(days=i)
+                day_str = str(day_date)
+                daily_activity.append({
+                    "day": day_str,
+                    "count": db_activity.get(day_str, 0)
+                })
 
             # 3. Top bronnen (Geoptimaliseerd met SQL jsonb aggregation)
             sources_sql = text("""

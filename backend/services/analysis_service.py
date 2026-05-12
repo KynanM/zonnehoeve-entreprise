@@ -1,6 +1,5 @@
-import os
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser

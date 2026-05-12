@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Request
+from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import List, Optional
@@ -87,7 +87,7 @@ async def get_threads(db: AsyncSession = Depends(get_db)):
         try:
             await db.rollback()
             # Selecteer enkel de kolommen die we ZEKER weten dat bestaan
-            from sqlalchemy import column
+            from sqlalchemy import text
             res = await db.execute(
                 text("SELECT id, title, created_at FROM chat_threads ORDER BY created_at DESC")
             )
@@ -123,11 +123,13 @@ async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, db: 
         if req.is_pinned is not None:
             try:
                 thread.is_pinned = req.is_pinned
-            except: pass
+            except Exception:
+                pass
         if req.is_archived is not None:
             try:
                 thread.is_archived = req.is_archived
-            except: pass
+            except Exception:
+                pass
             
         await db.commit()
         await db.refresh(thread)
