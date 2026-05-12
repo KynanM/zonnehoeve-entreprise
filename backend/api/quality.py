@@ -149,10 +149,11 @@ def _load_lint_report() -> dict[str, Any]:
             "top_rule_violations": [{"code": k, "count": v} for k, v in top_issues],
             "most_issues_in": [{"file": k, "count": v} for k, v in top_files],
             "is_clean": len(issues) == 0,
+            "message": "Lint rapport succesvol geladen." if len(issues) > 0 else "Geen linting issues gevonden!",
         }
     except Exception as e:
         logger.warning(f"Kon ruff_report.json niet lezen: {e}")
-        return {"available": False, "message": "Fout bij laden lint-rapport. Is het bestand geldig?"}
+        return {"available": False, "message": f"Fout bij laden lint-rapport: {str(e)}"}
 
 
 def _get_test_summary() -> dict[str, Any]:
@@ -188,7 +189,7 @@ def _get_test_summary() -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Kon pytest_results.json niet lezen: {e}")
-        return {"available": False, "message": "Fout bij laden testresultaten. Is het bestand geldig?"}
+        return {"available": False, "message": f"Fout bij laden testresultaten: {str(e)}"}
 
 
 def _get_safety_metrics() -> dict[str, Any]:
@@ -226,7 +227,7 @@ def _get_safety_metrics() -> dict[str, Any]:
         }
     except Exception as e:
         logger.warning(f"Kon safety_test_results.json niet lezen: {e}")
-        return {"available": False, "message": "Fout bij laden safety-metrics. Is het bestand geldig?"}
+        return {"available": False, "message": f"Fout bij laden safety-metrics: {str(e)}"}
 
 
 # ─────────────────────────────────────────────
