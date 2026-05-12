@@ -1,7 +1,7 @@
 # Zonnehoeve Enterprise AI Platform
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/KynanM/zonnehoeve-entreprise)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/KynanM/zonnehoeve-entreprise)
 
 ## Overview
@@ -192,6 +192,6 @@ The application was developed by:
 - **Kynan Melsens**
 - **Aaron Vangermeersch**
 
-## License
+This project is proprietary software. Copyright © 2026 Kynan Melsens & Aaron Vangermeersch.
 
-This project is proprietary software. All rights reserved by Zonnehoeve Living+.
+A license is granted to Zonnehoeve Living+ for internal use and modification. See the [LICENSE](LICENSE) file for full details.
