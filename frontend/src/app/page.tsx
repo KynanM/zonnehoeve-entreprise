@@ -76,13 +76,17 @@ export default function OnePager() {
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled ? 'h-20 bg-white/70 backdrop-blur-xl border-b border-black/5 premium-shadow' : 'h-28 bg-transparent'}`}
       >
         <div className="container-wide flex justify-between items-center h-full">
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => scrollTo('hero')}>
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => scrollTo('hero')}>
             <div className="w-12 h-12 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5 group-hover:rotate-6 transition-transform">
               <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold text-xl tracking-tight leading-none">Zonnehoeve</span>
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-green">Living+ Eke</span>
+            </div>
+            <div className="h-8 w-px bg-black/10 mx-1 hidden sm:block" />
+            <div className="w-10 h-10 relative hidden sm:block">
+              <Image src="/logo_vives.png" alt="VIVES Logo" fill className="object-contain" />
             </div>
           </div>
           
@@ -297,15 +301,27 @@ export default function OnePager() {
         <div className="container-wide">
           <div className="grid md:grid-cols-4 gap-20 mb-32">
             <div className="md:col-span-2">
-               <div className="flex items-center gap-4 mb-10">
+               <div className="flex items-center gap-4 mb-8">
                   <div className="w-14 h-14 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
                     <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
                   </div>
                   <span className="font-extrabold text-4xl tracking-tighter">Zonnehoeve</span>
                </div>
-               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm">
+               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm mb-10">
                   Een sociale voorziening in Eke-Nazareth voor zorg, begeleiding en tewerkstelling.
                </p>
+               <div className="flex flex-col gap-4">
+                 <span className="text-xs font-black uppercase tracking-[0.3em] text-earth-800/30">In samenwerking met</span>
+                 <div className="flex items-center gap-6">
+                   <div className="w-24 h-10 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                     <Image src="/logo_vives.png" alt="VIVES Hogeschool" fill className="object-contain" />
+                   </div>
+                   <div className="flex flex-col">
+                     <span className="text-xs font-bold text-earth-800/60">Kynan Melsens</span>
+                     <span className="text-xs font-bold text-earth-800/60">Aaron Vangermeersch</span>
+                   </div>
+                 </div>
+               </div>
             </div>
             <div>
                <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Afdelingen</h5>
