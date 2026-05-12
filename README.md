@@ -1,4 +1,4 @@
-# 🏰 Zonnehoeve Living+ Enterprise Chatbot
+#  Zonnehoeve Living+ Enterprise Chatbot
 
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -9,15 +9,15 @@ Een state-of-the-art AI-platform ontwikkeld voor **Zonnehoeve Living+**. Dit sys
 
 ---
 
-## ✨ Belangrijkste Functionaliteiten
+##  Belangrijkste Functionaliteiten
 
-### 🤖 Digitale Gids (AI Chat)
+###  Digitale Gids (AI Chat)
 - **Retrieval-Augmented Generation (RAG)**: Antwoorden zijn gebaseerd op de werkelijke PDF-protocollen van Zonnehoeve.
 - **Bronvermelding**: Elk antwoord bevat directe links naar de relevante documenten en specifieke pagina's.
 - **Smart Context**: De chatbot onthoudt de gespreksgeschiedenis voor vervolgvragen.
 - **Pin & Sla op**: Gebruikers kunnen belangrijke gesprekken pinnen of opslaan voor later gebruik.
 
-### 📊 Admin Dashboard
+###  Admin Dashboard
 - **Real-time Statistieken**: Direct inzicht in systeemgebruik, AI-performance en feedback via WebSockets (met automatische HTTP-polling fallback).
 - **Feedback Loop**: Beheerders kunnen user feedback (duimpjes) analyseren om de AI te verbeteren.
 - **Document Beheer**: Upload en verwijder protocollen direct vanuit de browser; de AI indexeert ze automatisch.
@@ -25,7 +25,7 @@ Een state-of-the-art AI-platform ontwikkeld voor **Zonnehoeve Living+**. Dit sys
 
 ---
 
-## 🛠️ Technologie Stack
+##  Technologie Stack
 
 ### Frontend
 - **Framework**: Next.js 16 (React 19) met App Router.
@@ -41,7 +41,7 @@ Een state-of-the-art AI-platform ontwikkeld voor **Zonnehoeve Living+**. Dit sys
 
 ---
 
-## 🚀 Snelle Installatie
+##  Snelle Installatie
 
 ### Met Docker (Aanbevolen)
 ```bash
@@ -75,7 +75,7 @@ npm run dev
 
 ---
 
-## 🧪 Kwaliteit & Stabiliteit
+##  Kwaliteit & Stabiliteit
 
 Wij hanteren een **Zero-Defect** beleid. Het project bevat uitgebreide test-suites voor zowel frontend als backend.
 
@@ -86,7 +86,7 @@ Wij hanteren een **Zero-Defect** beleid. Het project bevat uitgebreide test-suit
 
 ---
 
-## 🌍 Deployment
+##  Deployment
 
 Dit project is volledig geoptimaliseerd voor **Railway.app**. 
 - De frontend draait in `standalone` modus voor minimale resource-footprint.
@@ -94,7 +94,7 @@ Dit project is volledig geoptimaliseerd voor **Railway.app**.
 
 ---
 
-## 📜 Credits & Licentie
+##  Credits & Licentie
 Ontwikkeld door het AI-team voor **Zonnehoeve Living+**. Alle rechten voorbehouden aan Zonnehoeve.
 
 ---
