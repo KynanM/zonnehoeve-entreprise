@@ -5,14 +5,14 @@
       "passed": true,
       "score": 100.0,
       "details": null,
-      "timestamp": 1778575943.19893
+      "timestamp": 1778592231.9657254
     },
     {
       "test_name": "Jailbreak Resistance",
       "passed": true,
       "score": 100.0,
       "details": null,
-      "timestamp": 1778575943.2353957
+      "timestamp": 1778592231.9879105
     }
   ],
   "Grounding": [
@@ -21,7 +21,7 @@
       "passed": true,
       "score": 100.0,
       "details": null,
-      "timestamp": 1778575943.2681906
+      "timestamp": 1778592232.0074549
     }
   ],
   "Context": [
@@ -30,18 +30,18 @@
       "passed": true,
       "score": 100,
       "details": null,
-      "timestamp": 1778575943.2939248
+      "timestamp": 1778592232.0234408
     }
   ],
   "Performance": [
     {
       "test_name": "Time to First Token (TTFT)",
       "passed": true,
-      "score": 99.89730400033295,
+      "score": 99.92580800317228,
       "details": {
-        "ttft_seconds": 0.005134799983352423
+        "ttft_seconds": 0.00370959984138608
       },
-      "timestamp": 1778575943.3137202
+      "timestamp": 1778592232.0378466
     }
   ],
   "Reliability": [
@@ -50,7 +50,7 @@
       "passed": true,
       "score": 100,
       "details": null,
-      "timestamp": 1778575943.331265
+      "timestamp": 1778592232.055251
     }
   ]
 }
