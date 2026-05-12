@@ -161,6 +161,10 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                       <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500"><Sparkles size={18} /></div>
                       <h1 className={cn("font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h1>
                     </div>
+                    <div className="w-px h-6 bg-stone-200 dark:bg-stone-800" />
+                    <div className="w-16 h-6 relative grayscale opacity-40 hover:opacity-100 transition-opacity">
+                      <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
+                    </div>
                   </div>
                 </header>
 
@@ -168,12 +172,22 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                   {messages.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center text-center space-y-8 py-10">
                       <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                        className={cn("w-24 h-24 rounded-3xl flex items-center justify-center shadow-2xl border", theme === 'night' ? "bg-stone-800 border-stone-700" : "bg-white border-stone-100")}>
-                        <Image src="/logo.png" alt="Logo" width={64} height={64} />
+                        className={cn("w-32 h-24 rounded-3xl flex items-center justify-center gap-4 px-6 shadow-2xl border", theme === 'night' ? "bg-stone-800 border-stone-700" : "bg-white border-stone-100")}>
+                        <div className="w-12 h-12 relative">
+                          <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
+                        </div>
+                        <div className="w-px h-10 bg-stone-200 dark:bg-stone-700" />
+                        <div className="w-12 h-12 relative">
+                          <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
+                        </div>
                       </motion.div>
                       <div className="space-y-3">
                         <h2 className={cn("text-3xl font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h2>
                         <p className="text-stone-400 font-bold max-w-sm mx-auto leading-relaxed">Waarmee kan ik je helpen vandaag?</p>
+                        <div className="pt-2 flex flex-col items-center gap-1">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-stone-300 dark:text-stone-600">Ontwikkeld door</span>
+                          <span className="text-xs font-bold text-stone-400">Kynan Melsens & Aaron Vangermeersch</span>
+                        </div>
                       </div>
                       <div className="flex flex-wrap gap-3 justify-center max-w-2xl px-4">
                         {(suggestions.length > 0 ? suggestions : ["Rookbeleid?", "Arbeidsongeval?", "Medicatie protocol?"]).map((sug, i) => (
@@ -210,6 +224,9 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                    )}
                    <FourMoments onSuggestionClick={handleSubmit} />
                    <ChatInput input={input} setInput={setInput} isLoading={isLoading} onSubmit={handleSubmit} onVoiceInput={handleSubmit} cooldown={cooldown} theme={theme} />
+                   <div className="pb-2 text-center">
+                     <span className="text-[9px] font-bold text-stone-400 uppercase tracking-widest opacity-50">© 2026 VIVES - Kynan Melsens & Aaron Vangermeersch</span>
+                   </div>
                 </div>
               </section>
             </Panel>
