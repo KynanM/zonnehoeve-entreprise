@@ -16,12 +16,15 @@ function MiniBarChart({ data }: { data: { day: string; count: number }[] }) {
       {data.map((d, i) => (
         <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
           <div
-            className="w-full bg-brand-green/20 hover:bg-brand-green/50 rounded-t-lg transition-all cursor-default"
-            style={{ height: `${(d.count / max) * 100}%`, minHeight: "4px" }}
+            className={`w-full transition-all duration-300 rounded-t-sm ${d.count > 0 ? 'bg-emerald-400 opacity-100 shadow-[0_0_10px_rgba(52,211,153,0.3)]' : 'bg-slate-700 opacity-30'}`}
+            style={{ 
+                height: `${(d.count / max) * 100}%`,
+                minHeight: d.count > 0 ? '12px' : '4px' 
+            }}
             title={`${d.day}: ${d.count} vragen`}
           />
-          <div className="absolute bottom-full mb-1 bg-earth-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-            {d.day}: {d.count}
+          <div className="absolute bottom-full mb-2 bg-earth-900 text-white text-[10px] px-2 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all transform translate-y-1 group-hover:translate-y-0 whitespace-nowrap z-20 pointer-events-none shadow-xl">
+            <span className="font-bold">{d.day}</span>: <span className="text-brand-yellow">{d.count}</span>
           </div>
         </div>
       ))}

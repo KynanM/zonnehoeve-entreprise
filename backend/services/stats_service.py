@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from typing import Any, Dict
 
 from sqlalchemy import Date, cast, desc, func, select, text
@@ -63,11 +63,11 @@ class StatsService:
                 .order_by(cast(ChatLog.timestamp, Date))
             )
             activity_res = await self.db.execute(activity_query)
-            db_activity = {str(row.day): row.count for row in activity_res.fetchall()}
+            db_activity = {str(row.day): int(row.count) for row in activity_res.fetchall()}
             
             # Vul aan met nullen voor de laatste 'days' dagen
             daily_activity = []
-            today = datetime.now(timezone.utc).date()
+            today = datetime.now().date()
             for i in range(days - 1, -1, -1):
                 day_date = today - timedelta(days=i)
                 day_str = str(day_date)
