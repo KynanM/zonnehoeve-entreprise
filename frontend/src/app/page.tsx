@@ -77,15 +77,15 @@ export default function OnePager() {
       >
         <div className="container-wide flex justify-between items-center h-full">
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => scrollTo('hero')}>
-            <div className="w-12 h-12 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5 group-hover:rotate-6 transition-transform">
+            <div className="w-14 h-14 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5 group-hover:rotate-6 transition-transform">
               <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight leading-none">Zonnehoeve</span>
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-brand-green">Living+ Eke</span>
+              <span className="font-extrabold text-2xl tracking-tight leading-none">Zonnehoeve</span>
+              <span className="text-[11px] uppercase tracking-[0.2em] font-bold text-brand-green">Living+ Eke</span>
             </div>
-            <div className="h-8 w-px bg-black/10 mx-1 hidden sm:block" />
-            <div className="w-10 h-10 relative hidden sm:block">
+            <div className="h-10 w-px bg-black/10 mx-2 hidden sm:block" />
+            <div className="w-12 h-12 relative hidden sm:block">
               <Image src="/logo_vives.png" alt="VIVES Logo" fill className="object-contain" />
             </div>
           </div>
@@ -301,24 +301,24 @@ export default function OnePager() {
         <div className="container-wide">
           <div className="grid md:grid-cols-4 gap-20 mb-32">
             <div className="md:col-span-2">
-               <div className="flex items-center gap-4 mb-8">
-                  <div className="w-14 h-14 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
+               <div className="flex items-center gap-5 mb-8">
+                  <div className="w-16 h-16 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
                     <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
                   </div>
-                  <span className="font-extrabold text-4xl tracking-tighter">Zonnehoeve</span>
+                  <span className="font-extrabold text-5xl tracking-tighter">Zonnehoeve</span>
                </div>
-               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm mb-10">
+               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm mb-12">
                   Een sociale voorziening in Eke-Nazareth voor zorg, begeleiding en tewerkstelling.
                </p>
-               <div className="flex flex-col gap-4">
-                 <span className="text-xs font-black uppercase tracking-[0.3em] text-earth-800/30">In samenwerking met</span>
-                 <div className="flex items-center gap-6">
-                   <div className="w-24 h-10 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+               <div className="flex flex-col gap-6">
+                 <span className="text-sm font-black uppercase tracking-[0.3em] text-earth-800/30">In samenwerking met</span>
+                 <div className="flex items-center gap-8">
+                   <div className="w-32 h-14 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
                      <Image src="/logo_vives.png" alt="VIVES Hogeschool" fill className="object-contain" />
                    </div>
                    <div className="flex flex-col">
-                     <span className="text-xs font-bold text-earth-800/60">Kynan Melsens</span>
-                     <span className="text-xs font-bold text-earth-800/60">Aaron Vangermeersch</span>
+                     <span className="text-sm font-bold text-earth-800/60">Kynan Melsens</span>
+                     <span className="text-sm font-bold text-earth-800/60">Aaron Vangermeersch</span>
                    </div>
                  </div>
                </div>
