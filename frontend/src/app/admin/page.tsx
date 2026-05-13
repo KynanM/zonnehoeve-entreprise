@@ -88,7 +88,7 @@ export default function AdminDashboard() {
     } else if (msg.type === "feedback_update") {
       setStats((prev: any) => {
         if (!prev) return prev;
-        const updatedLogs = prev.recent_logs.map((log: any) => 
+        const updatedLogs = prev.recent_logs.map((log: any) =>
           log.id === msg.data.log_id ? { ...log, user_feedback: msg.data.feedback } : log
         );
         return { ...prev, recent_logs: updatedLogs };
@@ -174,16 +174,14 @@ export default function AdminDashboard() {
           <span className="font-extrabold text-lg text-earth-900">Zonnehoeve<span className="text-brand-green-dark font-normal ml-1">| Living+</span></span>
         </Link>
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-            connectionMode === 'websocket' ? 'bg-green-50 text-brand-green' :
-            connectionMode === 'polling' ? 'bg-blue-50 text-blue-600' :
-            'bg-red-50 text-red-500'
-          }`}>
-            <div className={`w-2 h-2 rounded-full ${
-              connectionMode === 'websocket' ? 'bg-brand-green animate-pulse' :
-              connectionMode === 'polling' ? 'bg-blue-500 animate-pulse' :
-              'bg-red-500'
-            }`} />
+          <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${connectionMode === 'websocket' ? 'bg-green-50 text-brand-green' :
+              connectionMode === 'polling' ? 'bg-blue-50 text-blue-600' :
+                'bg-red-50 text-red-500'
+            }`}>
+            <div className={`w-2 h-2 rounded-full ${connectionMode === 'websocket' ? 'bg-brand-green animate-pulse' :
+                connectionMode === 'polling' ? 'bg-blue-500 animate-pulse' :
+                  'bg-red-500'
+              }`} />
             {connectionMode === 'websocket' ? 'Real-time Live' : connectionMode === 'polling' ? 'Polling Actief' : 'Offline'}
           </div>
         </div>
@@ -211,16 +209,15 @@ export default function AdminDashboard() {
         <div className="flex gap-2 bg-white p-2 rounded-2xl shadow-sm border border-black/5 w-fit overflow-x-auto">
           {([
             { id: "dashboard", label: "Inzichten", icon: <BarChart2 size={16} /> },
-            { id: "docs",      label: "Protocollen",  icon: <FileText size={16} /> },
-            { id: "kwaliteit",  label: "Kwaliteit",    icon: <Code2 size={16} /> },
-            { id: "safety",     label: "AI Safety",    icon: <ShieldCheck size={16} /> },
+            { id: "docs", label: "Protocollen", icon: <FileText size={16} /> },
+            { id: "kwaliteit", label: "Kwaliteit", icon: <Code2 size={16} /> },
+            { id: "safety", label: "AI Safety", icon: <ShieldCheck size={16} /> },
           ] as const).map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${
-                activeTab === tab.id
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === tab.id
                   ? "bg-brand-green text-white shadow-md shadow-brand-green/20"
                   : "text-earth-800/50 hover:text-earth-900 hover:bg-earth-50"
-              }`}>
+                }`}>
               {tab.icon}{tab.label}
             </button>
           ))}
@@ -232,10 +229,10 @@ export default function AdminDashboard() {
               {stats ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <StatCard label="Totaal Vragen" value={stats.total_questions} icon={<FileText size={20}/>} color="bg-brand-yellow/10 text-brand-yellow-dark" index={0} />
-                    <StatCard label="Gem. Latency" value={`${stats.avg_latency}s`} icon={<Clock size={20}/>} color="bg-earth-100 text-earth-700" index={1} />
-                    <StatCard label="Thumbs Up" value={stats.thumbs_up} icon={<ThumbsUp size={20}/>} color="bg-green-50 text-brand-green" index={2} />
-                    <StatCard label="Thumbs Down" value={stats.thumbs_down} icon={<ThumbsDown size={20}/>} color="bg-red-50 text-red-500" index={3} />
+                    <StatCard label="Totaal Vragen" value={stats.total_questions} icon={<FileText size={20} />} color="bg-brand-yellow/10 text-brand-yellow-dark" index={0} />
+                    <StatCard label="Gem. Latency" value={`${stats.avg_latency}s`} icon={<Clock size={20} />} color="bg-earth-100 text-earth-700" index={1} />
+                    <StatCard label="Thumbs Up" value={stats.thumbs_up} icon={<ThumbsUp size={20} />} color="bg-green-50 text-brand-green" index={2} />
+                    <StatCard label="Thumbs Down" value={stats.thumbs_down} icon={<ThumbsDown size={20} />} color="bg-red-50 text-red-500" index={3} />
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -249,10 +246,10 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  <LogTable 
-                    logs={stats.recent_logs} 
-                    pagination={stats.pagination} 
-                    onPageChange={(page) => setCurrentPage(page)} 
+                  <LogTable
+                    logs={stats.recent_logs}
+                    pagination={stats.pagination}
+                    onPageChange={(page) => setCurrentPage(page)}
                   />
                 </>
               ) : (
@@ -266,11 +263,11 @@ export default function AdminDashboard() {
         )}
 
         {activeTab === "docs" && (
-          <DocumentManager 
-            documents={documents} 
-            onUpload={handleFileUpload} 
-            onDelete={handleDeleteDocument} 
-            isUploading={uploadingFile} 
+          <DocumentManager
+            documents={documents}
+            onUpload={handleFileUpload}
+            onDelete={handleDeleteDocument}
+            isUploading={uploadingFile}
           />
         )}
 
@@ -292,29 +289,26 @@ export default function AdminDashboard() {
                 {/* Score Header */}
                 <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-black/5 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
                   <div className="absolute right-0 top-0 w-64 h-64 bg-brand-yellow/5 blur-3xl rounded-full pointer-events-none" />
-                  <div className={`w-28 h-28 rounded-full flex items-center justify-center text-4xl font-black shrink-0 ${
-                    qaReport.overall_score >= 80 ? "bg-brand-green/10 text-brand-green" :
-                    qaReport.overall_score >= 60 ? "bg-yellow-50 text-yellow-600" :
-                    qaReport.overall_score >= 40 ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
-                  }`}>
+                  <div className={`w-28 h-28 rounded-full flex items-center justify-center text-4xl font-black shrink-0 ${qaReport.overall_score >= 80 ? "bg-brand-green/10 text-brand-green" :
+                      qaReport.overall_score >= 60 ? "bg-yellow-50 text-yellow-600" :
+                        qaReport.overall_score >= 40 ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
+                    }`}>
                     {qaReport.overall_score}
                   </div>
                   <div className="flex-1">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 ${
-                      qaReport.score_color === "green" ? "bg-brand-green/10 text-brand-green" :
-                      qaReport.score_color === "yellow" ? "bg-yellow-50 text-yellow-600" :
-                      qaReport.score_color === "orange" ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
-                    }`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-3 ${qaReport.score_color === "green" ? "bg-brand-green/10 text-brand-green" :
+                        qaReport.score_color === "yellow" ? "bg-yellow-50 text-yellow-600" :
+                          qaReport.score_color === "orange" ? "bg-orange-50 text-orange-500" : "bg-red-50 text-red-500"
+                      }`}>
                       <CheckCircle2 size={12} /> {qaReport.score_label}
                     </div>
                     <h2 className="text-2xl font-black text-earth-900 mb-1">Code Kwaliteitsrapport</h2>
                     <p className="text-earth-800/50 text-sm">Gegenereerd op {qaReport.generated_at ? new Date(qaReport.generated_at).toLocaleString("nl-BE") : "—"}</p>
                     <div className="mt-4 h-2.5 bg-earth-100 rounded-full overflow-hidden max-w-sm">
-                      <div className={`h-full rounded-full transition-all duration-1000 ${
-                        qaReport.overall_score >= 80 ? "bg-brand-green" :
-                        qaReport.overall_score >= 60 ? "bg-yellow-400" :
-                        qaReport.overall_score >= 40 ? "bg-orange-400" : "bg-red-400"
-                      }`} style={{ width: `${qaReport.overall_score}%` }} />
+                      <div className={`h-full rounded-full transition-all duration-1000 ${qaReport.overall_score >= 80 ? "bg-brand-green" :
+                          qaReport.overall_score >= 60 ? "bg-yellow-400" :
+                            qaReport.overall_score >= 40 ? "bg-orange-400" : "bg-red-400"
+                        }`} style={{ width: `${qaReport.overall_score}%` }} />
                     </div>
                   </div>
                 </div>
