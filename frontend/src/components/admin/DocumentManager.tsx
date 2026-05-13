@@ -50,55 +50,92 @@ export function DocumentManager({ documents, onUpload, onDelete, isUploading }: 
       </div>
 
       {/* Document List */}
-      <div className="bg-white rounded-[2rem] overflow-hidden shadow-sm border border-black/5">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="text-earth-800/40 text-[10px] uppercase tracking-widest font-extrabold border-b border-black/5 bg-earth-50/50">
-                <th className="px-6 py-4">Protocol Naam</th>
-                <th className="px-6 py-4">Laatst Bijgewerkt</th>
-                <th className="px-6 py-4 text-right">Acties</th>
+      {/* Mobile Card View */}
+      <div className="md:hidden divide-y divide-black/5">
+        {filteredDocs.length === 0 && (
+          <div className="px-6 py-10 text-center text-earth-800/30 font-bold">
+            Geen documenten gevonden.
+          </div>
+        )}
+        {filteredDocs.map((doc, i) => (
+          <div key={i} className="p-6 space-y-4">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center text-brand-green-dark shrink-0">
+                  <Plus size={14} />
+                </div>
+                <span className="font-bold text-earth-900 text-sm leading-tight">{doc.filename}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <button className="p-2 text-earth-800/40 hover:text-brand-green-dark bg-earth-50 rounded-lg">
+                  <Eye size={18} />
+                </button>
+                <button 
+                  onClick={() => onDelete(doc.filename)}
+                  className="p-2 text-earth-800/40 hover:text-red-500 bg-earth-50 rounded-lg"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-black uppercase tracking-widest text-earth-800/30">Laatst Bijgewerkt</span>
+              <span className="text-xs font-bold text-earth-800/50">
+                {new Date(doc.last_ingested).toLocaleDateString("nl-BE", { day: "numeric", month: "short", year: "numeric" })}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-left">
+          <thead>
+            <tr className="text-earth-800/40 text-[10px] uppercase tracking-widest font-extrabold border-b border-black/5 bg-earth-50/50">
+              <th className="px-6 py-4">Protocol Naam</th>
+              <th className="px-6 py-4">Laatst Bijgewerkt</th>
+              <th className="px-6 py-4 text-right">Acties</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredDocs.length === 0 && (
+              <tr>
+                <td colSpan={3} className="px-6 py-10 text-center text-earth-800/30 font-bold">
+                  Geen documenten gevonden.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredDocs.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="px-6 py-10 text-center text-earth-800/30 font-bold">
-                    Geen documenten gevonden.
-                  </td>
-                </tr>
-              )}
-              {filteredDocs.map((doc, i) => (
-                <tr key={i} className="border-b border-black/5 hover:bg-earth-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center text-brand-green-dark">
-                        <Plus size={14} />
-                      </div>
-                      <span className="font-bold text-earth-900 text-sm">{doc.filename}</span>
+            )}
+            {filteredDocs.map((doc, i) => (
+              <tr key={i} className="border-b border-black/5 hover:bg-earth-50/50 transition-colors">
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-brand-green/10 flex items-center justify-center text-brand-green-dark">
+                      <Plus size={14} />
                     </div>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-bold text-earth-800/40">
-                    {new Date(doc.last_ingested).toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" })}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 text-earth-800/40 hover:text-brand-green-dark hover:bg-brand-green/5 rounded-lg transition-all">
-                        <Eye size={18} />
-                      </button>
-                      <button 
-                        onClick={() => onDelete(doc.filename)}
-                        className="p-2 text-earth-800/40 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    <span className="font-bold text-earth-900 text-sm">{doc.filename}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 text-xs font-bold text-earth-800/40">
+                  {new Date(doc.last_ingested).toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" })}
+                </td>
+                <td className="px-6 py-4 text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <button className="p-2 text-earth-800/40 hover:text-brand-green-dark hover:bg-brand-green/5 rounded-lg transition-all">
+                      <Eye size={18} />
+                    </button>
+                    <button 
+                      onClick={() => onDelete(doc.filename)}
+                      className="p-2 text-earth-800/40 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </motion.div>
   );

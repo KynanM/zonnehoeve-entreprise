@@ -43,7 +43,50 @@ export function LogTable({ logs, pagination, onPageChange }: LogTableProps) {
         </div>
       </div>
       
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="md:hidden divide-y divide-black/5">
+        {logs.length === 0 && (
+          <div className="px-6 py-16 text-center text-earth-800/30 font-bold">
+            Nog geen gesprekken gevonden.
+          </div>
+        )}
+        {logs.map((log) => (
+          <div key={log.id} className="p-6 space-y-4">
+            <div className="flex justify-between items-start">
+              <span className="text-[11px] font-black uppercase tracking-widest text-earth-800/30">
+                {new Date(log.timestamp).toLocaleString("nl-BE", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+              </span>
+              <div className="flex items-center gap-2">
+                {log.user_feedback === "thumbs_up" && <ThumbsUp size={14} className="text-brand-green" />}
+                {log.user_feedback === "thumbs_down" && <ThumbsDown size={14} className="text-red-400" />}
+                <span className="text-[10px] font-mono text-earth-800/30">{log.latency_seconds ? `${(log.latency_seconds * 1000).toFixed(0)}ms` : ""}</span>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-black text-earth-800/30 uppercase mb-1">Vraag</p>
+              <p className="font-bold text-earth-900">{log.user_prompt}</p>
+            </div>
+            <div>
+              <p className="text-xs font-black text-earth-800/30 uppercase mb-1">Antwoord</p>
+              <button onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                className="text-left text-earth-800/70 text-sm">
+                <span className={expandedLogId === log.id ? "" : "line-clamp-3"}>{log.bot_response}</span>
+                <span className="text-brand-green font-bold text-[10px] ml-1">{expandedLogId === log.id ? "Minder tonen" : "Meer tonen"}</span>
+              </button>
+            </div>
+            {log.retrieved_sources?.length > 0 && (
+              <div className="flex flex-wrap gap-1 pt-2">
+                {log.retrieved_sources.map((s, i) => (
+                  <span key={i} className="text-[9px] bg-earth-50 border border-black/5 px-2 py-0.5 rounded font-bold text-earth-800/40">{s}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left">
           <thead>
             <tr className="text-earth-800/40 text-[10px] uppercase tracking-widest font-extrabold border-b border-black/5 bg-earth-50/50">

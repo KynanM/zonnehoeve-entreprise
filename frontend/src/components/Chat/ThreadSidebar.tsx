@@ -22,6 +22,8 @@ interface ThreadSidebarProps {
   onDeleteAll: () => void;
   onNewChat: () => void;
   theme: "light" | "night";
+  isMobileOpen?: boolean;
+  onClose?: () => void;
 }
 
 export default function ThreadSidebar({
@@ -33,7 +35,9 @@ export default function ThreadSidebar({
   onThreadRename,
   onDeleteAll,
   onNewChat,
-  theme
+  theme,
+  isMobileOpen,
+  onClose
 }: ThreadSidebarProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -73,10 +77,32 @@ export default function ThreadSidebar({
   };
 
   return (
-    <aside className={cn(
-      "w-full lg:w-[320px] hidden lg:flex lg:flex-col relative overflow-hidden shrink-0 border-r transition-all duration-500",
-      theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200 shadow-none"
-    )}>
+    <>
+      {/* Mobile Overlay Background */}
+      <AnimatePresence>
+        {isMobileOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[100] lg:hidden"
+          />
+        )}
+      </AnimatePresence>
+
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-[110] w-[280px] lg:w-[320px] lg:static lg:flex lg:flex-col relative overflow-hidden shrink-0 border-r transition-all duration-500",
+        theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200 shadow-none",
+        isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
+        {/* Mobile Close Button */}
+        <button 
+          onClick={onClose}
+          className="lg:hidden absolute top-6 right-4 p-2 text-stone-400 hover:text-emerald-500 transition-colors"
+        >
+          <X size={20} />
+        </button>
       {/* Header */}
       <div className="p-8 pb-4">
         <h2 className={cn("text-2xl font-black tracking-tight mb-6", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Gesprekken</h2>
@@ -153,7 +179,7 @@ export default function ThreadSidebar({
                     ) : (
                       <>
                         <button 
-                          onClick={() => onThreadSelect(t.id)}
+                          onClick={() => { onThreadSelect(t.id); onClose?.(); }}
                           className={cn(
                             "w-full text-left pl-5 pr-20 py-4 rounded-2xl text-sm font-bold transition-all truncate border group", 
                             activeThreadId === t.id 
@@ -221,5 +247,6 @@ export default function ThreadSidebar({
         </button>
       </div>
     </aside>
+    </>
   );
 }
