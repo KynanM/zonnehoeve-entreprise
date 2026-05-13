@@ -14,7 +14,7 @@ function MiniBarChart({ data }: { data: { day: string; count: number }[] }) {
   return (
     <div className="flex items-end gap-1.5 h-24 w-full">
       {data.map((d, i) => (
-        <div key={i} className="flex-1 flex flex-col items-center gap-1 group relative">
+        <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1 group relative h-full">
           <div
             className={`w-full transition-all duration-300 rounded-t-sm ${d.count > 0 ? 'bg-emerald-400 opacity-100 shadow-[0_0_10px_rgba(52,211,153,0.3)]' : 'bg-slate-700 opacity-30'}`}
             style={{ 
