@@ -19,7 +19,7 @@ class ChatService:
         self.db = db
         self.app_state = app_state
 
-    async def handle_chat(self, user_input: str, chat_history: List[Tuple[str, str]], thread_id: Optional[str] = None):
+    async def handle_chat(self, user_input: str, chat_history: List[Tuple[str, str]], thread_id: Optional[str] = None, user_id: Optional[str] = None):
         """Processes a chat request and yields chunks of the response."""
         start_time = time.time()
         thread_id = thread_id or str(uuid.uuid4())
@@ -34,7 +34,7 @@ class ChatService:
         try:
             # 2. Create Initial Log
             try:
-                log_id = await self.create_chat_log(thread_id, user_input)
+                log_id = await self.create_chat_log(thread_id, user_input, user_id=user_id)
                 yield f"__log_id__:{log_id}\n"
                 yield f"__thread_id__:{thread_id}\n"
             except Exception as e:
@@ -110,12 +110,16 @@ class ChatService:
             f"Input: {user_input}"
         )
 
-    async def create_chat_log(self, thread_id: str, user_prompt: str) -> int:
+    async def create_chat_log(self, thread_id: str, user_prompt: str, user_id: Optional[str] = None) -> int:
         res = await self.db.execute(select(ChatThread).filter(ChatThread.id == thread_id))
         thread = res.scalar_one_or_none()
         if not thread:
-            thread = ChatThread(id=thread_id, title=user_prompt[:50])
+            thread = ChatThread(id=thread_id, title=user_prompt[:50], user_id=user_id)
             self.db.add(thread)
+            await self.db.flush()
+        elif user_id and not thread.user_id:
+            # Als de thread bestond zonder user_id, koppel hem alsnog (optioneel, voor migratie)
+            thread.user_id = user_id
             await self.db.flush()
         
         new_log = ChatLog(

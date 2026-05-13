@@ -92,7 +92,7 @@ export default function ThreadSidebar({
       </AnimatePresence>
 
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-[110] w-[280px] lg:w-[320px] lg:static lg:flex lg:flex-col relative overflow-hidden shrink-0 border-r transition-all duration-500",
+        "fixed inset-y-0 left-0 z-[110] w-[280px] lg:w-[320px] lg:static lg:flex lg:flex-col overflow-hidden shrink-0 border-r transition-all duration-500",
         theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200 shadow-none",
         isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>

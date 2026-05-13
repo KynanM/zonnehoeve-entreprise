@@ -8,6 +8,7 @@ class ChatThread(Base):
     """Container voor een gesprekssessie tussen een medewerker en de AI."""
     __tablename__ = "chat_threads"
     id = Column(String, primary_key=True)  # UUID
+    user_id = Column(String, index=True, nullable=True)  # Gekoppeld aan browser localStorage UUID
     title = Column(String, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), index=True)
     is_pinned = Column(Boolean, default=False)
