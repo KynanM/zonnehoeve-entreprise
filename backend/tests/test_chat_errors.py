@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, AsyncMock
 @pytest.mark.anyio
 async def test_feedback_not_found():
     mock_db = AsyncMock()
-    mock_db.get.return_value = None
+    # The endpoint uses db.execute(...).scalar_one_or_none(), so mock that instead
+    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: None)
     from database import get_db
     app.dependency_overrides[get_db] = lambda: mock_db
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:

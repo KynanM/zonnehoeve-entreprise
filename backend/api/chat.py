@@ -67,14 +67,16 @@ async def chat_endpoint(req: ChatRequest, request: Request, db: AsyncSession = D
 @router.post("/feedback")
 async def submit_feedback(req: FeedbackRequest, request: Request, db: AsyncSession = Depends(get_db)):
     from models import ChatLog
+    from sqlalchemy.orm import selectinload
     from services.socket_manager import manager
     
     user_id = await get_guest_id(request)
     is_admin = await is_admin_request(request)
     
-    # Gebruik join om eigenaarschap te controleren
+    # Gebruik join + selectinload om eigenaarschap te controleren en relatie te laden
     res = await db.execute(
         select(ChatLog)
+        .options(selectinload(ChatLog.thread))
         .join(ChatThread)
         .where(ChatLog.id == req.log_id)
     )

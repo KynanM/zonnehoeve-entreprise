@@ -22,7 +22,8 @@ def mock_admin():
 @pytest.mark.anyio
 async def test_submit_feedback(mock_db):
     mock_log = ChatLog(id=1, user_prompt="test")
-    mock_db.get.return_value = mock_log
+    # Mock the same call path as the endpoint: db.execute(...).scalar_one_or_none()
+    mock_db.execute.return_value = MagicMock(scalar_one_or_none=lambda: mock_log)
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         response = await ac.post("/api/chat/feedback", json={"log_id": 1, "feedback": "thumbs_up"})
@@ -33,9 +34,10 @@ async def test_submit_feedback(mock_db):
 
 @pytest.mark.anyio
 async def test_get_threads(mock_db):
-    mock_db.execute.return_value = MagicMock(scalars=lambda: MagicMock(all=lambda: [ChatThread(id="t1", title="T1")]))
+    mock_db.execute.return_value = MagicMock(scalars=lambda: MagicMock(all=lambda: [ChatThread(id="t1", title="T1")] ))
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/chat/threads")
+        # Provide a guest id header to allow non-admin queries to return threads
+        response = await ac.get("/api/chat/threads", headers={"X-Guest-ID": "user1"})
     assert response.status_code == 200
     assert response.json()[0]["id"] == "t1"
 
