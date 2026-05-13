@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, AlertTriangle, Sparkles, ClipboardList, Home, ThumbsUp, ThumbsDown } from "lucide-react";
+import { X, FileText, AlertTriangle, Sparkles, ClipboardList, Home, ThumbsUp, ThumbsDown, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
@@ -36,12 +36,23 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
   } = useDigitalGuide(initialTheme, onThemeChange);
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showMobileDoc, setShowMobileDoc] = useState(false);
   const [dossierNote, setDossierNote] = useState("");
   const [feedbackExplainer, setFeedbackExplainer] = useState<{index: number, feedback: string} | null>(null);
   const [explainerText, setExplainerText] = useState("");
   const [zoom, setZoom] = useState(1.0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileActiveTab, setMobileActiveTab] = useState<"chat" | "library">("chat");
   const { pdfBlobUrl, isPdfLoading } = usePdfLoader(activeDocument, showToast);
+
+  // Responsive detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Local effect for deep-linking
   useEffect(() => {
@@ -116,6 +127,189 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
     setDossierModal(null);
   };
 
+  const renderChatHeader = () => (
+    <header className={cn(
+      "px-8 py-4 border-b flex items-center justify-between backdrop-blur-md sticky top-0 z-[60]",
+      theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100"
+    )}>
+      <div className="flex items-center gap-4 sm:gap-6">
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden p-2 text-stone-400 hover:text-emerald-500 transition-colors"
+          aria-label="Open gesprekken"
+        >
+          <MessageSquare size={20} />
+        </button>
+        <Link href="/" aria-label="Terug naar Home" className="hover:text-emerald-500 transition-colors text-stone-400 hidden sm:block">
+          <Home size={20} />
+        </Link>
+        <div className="w-px h-6 bg-stone-200 dark:bg-stone-800 hidden sm:block" />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500 hidden sm:block"><Sparkles size={18} /></div>
+          <h1 className={cn("font-black tracking-tight text-[11px] sm:text-base uppercase", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h1>
+        </div>
+        {!isMobile && (
+          <>
+            <div className="w-px h-6 bg-stone-200 dark:bg-stone-800 hidden md:block" />
+            <div className="w-20 h-8 relative grayscale opacity-40 hover:opacity-100 transition-opacity hidden md:block">
+              <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
+            </div>
+          </>
+        )}
+      </div>
+
+      {isMobile && (
+        <div className="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
+          <button 
+            onClick={() => setMobileActiveTab("chat")}
+            className={cn(
+              "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+              mobileActiveTab === "chat" 
+                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm" 
+                : "text-stone-400"
+            )}
+          >
+            Chat
+          </button>
+          <button 
+            onClick={() => setMobileActiveTab("library")}
+            className={cn(
+              "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+              mobileActiveTab === "library" 
+                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm" 
+                : "text-stone-400"
+            )}
+          >
+            Bib
+          </button>
+        </div>
+      )}
+    </header>
+  );
+
+  const renderChatContent = () => (
+    <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 custom-scrollbar">
+      {messages.length === 0 && (
+        <div className="h-full flex flex-col items-center justify-center text-center space-y-8 py-10">
+          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            className={cn("w-40 h-28 rounded-[2rem] flex items-center justify-center gap-6 px-8 shadow-2xl border", theme === 'night' ? "bg-stone-800 border-stone-700" : "bg-white border-stone-100")}>
+            <div className="w-14 h-14 relative">
+              <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
+            </div>
+            <div className="w-px h-12 bg-stone-200 dark:bg-stone-700" />
+            <div className="w-14 h-14 relative">
+              <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
+            </div>
+          </motion.div>
+          <div className="space-y-3">
+            <h2 className={cn("text-3xl font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h2>
+            <p className="text-stone-400 font-bold max-w-sm mx-auto leading-relaxed">Waarmee kan ik je helpen vandaag?</p>
+            <div className="pt-4 flex flex-col items-center gap-1">
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] text-stone-300 dark:text-stone-600">Ontwikkeld door</span>
+              <span className="text-sm font-bold text-stone-500">Kynan Melsens & Aaron Vangermeersch</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3 justify-center max-w-2xl px-4">
+            {(suggestions.length > 0 ? suggestions : ["Rookbeleid?", "Arbeidsongeval?", "Medicatie protocol?"]).map((sug, i) => (
+              <button key={i} onClick={() => handleSubmit(sug)}
+                className={cn(
+                  "px-5 py-3 rounded-2xl text-xs font-black transition-all shadow-sm flex items-center gap-2 group",
+                  theme === 'night' ? "bg-stone-800 border border-stone-700 text-stone-300 hover:bg-emerald-600 hover:text-white" : "bg-white border border-stone-100 text-stone-600 hover:bg-emerald-600 hover:text-white"
+                )}>
+                <Sparkles size={14} className="text-emerald-500 group-hover:text-white" />
+                {sug}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {messages.map((msg, i) => (
+        <MessageItem 
+          key={i} index={i} message={msg} theme={theme} 
+          onCopy={handleCopy} onPrint={handlePrint} onDossierExport={handleDossierExport} 
+          onFeedback={handleFeedbackClick} onDocumentClick={handleDocumentClick}
+        />
+      ))}
+      {isLoading && messages[messages.length - 1]?.role === "assistant" && !messages[messages.length - 1]?.content && (
+        <div className="flex justify-start mb-6"><div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" /></div>
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+
+  const renderChatFooter = () => (
+    <div className="bg-white/50 backdrop-blur-xl relative">
+       {activeDocument && (
+         <button onClick={() => setShowMobileDoc(true)} className="lg:hidden absolute -top-16 right-6 p-4 bg-emerald-600 text-white rounded-full shadow-xl z-50 flex items-center gap-2 font-bold text-sm">
+           <FileText size={18} /><span>Lees Protocol</span>
+         </button>
+       )}
+       <FourMoments onSuggestionClick={handleSubmit} />
+       <ChatInput input={input} setInput={setInput} isLoading={isLoading} onSubmit={handleSubmit} onVoiceInput={handleSubmit} cooldown={cooldown} theme={theme} />
+       <div className="pb-3 text-center">
+         <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest opacity-50">© 2026 VIVES - Kynan Melsens & Aaron Vangermeersch</span>
+       </div>
+    </div>
+  );
+
+  const renderDocumentContent = () => (
+    activeDocument ? (
+      <div className="flex-1 flex flex-col h-full">
+        <DocumentToolbar 
+          filename={activeDocument} 
+          currentPage={parseInt(activePage?.replace("page=", "") || "1")} 
+          totalPages={0} 
+          zoom={zoom} 
+          onZoomChange={setZoom} 
+          onPageChange={(p) => setActivePage(`page=${p}`)} 
+          onClose={() => setActiveDocument(null)} 
+          onDownload={() => handleDownload(activeDocument)}
+          theme={theme} 
+        />
+        <div className="flex-1 relative flex bg-stone-50 overflow-hidden">
+          <AnimatePresence>
+            {showOutline && <OutlineView outline={outline} onPageClick={setActivePage} onClose={() => setShowOutline(false)} theme={theme} />}
+          </AnimatePresence>
+          
+          {isPdfLoading ? (
+            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+               <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+               <p className="text-xs font-bold text-stone-400">Document inladen...</p>
+            </div>
+          ) : pdfBlobUrl ? (
+            <iframe 
+              style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', width: `${100/zoom}%`, height: `${100/zoom}%` }}
+              src={`${pdfBlobUrl}${activePage ? `#${activePage}` : ''}`} 
+              className="flex-1 border-0" 
+              key={`${activeDocument}-${activePage}-${pdfBlobUrl}`} 
+            />
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-stone-400 font-bold text-sm">
+               Kon document niet weergeven.
+            </div>
+          )}
+        </div>
+      </div>
+    ) : (
+      <div className="flex-1 flex flex-col h-full">
+        {!isMobile && (
+          <div className={cn("p-5 border-b flex items-center justify-between backdrop-blur-md", theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100")}>
+             <div className="flex-1 font-black text-sm uppercase tracking-widest text-stone-400">Bibliotheek</div>
+          </div>
+        )}
+        <DocumentSidebar 
+          availableDocs={availableDocs} pinnedDocs={pinnedDocs} recentDocs={recentDocs} 
+          recentUpdates={recentUpdates} previews={previews} 
+          onDocumentClick={handleDocumentClick} 
+          onDocumentDownload={handleDownload}
+          onPinToggle={handlePin} 
+          onFetchPreview={fetchPreview} searchQuery={searchQuery} onSearchChange={setSearchQuery} 
+          isSearching={isSearching} theme={theme} 
+        />
+      </div>
+    )
+  );
+
   return (
     <div className={cn("flex flex-col h-full bg-transparent overflow-hidden", className)}>
       <AnimatePresence>
@@ -127,176 +321,74 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
         )}
       </AnimatePresence>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative z-10 w-full max-w-full min-h-0">
-        <ThreadSidebar 
-          threads={threads} 
-          activeThreadId={activeThreadId} 
-          onThreadSelect={(id) => { setActiveThreadId(id); }} 
-          onThreadDelete={deleteThread} 
-          onThreadPin={pinThread}
-          onThreadRename={renameThread}
-          onDeleteAll={deleteAllThreads}
-          onNewChat={startNewChat} 
-          theme={theme} 
-        />
-
         <div className="flex-1 flex flex-col lg:flex-row overflow-hidden w-full min-h-0">
-          <Group orientation="horizontal" className="flex-1 w-full h-full">
-            {/* Chat Panel */}
-            <Panel defaultSize={60} minSize={30}>
-              <section className={cn(
-                "h-full flex flex-col overflow-hidden transition-all border-l",
-                theme === 'night' ? "bg-stone-900/60 border-stone-800" : "bg-white/60 border-stone-200"
-              )}>
-                <header className={cn(
-                  "px-8 py-4 border-b flex items-center justify-between backdrop-blur-md sticky top-0 z-[60]",
-                  theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100"
-                )}>
-                  <div className="flex items-center gap-6">
-                    <Link href="/" aria-label="Terug naar Home" className="hover:text-emerald-500 transition-colors text-stone-400">
-                      <Home size={20} />
-                    </Link>
-                    <div className="w-px h-6 bg-stone-200 dark:bg-stone-800" />
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500"><Sparkles size={18} /></div>
-                      <h1 className={cn("font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h1>
-                    </div>
-                    <div className="w-px h-6 bg-stone-200 dark:bg-stone-800" />
-                    <div className="w-20 h-8 relative grayscale opacity-40 hover:opacity-100 transition-opacity">
-                      <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
-                    </div>
-                  </div>
-                </header>
+          <ThreadSidebar 
+            threads={threads} 
+            activeThreadId={activeThreadId} 
+            onThreadSelect={(id) => { setActiveThreadId(id); }} 
+            onThreadDelete={deleteThread} 
+            onThreadPin={pinThread}
+            onThreadRename={renameThread}
+            onDeleteAll={deleteAllThreads}
+            onNewChat={startNewChat} 
+            theme={theme} 
+            isMobileOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
+          />
 
-                <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 custom-scrollbar">
-                  {messages.length === 0 && (
-                    <div className="h-full flex flex-col items-center justify-center text-center space-y-8 py-10">
-                      <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                        className={cn("w-40 h-28 rounded-[2rem] flex items-center justify-center gap-6 px-8 shadow-2xl border", theme === 'night' ? "bg-stone-800 border-stone-700" : "bg-white border-stone-100")}>
-                        <div className="w-14 h-14 relative">
-                          <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
-                        </div>
-                        <div className="w-px h-12 bg-stone-200 dark:bg-stone-700" />
-                        <div className="w-14 h-14 relative">
-                          <Image src="/logo_vives.png" alt="VIVES" fill className="object-contain" />
-                        </div>
-                      </motion.div>
-                      <div className="space-y-3">
-                        <h2 className={cn("text-3xl font-black tracking-tight", theme === 'night' ? "text-stone-100" : "text-stone-900")}>Digitale Gids</h2>
-                        <p className="text-stone-400 font-bold max-w-sm mx-auto leading-relaxed">Waarmee kan ik je helpen vandaag?</p>
-                        <div className="pt-4 flex flex-col items-center gap-1">
-                          <span className="text-[11px] font-black uppercase tracking-[0.2em] text-stone-300 dark:text-stone-600">Ontwikkeld door</span>
-                          <span className="text-sm font-bold text-stone-500">Kynan Melsens & Aaron Vangermeersch</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-3 justify-center max-w-2xl px-4">
-                        {(suggestions.length > 0 ? suggestions : ["Rookbeleid?", "Arbeidsongeval?", "Medicatie protocol?"]).map((sug, i) => (
-                          <button key={i} onClick={() => handleSubmit(sug)}
-                            className={cn(
-                              "px-5 py-3 rounded-2xl text-xs font-black transition-all shadow-sm flex items-center gap-2 group",
-                              theme === 'night' ? "bg-stone-800 border border-stone-700 text-stone-300 hover:bg-emerald-600 hover:text-white" : "bg-white border border-stone-100 text-stone-600 hover:bg-emerald-600 hover:text-white"
-                            )}>
-                            <Sparkles size={14} className="text-emerald-500 group-hover:text-white" />
-                            {sug}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {messages.map((msg, i) => (
-                    <MessageItem 
-                      key={i} index={i} message={msg} theme={theme} 
-                      onCopy={handleCopy} onPrint={handlePrint} onDossierExport={handleDossierExport} 
-                      onFeedback={handleFeedbackClick} onDocumentClick={handleDocumentClick}
-                    />
-                  ))}
-                  {isLoading && messages[messages.length - 1]?.role === "assistant" && !messages[messages.length - 1]?.content && (
-                    <div className="flex justify-start mb-6"><div className="w-8 h-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" /></div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
+          <div className="flex-1 flex flex-col overflow-hidden w-full min-h-0">
+            {!isMobile ? (
+              <Group orientation="horizontal" className="flex-1 w-full h-full">
+                {/* Chat Panel */}
+                <Panel defaultSize={60} minSize={30}>
+                  <section className={cn(
+                    "h-full flex flex-col overflow-hidden transition-all border-l",
+                    theme === 'night' ? "bg-stone-900/60 border-stone-800" : "bg-white/60 border-stone-200"
+                  )}>
+                    {renderChatHeader()}
+                    {renderChatContent()}
+                    {renderChatFooter()}
+                  </section>
+                </Panel>
 
-                <div className="bg-white/50 backdrop-blur-xl relative">
-                   {activeDocument && (
-                     <button onClick={() => setShowMobileDoc(true)} className="lg:hidden absolute -top-16 right-6 p-4 bg-emerald-600 text-white rounded-full shadow-xl z-50 flex items-center gap-2 font-bold text-sm">
-                       <FileText size={18} /><span>Lees Protocol</span>
-                     </button>
-                   )}
-                   <FourMoments onSuggestionClick={handleSubmit} />
-                   <ChatInput input={input} setInput={setInput} isLoading={isLoading} onSubmit={handleSubmit} onVoiceInput={handleSubmit} cooldown={cooldown} theme={theme} />
-                   <div className="pb-3 text-center">
-                     <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest opacity-50">© 2026 VIVES - Kynan Melsens & Aaron Vangermeersch</span>
-                   </div>
-                </div>
-              </section>
-            </Panel>
+                <Separator className="w-2 hover:bg-emerald-500/20 transition-colors hidden lg:block cursor-col-resize" />
 
-            <Separator className="w-2 hover:bg-emerald-500/20 transition-colors hidden lg:block cursor-col-resize" />
-
-            {/* Document Panel */}
-            <Panel defaultSize={40} minSize={0} collapsible={true}>
-              <aside className={cn(
-                "h-full border-l overflow-hidden transition-all flex flex-col",
-                theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200"
-              )}>
-                {activeDocument ? (
-                  <div className="flex-1 flex flex-col h-full">
-                    <DocumentToolbar 
-                      filename={activeDocument} 
-                      currentPage={parseInt(activePage?.replace("page=", "") || "1")} 
-                      totalPages={0} 
-                      zoom={zoom} 
-                      onZoomChange={setZoom} 
-                      onPageChange={(p) => setActivePage(`page=${p}`)} 
-                      onClose={() => setActiveDocument(null)} 
-                      onDownload={() => handleDownload(activeDocument)}
-                      theme={theme} 
-                    />
-                    <div className="flex-1 relative flex bg-stone-50 overflow-hidden">
-                      <AnimatePresence>
-                        {showOutline && <OutlineView outline={outline} onPageClick={setActivePage} onClose={() => setShowOutline(false)} theme={theme} />}
-                      </AnimatePresence>
-                      
-                      {isPdfLoading ? (
-                        <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-                           <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-                           <p className="text-xs font-bold text-stone-400">Document inladen...</p>
-                        </div>
-                      ) : pdfBlobUrl ? (
-                        <iframe 
-                          style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', width: `${100/zoom}%`, height: `${100/zoom}%` }}
-                          src={`${pdfBlobUrl}${activePage ? `#${activePage}` : ''}`} 
-                          className="flex-1 border-0" 
-                          key={`${activeDocument}-${activePage}-${pdfBlobUrl}`} 
-                        />
-                      ) : (
-                        <div className="flex-1 flex items-center justify-center text-stone-400 font-bold text-sm">
-                           Kon document niet weergeven.
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                {/* Document Panel */}
+                <Panel defaultSize={40} minSize={0} collapsible={true}>
+                  <aside className={cn(
+                    "h-full border-l overflow-hidden transition-all flex flex-col",
+                    theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200"
+                  )}>
+                    {renderDocumentContent()}
+                  </aside>
+                </Panel>
+              </Group>
+            ) : (
+              <div className="flex-1 flex flex-col overflow-hidden w-full">
+                {mobileActiveTab === "chat" ? (
+                  <section className={cn(
+                    "h-full flex flex-col overflow-hidden transition-all",
+                    theme === 'night' ? "bg-stone-900/60" : "bg-white/60"
+                  )}>
+                    {renderChatHeader()}
+                    {renderChatContent()}
+                    {renderChatFooter()}
+                  </section>
                 ) : (
-                  <div className="flex-1 flex flex-col h-full">
-                    <div className={cn("p-5 border-b flex items-center justify-between backdrop-blur-md", theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100")}>
-                       <div className="flex-1 font-black text-sm uppercase tracking-widest text-stone-400">Bibliotheek</div>
+                  <section className={cn(
+                    "h-full overflow-hidden transition-all flex flex-col",
+                    theme === 'night' ? "bg-stone-900" : "bg-white"
+                  )}>
+                    {renderChatHeader()}
+                    <div className="flex-1 overflow-hidden">
+                      {renderDocumentContent()}
                     </div>
-                    <DocumentSidebar 
-                      availableDocs={availableDocs} pinnedDocs={pinnedDocs} recentDocs={recentDocs} 
-                      recentUpdates={recentUpdates} previews={previews} 
-                      onDocumentClick={handleDocumentClick} 
-                      onDocumentDownload={handleDownload}
-                      onPinToggle={handlePin} 
-                      onFetchPreview={fetchPreview} searchQuery={searchQuery} onSearchChange={setSearchQuery} 
-                      isSearching={isSearching} theme={theme} 
-                    />
-                  </div>
+                  </section>
                 )}
-              </aside>
-            </Panel>
-          </Group>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
       {/* Modals */}
       <AnimatePresence>

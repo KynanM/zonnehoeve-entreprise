@@ -47,6 +47,9 @@ jest.mock('lucide-react', () => ({
   ClipboardList: () => <span data-testid="clipboard-list-icon" />,
   Send: () => <span data-testid="send-icon" />,
   Home: () => <span data-testid="home-icon" />,
+  MessageSquare: () => <span data-testid="message-square-icon" />,
+  ThumbsUp: () => <span data-testid="thumbs-up-icon" />,
+  ThumbsDown: () => <span data-testid="thumbs-down-icon" />,
 }))
 
 // Mocking sub-components to keep test focused
@@ -78,6 +81,13 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
+});
+
+// Mock window.innerWidth
+Object.defineProperty(window, 'innerWidth', {
+  writable: true,
+  configurable: true,
+  value: 1200, // Desktop by default
 });
 
 describe('DigitalGuide', () => {

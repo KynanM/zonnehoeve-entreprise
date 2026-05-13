@@ -41,6 +41,7 @@ const clusters = [
 
 export default function OnePager() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showFab, setShowFab] = useState(false);
   const [mounted, setMounted] = useState(false);
   const heroRef = useRef(null);
@@ -65,6 +66,7 @@ export default function OnePager() {
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth" });
+    setIsMenuOpen(false);
   };
 
   return (
@@ -104,10 +106,38 @@ export default function OnePager() {
             </button>
           </div>
 
-          <button className="lg:hidden w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-black/5">
-            <Command size={20} />
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-black/5 active:scale-95 transition-transform"
+          >
+            <Command size={20} className={cn("transition-transform duration-500", isMenuOpen && "rotate-90 text-brand-green")} />
           </button>
         </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-white/90 backdrop-blur-2xl border-b border-black/5 overflow-hidden"
+            >
+              <div className="container-wide py-8 flex flex-col gap-6 font-bold text-lg">
+                <button onClick={() => scrollTo('vision')} className="text-left py-2 border-b border-black/5">Onze Visie</button>
+                <button onClick={() => scrollTo('services')} className="text-left py-2 border-b border-black/5">Diensten</button>
+                <button onClick={() => scrollTo('guide')} className="text-left py-2 border-b border-black/5">De Gids</button>
+                <Link href="/admin" className="text-left py-2 border-b border-black/5">Portaal</Link>
+                <button 
+                  onClick={() => scrollTo('guide')}
+                  className="bg-brand-green text-white px-8 py-4 rounded-2xl shadow-xl shadow-brand-green/20 text-center mt-4"
+                >
+                  Start Sessie
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.nav>
 
       {/* Hero Section */}
@@ -134,19 +164,19 @@ export default function OnePager() {
                 <MapPin size={14} className="text-brand-green" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-brand-green">Zonnestraat 13, Eke-Nazareth</span>
               </div>
-              <h1 className="text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-10 text-earth-900">
+              <h1 className="text-[3.2rem] sm:text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter mb-10 text-earth-900">
                 Zonnehoeve <br />
                 <span className="text-gradient">Living+.</span>
               </h1>
-              <p className="text-xl md:text-3xl text-earth-800 font-bold max-w-2xl leading-tight mb-12">
+              <p className="text-lg sm:text-xl md:text-3xl text-earth-800 font-bold max-w-2xl leading-tight mb-12">
                 Een warme thuis en professionele begeleiding voor volwassenen met een beperking, NAH of autisme.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-6">
-                <button onClick={() => scrollTo('guide')} className="group px-12 py-6 bg-brand-green text-white rounded-3xl font-black text-xl shadow-2xl shadow-brand-green/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                <button onClick={() => scrollTo('guide')} className="group px-8 sm:px-12 py-5 sm:py-6 bg-brand-green text-white rounded-[1.8rem] sm:rounded-3xl font-black text-lg sm:text-xl shadow-2xl shadow-brand-green/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4">
                   Open de Gids <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
                 </button>
-                <button onClick={() => scrollTo('vision')} className="px-12 py-6 bg-white text-earth-900 border border-black/5 rounded-3xl font-black text-xl hover:bg-earth-50 transition-all shadow-xl">
+                <button onClick={() => scrollTo('vision')} className="px-8 sm:px-12 py-5 sm:py-6 bg-white text-earth-900 border border-black/5 rounded-[1.8rem] sm:rounded-3xl font-black text-lg sm:text-xl hover:bg-earth-50 transition-all shadow-xl">
                   Onze Visie
                 </button>
               </div>
@@ -185,7 +215,7 @@ export default function OnePager() {
               <motion.div 
                 key={i}
                 whileHover={{ y: -10 }}
-                className="group relative h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
+                className="group relative h-[500px] sm:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
               >
                 <Image src={cluster.image} alt={cluster.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-earth-900/90 via-earth-900/40 to-transparent" />

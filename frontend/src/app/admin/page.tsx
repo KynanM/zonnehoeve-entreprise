@@ -231,7 +231,7 @@ export default function AdminDashboard() {
             <motion.div key="dash" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
               {stats ? (
                 <>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <StatCard label="Totaal Vragen" value={stats.total_questions} icon={<FileText size={20}/>} color="bg-brand-yellow/10 text-brand-yellow-dark" index={0} />
                     <StatCard label="Gem. Latency" value={`${stats.avg_latency}s`} icon={<Clock size={20}/>} color="bg-earth-100 text-earth-700" index={1} />
                     <StatCard label="Thumbs Up" value={stats.thumbs_up} icon={<ThumbsUp size={20}/>} color="bg-green-50 text-brand-green" index={2} />
