@@ -14,6 +14,16 @@ from services.chat_service import ChatService
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
 logger = logging.getLogger(__name__)
 
+async def get_guest_id(request: Request) -> Optional[str]:
+    """Extraheert het Guest ID uit de headers voor gebruikersisolatie."""
+    return request.headers.get("X-Guest-ID")
+
+async def is_admin_request(request: Request) -> bool:
+    """Controleert of het verzoek van een admin komt (bevat geldige admin key)."""
+    from api.auth import ADMIN_API_KEY
+    admin_key = request.headers.get("x-admin-key")
+    return ADMIN_API_KEY is not None and admin_key == ADMIN_API_KEY
+
 class Message(BaseModel):
     role: str
     content: str
@@ -43,9 +53,10 @@ async def chat_endpoint(req: ChatRequest, request: Request, db: AsyncSession = D
             formatted_history.append((role, msg.content))
 
         chat_service = ChatService(db, request.app.state)
+        user_id = await get_guest_id(request)
         
         return StreamingResponse(
-            chat_service.handle_chat(req.input, formatted_history, req.thread_id),
+            chat_service.handle_chat(req.input, formatted_history, req.thread_id, user_id=user_id),
             media_type="text/plain"
         )
 
@@ -54,13 +65,27 @@ async def chat_endpoint(req: ChatRequest, request: Request, db: AsyncSession = D
         raise HTTPException(status_code=500, detail="Interne serverfout")
 
 @router.post("/feedback")
-async def submit_feedback(req: FeedbackRequest, db: AsyncSession = Depends(get_db)):
+async def submit_feedback(req: FeedbackRequest, request: Request, db: AsyncSession = Depends(get_db)):
     from models import ChatLog
     from services.socket_manager import manager
     
-    log = await db.get(ChatLog, req.log_id)
+    user_id = await get_guest_id(request)
+    is_admin = await is_admin_request(request)
+    
+    # Gebruik join om eigenaarschap te controleren
+    res = await db.execute(
+        select(ChatLog)
+        .join(ChatThread)
+        .where(ChatLog.id == req.log_id)
+    )
+    log = res.scalar_one_or_none()
+    
     if not log:
         raise HTTPException(status_code=404, detail="Log niet gevonden")
+    
+    # Controleer eigenaarschap (admins mogen alles)
+    if not is_admin and user_id and log.thread.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Geen toegang tot deze feedback")
     
     log.user_feedback = req.feedback
     await db.commit()
@@ -74,12 +99,22 @@ async def submit_feedback(req: FeedbackRequest, db: AsyncSession = Depends(get_d
     return {"status": "success"}
 
 @router.get("/threads")
-async def get_threads(db: AsyncSession = Depends(get_db)):
+async def get_threads(request: Request, db: AsyncSession = Depends(get_db)):
     try:
+        user_id = await get_guest_id(request)
+        is_admin = await is_admin_request(request)
+        
+        query = select(ChatThread).where(ChatThread.is_archived.is_(False))
+        
+        if not is_admin:
+            if user_id:
+                query = query.where(ChatThread.user_id == user_id)
+            else:
+                # Als er geen guest ID is en geen admin, toon dan niets
+                return []
+            
         res = await db.execute(
-            select(ChatThread)
-            .where(ChatThread.is_archived.is_(False))
-            .order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
+            query.order_by(ChatThread.is_pinned.desc(), ChatThread.created_at.desc())
         )
         return res.scalars().all()
     except Exception as e:
@@ -88,9 +123,17 @@ async def get_threads(db: AsyncSession = Depends(get_db)):
             await db.rollback()
             # Selecteer enkel de kolommen die we ZEKER weten dat bestaan
             from sqlalchemy import text
-            res = await db.execute(
-                text("SELECT id, title, created_at FROM chat_threads ORDER BY created_at DESC")
-            )
+            if is_admin:
+                res = await db.execute(
+                    text("SELECT id, title, created_at FROM chat_threads ORDER BY created_at DESC")
+                )
+            elif user_id:
+                res = await db.execute(
+                    text("SELECT id, title, created_at FROM chat_threads WHERE user_id = :uid ORDER BY created_at DESC"),
+                    {"uid": user_id}
+                )
+            else:
+                return []
             rows = res.fetchall()
             return [{"id": r[0], "title": r[1], "created_at": r[2], "is_pinned": False, "is_archived": False} for r in rows]
         except Exception as e2:
@@ -99,24 +142,39 @@ async def get_threads(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/threads/{thread_id}")
-async def get_thread_history(thread_id: str, db: AsyncSession = Depends(get_db)):
+async def get_thread_history(thread_id: str, request: Request, db: AsyncSession = Depends(get_db)):
     from sqlalchemy.orm import selectinload
+    user_id = await get_guest_id(request)
+    
     res = await db.execute(
         select(ChatThread)
         .options(selectinload(ChatThread.logs))
         .filter(ChatThread.id == thread_id)
     )
     thread = res.scalar_one_or_none()
+    
     if not thread:
         raise HTTPException(status_code=404, detail="Thread niet gevonden")
+    
+    # Controleer eigenaarschap (admins mogen alles zien)
+    is_admin = await is_admin_request(request)
+    if not is_admin and user_id and thread.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Geen toegang tot dit gesprek")
+        
     return thread
 
 @router.patch("/threads/{thread_id}/metadata")
-async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, db: AsyncSession = Depends(get_db)):
+async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, request: Request, db: AsyncSession = Depends(get_db)):
     try:
+        user_id = await get_guest_id(request)
         thread = await db.get(ChatThread, thread_id)
         if not thread:
             raise HTTPException(status_code=404, detail="Thread niet gevonden")
+        
+        # Controleer eigenaarschap (admins mogen alles bijwerken)
+        is_admin = await is_admin_request(request)
+        if not is_admin and user_id and thread.user_id != user_id:
+            raise HTTPException(status_code=403, detail="Geen toegang tot dit gesprek")
         
         if req.title is not None:
             thread.title = req.title

@@ -5,6 +5,16 @@
 const API_BASE_URL = "";
 
 
+function getGuestId(): string | null {
+  if (typeof window === "undefined") return null;
+  let guestId = localStorage.getItem("zonnehoeve-guest-id");
+  if (!guestId) {
+    guestId = crypto.randomUUID();
+    localStorage.setItem("zonnehoeve-guest-id", guestId);
+  }
+  return guestId;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
   
@@ -14,6 +24,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   
   if (!isFormData && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
+  }
+
+  // Voeg Guest ID toe voor isolatie van geschiedenis
+  const guestId = getGuestId();
+  if (guestId) {
+    headers["X-Guest-ID"] = guestId;
   }
 
   try {
@@ -64,9 +80,15 @@ export const api = {
     onSources?: (sources: string[]) => void,
     onThreadId?: (threadId: string) => void
   ) => {
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const guestId = getGuestId();
+    if (guestId) {
+      headers["X-Guest-ID"] = guestId;
+    }
+
     const response = await fetch(`${API_BASE_URL}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(body),
     });
 

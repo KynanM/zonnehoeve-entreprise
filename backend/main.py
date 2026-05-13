@@ -22,12 +22,12 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         try:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
-            print("✅ pgvector extensie geactiveerd.")
+            print("[OK] pgvector extensie geactiveerd.")
         except Exception as e:
-            print(f"⚠️ Kon pgvector extensie niet automatisch laden: {e}")
+            print(f"[ERROR] Kon pgvector extensie niet automatisch laden: {e}")
 
         await conn.run_sync(Base.metadata.create_all)
-        print("✅ Database tabellen gecontroleerd/aangemaakt.")
+        print("[OK] Database tabellen gecontroleerd/aangemaakt.")
         
         # Expliciete kolommigratie: create_all voegt geen kolommen toe aan bestaande tabellen.
         # Deze ALTER TABLE statements zijn idempotent (IF NOT EXISTS).
@@ -43,16 +43,16 @@ async def lifespan(app: FastAPI):
             try:
                 await conn.execute(text(stmt))
             except Exception as e:
-                print(f"⚠️ Migratie overgeslagen ({stmt[:40]}...): {e}")
-        print("✅ Kolommigraties uitgevoerd.")
+                print(f"[WARN] Migratie overgeslagen ({stmt[:40]}...): {e}")
+        print("[OK] Kolommigraties uitgevoerd.")
 
     try:
         rag_data = await setup_rag_chain()
         app.state.rag_chain = rag_data
         app.state.llm = rag_data.get("llm")
-        print("✅ RAG Chain vooraf ingeladen.")
+        print("[OK] RAG Chain vooraf ingeladen.")
     except Exception as e:
-        print(f"⚠️ RAG Chain faalde om vooraf te laden: {e}")
+        print(f"[ERROR] RAG Chain faalde om vooraf te laden: {e}")
         app.state.rag_chain = None
         app.state.llm = None
 
