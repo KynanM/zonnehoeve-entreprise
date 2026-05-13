@@ -24,10 +24,10 @@ export default function ServiceWorkerRegistrar() {
     // Luister naar het PWA install event
     const handleBeforeInstall = (e: Event) => {
       console.log("[PWA] beforeinstallprompt event afgevuurd");
-      
+
       // Sla de event op voor later gebruik
       setInstallPrompt(e);
-      
+
       // Toon banner alleen als niet eerder weggedrukt in deze sessie
       const wasDismissed = localStorage.getItem("pwa-install-dismissed");
       if (!wasDismissed) {

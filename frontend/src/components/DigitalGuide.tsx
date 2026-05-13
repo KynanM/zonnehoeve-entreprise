@@ -31,7 +31,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
     showUpdateBanner, setShowUpdateBanner, dossierModal, setDossierModal,
     messagesEndRef,
     // Handlers
-    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, startNewChat, 
+    handleSubmit, handleDocumentClick, handleDownload, handleFeedback, handlePin, deleteThread, startNewChat,
     showToast, fetchPreview, pinThread, renameThread, deleteAllThreads
   } = useDigitalGuide(initialTheme, onThemeChange);
 
@@ -39,7 +39,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showMobileDoc, setShowMobileDoc] = useState(false);
   const [dossierNote, setDossierNote] = useState("");
-  const [feedbackExplainer, setFeedbackExplainer] = useState<{index: number, feedback: string} | null>(null);
+  const [feedbackExplainer, setFeedbackExplainer] = useState<{ index: number, feedback: string } | null>(null);
   const [explainerText, setExplainerText] = useState("");
   const [zoom, setZoom] = useState(1.0);
   const [isMobile, setIsMobile] = useState(false);
@@ -133,7 +133,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
       theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100"
     )}>
       <div className="flex items-center gap-4 sm:gap-6">
-        <button 
+        <button
           onClick={() => setIsSidebarOpen(true)}
           className="lg:hidden p-2 text-stone-400 hover:text-emerald-500 transition-colors"
           aria-label="Open gesprekken"
@@ -160,23 +160,23 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
 
       {isMobile && (
         <div className="flex bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
-          <button 
+          <button
             onClick={() => setMobileActiveTab("chat")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-              mobileActiveTab === "chat" 
-                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm" 
+              mobileActiveTab === "chat"
+                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm"
                 : "text-stone-400"
             )}
           >
             Chat
           </button>
-          <button 
+          <button
             onClick={() => setMobileActiveTab("library")}
             className={cn(
               "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-              mobileActiveTab === "library" 
-                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm" 
+              mobileActiveTab === "library"
+                ? "bg-white dark:bg-stone-700 text-emerald-600 shadow-sm"
                 : "text-stone-400"
             )}
           >
@@ -224,9 +224,9 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
         </div>
       )}
       {messages.map((msg, i) => (
-        <MessageItem 
-          key={i} index={i} message={msg} theme={theme} 
-          onCopy={handleCopy} onPrint={handlePrint} onDossierExport={handleDossierExport} 
+        <MessageItem
+          key={i} index={i} message={msg} theme={theme}
+          onCopy={handleCopy} onPrint={handlePrint} onDossierExport={handleDossierExport}
           onFeedback={handleFeedbackClick} onDocumentClick={handleDocumentClick}
         />
       ))}
@@ -239,53 +239,53 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
 
   const renderChatFooter = () => (
     <div className="bg-white/50 backdrop-blur-xl relative">
-       {activeDocument && (
-         <button onClick={() => setShowMobileDoc(true)} className="lg:hidden absolute -top-16 right-6 p-4 bg-emerald-600 text-white rounded-full shadow-xl z-50 flex items-center gap-2 font-bold text-sm">
-           <FileText size={18} /><span>Lees Protocol</span>
-         </button>
-       )}
-       <FourMoments onSuggestionClick={handleSubmit} />
-       <ChatInput input={input} setInput={setInput} isLoading={isLoading} onSubmit={handleSubmit} onVoiceInput={handleSubmit} cooldown={cooldown} theme={theme} />
-       <div className="pb-3 text-center">
-         <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest opacity-50">© 2026 VIVES - Kynan Melsens & Aaron Vangermeersch</span>
-       </div>
+      {activeDocument && (
+        <button onClick={() => setShowMobileDoc(true)} className="lg:hidden absolute -top-16 right-6 p-4 bg-emerald-600 text-white rounded-full shadow-xl z-50 flex items-center gap-2 font-bold text-sm">
+          <FileText size={18} /><span>Lees Protocol</span>
+        </button>
+      )}
+      <FourMoments onSuggestionClick={handleSubmit} />
+      <ChatInput input={input} setInput={setInput} isLoading={isLoading} onSubmit={handleSubmit} onVoiceInput={handleSubmit} cooldown={cooldown} theme={theme} />
+      <div className="pb-3 text-center">
+        <span className="text-[11px] font-bold text-stone-400 uppercase tracking-widest opacity-50">© 2026 VIVES - Kynan Melsens & Aaron Vangermeersch</span>
+      </div>
     </div>
   );
 
   const renderDocumentContent = () => (
     activeDocument ? (
       <div className="flex-1 flex flex-col h-full">
-        <DocumentToolbar 
-          filename={activeDocument} 
-          currentPage={parseInt(activePage?.replace("page=", "") || "1")} 
-          totalPages={0} 
-          zoom={zoom} 
-          onZoomChange={setZoom} 
-          onPageChange={(p) => setActivePage(`page=${p}`)} 
-          onClose={() => setActiveDocument(null)} 
+        <DocumentToolbar
+          filename={activeDocument}
+          currentPage={parseInt(activePage?.replace("page=", "") || "1")}
+          totalPages={0}
+          zoom={zoom}
+          onZoomChange={setZoom}
+          onPageChange={(p) => setActivePage(`page=${p}`)}
+          onClose={() => setActiveDocument(null)}
           onDownload={() => handleDownload(activeDocument)}
-          theme={theme} 
+          theme={theme}
         />
         <div className="flex-1 relative flex bg-stone-50 overflow-hidden">
           <AnimatePresence>
             {showOutline && <OutlineView outline={outline} onPageClick={setActivePage} onClose={() => setShowOutline(false)} theme={theme} />}
           </AnimatePresence>
-          
+
           {isPdfLoading ? (
             <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-               <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-               <p className="text-xs font-bold text-stone-400">Document inladen...</p>
+              <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
+              <p className="text-xs font-bold text-stone-400">Document inladen...</p>
             </div>
           ) : pdfBlobUrl ? (
-            <iframe 
-              style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', width: `${100/zoom}%`, height: `${100/zoom}%` }}
-              src={`${pdfBlobUrl}${activePage ? `#${activePage}` : ''}`} 
-              className="flex-1 border-0" 
-              key={`${activeDocument}-${activePage}-${pdfBlobUrl}`} 
+            <iframe
+              style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', width: `${100 / zoom}%`, height: `${100 / zoom}%` }}
+              src={`${pdfBlobUrl}${activePage ? `#${activePage}` : ''}`}
+              className="flex-1 border-0"
+              key={`${activeDocument}-${activePage}-${pdfBlobUrl}`}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center text-stone-400 font-bold text-sm">
-               Kon document niet weergeven.
+              Kon document niet weergeven.
             </div>
           )}
         </div>
@@ -294,17 +294,17 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
       <div className="flex-1 flex flex-col h-full">
         {!isMobile && (
           <div className={cn("p-5 border-b flex items-center justify-between backdrop-blur-md", theme === 'night' ? "bg-stone-900/80 border-stone-800" : "bg-white/80 border-stone-100")}>
-             <div className="flex-1 font-black text-sm uppercase tracking-widest text-stone-400">Bibliotheek</div>
+            <div className="flex-1 font-black text-sm uppercase tracking-widest text-stone-400">Bibliotheek</div>
           </div>
         )}
-        <DocumentSidebar 
-          availableDocs={availableDocs} pinnedDocs={pinnedDocs} recentDocs={recentDocs} 
-          recentUpdates={recentUpdates} previews={previews} 
-          onDocumentClick={handleDocumentClick} 
+        <DocumentSidebar
+          availableDocs={availableDocs} pinnedDocs={pinnedDocs} recentDocs={recentDocs}
+          recentUpdates={recentUpdates} previews={previews}
+          onDocumentClick={handleDocumentClick}
           onDocumentDownload={handleDownload}
-          onPinToggle={handlePin} 
-          onFetchPreview={fetchPreview} searchQuery={searchQuery} onSearchChange={setSearchQuery} 
-          isSearching={isSearching} theme={theme} 
+          onPinToggle={handlePin}
+          onFetchPreview={fetchPreview} searchQuery={searchQuery} onSearchChange={setSearchQuery}
+          isSearching={isSearching} theme={theme}
         />
       </div>
     )
@@ -321,74 +321,74 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
         )}
       </AnimatePresence>
 
-        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden w-full min-h-0">
-          <ThreadSidebar 
-            threads={threads} 
-            activeThreadId={activeThreadId} 
-            onThreadSelect={(id) => { setActiveThreadId(id); }} 
-            onThreadDelete={deleteThread} 
-            onThreadPin={pinThread}
-            onThreadRename={renameThread}
-            onDeleteAll={deleteAllThreads}
-            onNewChat={startNewChat} 
-            theme={theme} 
-            isMobileOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-          />
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden w-full min-h-0">
+        <ThreadSidebar
+          threads={threads}
+          activeThreadId={activeThreadId}
+          onThreadSelect={(id) => { setActiveThreadId(id); }}
+          onThreadDelete={deleteThread}
+          onThreadPin={pinThread}
+          onThreadRename={renameThread}
+          onDeleteAll={deleteAllThreads}
+          onNewChat={startNewChat}
+          theme={theme}
+          isMobileOpen={isSidebarOpen}
+          onClose={() => setIsSidebarOpen(false)}
+        />
 
-          <div className="flex-1 flex flex-col overflow-hidden w-full min-h-0">
-            {!isMobile ? (
-              <Group orientation="horizontal" className="flex-1 w-full h-full">
-                {/* Chat Panel */}
-                <Panel defaultSize={60} minSize={30}>
-                  <section className={cn(
-                    "h-full flex flex-col overflow-hidden transition-all border-l",
-                    theme === 'night' ? "bg-stone-900/60 border-stone-800" : "bg-white/60 border-stone-200"
-                  )}>
-                    {renderChatHeader()}
-                    {renderChatContent()}
-                    {renderChatFooter()}
-                  </section>
-                </Panel>
+        <div className="flex-1 flex flex-col overflow-hidden w-full min-h-0">
+          {!isMobile ? (
+            <Group orientation="horizontal" className="flex-1 w-full h-full">
+              {/* Chat Panel */}
+              <Panel defaultSize={60} minSize={30}>
+                <section className={cn(
+                  "h-full flex flex-col overflow-hidden transition-all border-l",
+                  theme === 'night' ? "bg-stone-900/60 border-stone-800" : "bg-white/60 border-stone-200"
+                )}>
+                  {renderChatHeader()}
+                  {renderChatContent()}
+                  {renderChatFooter()}
+                </section>
+              </Panel>
 
-                <Separator className="w-2 hover:bg-emerald-500/20 transition-colors hidden lg:block cursor-col-resize" />
+              <Separator className="w-2 hover:bg-emerald-500/20 transition-colors hidden lg:block cursor-col-resize" />
 
-                {/* Document Panel */}
-                <Panel defaultSize={40} minSize={0} collapsible={true}>
-                  <aside className={cn(
-                    "h-full border-l overflow-hidden transition-all flex flex-col",
-                    theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200"
-                  )}>
+              {/* Document Panel */}
+              <Panel defaultSize={40} minSize={0} collapsible={true}>
+                <aside className={cn(
+                  "h-full border-l overflow-hidden transition-all flex flex-col",
+                  theme === 'night' ? "bg-stone-900 border-stone-800" : "bg-white border-stone-200"
+                )}>
+                  {renderDocumentContent()}
+                </aside>
+              </Panel>
+            </Group>
+          ) : (
+            <div className="flex-1 flex flex-col overflow-hidden w-full">
+              {mobileActiveTab === "chat" ? (
+                <section className={cn(
+                  "h-full flex flex-col overflow-hidden transition-all",
+                  theme === 'night' ? "bg-stone-900/60" : "bg-white/60"
+                )}>
+                  {renderChatHeader()}
+                  {renderChatContent()}
+                  {renderChatFooter()}
+                </section>
+              ) : (
+                <section className={cn(
+                  "h-full overflow-hidden transition-all flex flex-col",
+                  theme === 'night' ? "bg-stone-900" : "bg-white"
+                )}>
+                  {renderChatHeader()}
+                  <div className="flex-1 overflow-hidden">
                     {renderDocumentContent()}
-                  </aside>
-                </Panel>
-              </Group>
-            ) : (
-              <div className="flex-1 flex flex-col overflow-hidden w-full">
-                {mobileActiveTab === "chat" ? (
-                  <section className={cn(
-                    "h-full flex flex-col overflow-hidden transition-all",
-                    theme === 'night' ? "bg-stone-900/60" : "bg-white/60"
-                  )}>
-                    {renderChatHeader()}
-                    {renderChatContent()}
-                    {renderChatFooter()}
-                  </section>
-                ) : (
-                  <section className={cn(
-                    "h-full overflow-hidden transition-all flex flex-col",
-                    theme === 'night' ? "bg-stone-900" : "bg-white"
-                  )}>
-                    {renderChatHeader()}
-                    <div className="flex-1 overflow-hidden">
-                      {renderDocumentContent()}
-                    </div>
-                  </section>
-                )}
-              </div>
-            )}
-          </div>
+                  </div>
+                </section>
+              )}
+            </div>
+          )}
         </div>
+      </div>
 
       {/* Modals */}
       <AnimatePresence>
@@ -419,11 +419,11 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
                 <h3 className="text-xl font-black">Bedankt voor je feedback!</h3>
               </div>
               <p className="text-stone-500 text-sm mb-6 font-medium">Wil je kort toelichten waarom dit antwoord {feedbackExplainer.feedback === "thumbs_up" ? "nuttig" : "niet nuttig"} was? Dit helpt ons de gids te verbeteren.</p>
-              <textarea 
-                value={explainerText} 
-                onChange={e => setExplainerText(e.target.value)} 
+              <textarea
+                value={explainerText}
+                onChange={e => setExplainerText(e.target.value)}
                 placeholder="Toelichting (optioneel)..."
-                className="w-full border-2 border-stone-100 p-5 rounded-2xl mb-6 h-32 outline-none focus:border-emerald-500 transition-colors text-sm font-medium" 
+                className="w-full border-2 border-stone-100 p-5 rounded-2xl mb-6 h-32 outline-none focus:border-emerald-500 transition-colors text-sm font-medium"
               />
               <div className="flex gap-3">
                 <button onClick={submitFeedbackExplainer} className="flex-1 bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition-colors active:scale-95 shadow-lg shadow-emerald-600/20">Versturen</button>
@@ -433,7 +433,7 @@ export default function DigitalGuide({ initialTheme = "light", onThemeChange, cl
           </div>
         )}
       </AnimatePresence>
-      
+
       {/* Mobile Drawer */}
       <AnimatePresence>
         {showMobileDoc && activeDocument && (

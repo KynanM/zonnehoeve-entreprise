@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { 
-  Users, ShieldCheck, HeartPulse, ArrowRight, MapPin, 
+import {
+  Users, ShieldCheck, HeartPulse, ArrowRight, MapPin,
   ChevronRight, CheckCircle2, MessageSquare, Sparkles,
   Command, Layers, Smartphone, WifiOff, Mic, Settings,
   ArrowUp, HeartHandshake, MousePointer2, Zap, Globe, Lock
@@ -72,7 +72,7 @@ export default function OnePager() {
   return (
     <div className="relative min-h-screen bg-earth-50 overflow-x-hidden">
       {/* Dynamic Header */}
-      <motion.nav 
+      <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${isScrolled ? 'h-20 bg-white/70 backdrop-blur-xl border-b border-black/5 premium-shadow' : 'h-28 bg-transparent'}`}
@@ -91,14 +91,14 @@ export default function OnePager() {
               <Image src="/logo_vives.png" alt="VIVES Logo" fill className="object-contain" />
             </div>
           </div>
-          
+
           <div className="hidden lg:flex gap-8 items-center font-bold text-sm tracking-tight text-earth-800">
             <button onClick={() => scrollTo('vision')} className="hover:text-brand-green transition-colors">Onze Visie</button>
             <button onClick={() => scrollTo('services')} className="hover:text-brand-green transition-colors">Diensten</button>
             <button onClick={() => scrollTo('guide')} className="hover:text-brand-green transition-colors">De Gids</button>
             <Link href="/admin" className="hover:text-brand-green transition-colors">Portaal</Link>
             <div className="h-6 w-[1px] bg-black/10 mx-2" />
-            <button 
+            <button
               onClick={() => scrollTo('guide')}
               className="bg-brand-green text-white px-8 py-3 rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-green/20"
             >
@@ -106,7 +106,7 @@ export default function OnePager() {
             </button>
           </div>
 
-          <button 
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="lg:hidden w-10 h-10 flex items-center justify-center bg-white rounded-xl shadow-sm border border-black/5 active:scale-95 transition-transform"
           >
@@ -128,7 +128,7 @@ export default function OnePager() {
                 <button onClick={() => scrollTo('services')} className="text-left py-2 border-b border-black/5">Diensten</button>
                 <button onClick={() => scrollTo('guide')} className="text-left py-2 border-b border-black/5">De Gids</button>
                 <Link href="/admin" className="text-left py-2 border-b border-black/5">Portaal</Link>
-                <button 
+                <button
                   onClick={() => scrollTo('guide')}
                   className="bg-brand-green text-white px-8 py-4 rounded-2xl shadow-xl shadow-brand-green/20 text-center mt-4"
                 >
@@ -143,10 +143,10 @@ export default function OnePager() {
       {/* Hero Section */}
       <header id="hero" ref={heroRef} className="relative h-screen flex items-center overflow-hidden pt-20">
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0 z-0">
-          <Image 
-            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000" 
-            alt="Zonnehoeve Living+" 
-            fill 
+          <Image
+            src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&q=80&w=2000"
+            alt="Zonnehoeve Living+"
+            fill
             className="object-cover brightness-[0.85]"
             priority
           />
@@ -171,7 +171,7 @@ export default function OnePager() {
               <p className="text-lg sm:text-xl md:text-3xl text-earth-800 font-bold max-w-2xl leading-tight mb-12">
                 Een warme thuis en professionele begeleiding voor volwassenen met een beperking, NAH of autisme.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 <button onClick={() => scrollTo('guide')} className="group px-8 sm:px-12 py-5 sm:py-6 bg-brand-green text-white rounded-[1.8rem] sm:rounded-3xl font-black text-lg sm:text-xl shadow-2xl shadow-brand-green/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-4">
                   Open de Gids <ArrowRight size={24} className="group-hover:translate-x-2 transition-transform" />
@@ -195,31 +195,31 @@ export default function OnePager() {
                 Bij Zonnehoeve staan de noden, wensen en de kwaliteit van leven van de individuele cliënt centraal. Wij bieden zorg voor mensen met een verstandelijke of meervoudige beperking, NAH of autisme.
               </p>
               <div className="flex flex-wrap gap-4">
-                 {["NAH Ondersteuning", "Autisme Begeleiding", "Inclusief Wonen", "Zinvolle Dagbesteding"].map((label, i) => (
-                   <span key={i} className="px-4 py-2 bg-earth-50 rounded-xl text-earth-800 font-bold text-sm border border-earth-100">{label}</span>
-                 ))}
+                {["NAH Ondersteuning", "Autisme Begeleiding", "Inclusief Wonen", "Zinvolle Dagbesteding"].map((label, i) => (
+                  <span key={i} className="px-4 py-2 bg-earth-50 rounded-xl text-earth-800 font-bold text-sm border border-earth-100">{label}</span>
+                ))}
               </div>
             </div>
             <div className="relative h-[500px] rounded-[3rem] overflow-hidden shadow-2xl">
-               <div className="absolute inset-0 bg-gradient-to-br from-brand-green/20 via-earth-50 to-white" />
-               <div className="absolute inset-0 flex items-center justify-center">
-                 <div className="text-brand-green/10">
-                   <Users size={300} strokeWidth={0.5} />
-                 </div>
-               </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-green/20 via-earth-50 to-white" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-brand-green/10">
+                  <Users size={300} strokeWidth={0.5} />
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {clusters.map((cluster, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 whileHover={{ y: -10 }}
                 className="group relative h-[500px] sm:h-[600px] rounded-[3rem] overflow-hidden shadow-2xl"
               >
                 <Image src={cluster.image} alt={cluster.title} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-gradient-to-t from-earth-900/90 via-earth-900/40 to-transparent" />
-                
+
                 <div className="absolute inset-0 p-12 flex flex-col justify-end text-white">
                   <div className="w-16 h-16 rounded-2xl bg-white flex items-center justify-center mb-8 shadow-xl">
                     {cluster.icon}
@@ -239,29 +239,29 @@ export default function OnePager() {
       {/* Services Context */}
       <section id="services" className="py-32 bg-earth-50">
         <div className="container-wide">
-           <div className="max-w-4xl mx-auto text-center mb-24">
-              <h2 className="text-5xl font-black mb-8">Wonen & Dagbesteding</h2>
-              <p className="text-xl text-earth-800/60 font-bold">Wij bieden diverse woonvormen en ondersteuning op maat van de cliënt.</p>
-           </div>
-           
-           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { t: "Woonondersteuning", d: "Intensieve begeleiding in leefgroepen en studiowonen." },
-                { t: "Kortverblijf", d: "Tijdelijke opvang en respijtzorg voor wie het nodig heeft." },
-                { t: "Ambulante Hulp", d: "RTH ondersteuning aan huis of op locatie." },
-                { t: "Dagbesteding", d: "Zinvolle vrijetijdsactiviteiten en tewerkstelling." }
-              ].map((service, i) => (
-                <div key={i} className="bg-white rounded-[2.5rem] border border-black/5 shadow-premium overflow-hidden group">
-                   <div className="p-8">
-                      <div className="w-12 h-12 rounded-2xl bg-brand-green/10 flex items-center justify-center mb-6 text-brand-green">
-                         <CheckCircle2 size={24} />
-                      </div>
-                      <h4 className="text-xl font-black mb-3">{service.t}</h4>
-                      <p className="text-earth-800/50 font-bold text-xs leading-relaxed">{service.d}</p>
-                   </div>
+          <div className="max-w-4xl mx-auto text-center mb-24">
+            <h2 className="text-5xl font-black mb-8">Wonen & Dagbesteding</h2>
+            <p className="text-xl text-earth-800/60 font-bold">Wij bieden diverse woonvormen en ondersteuning op maat van de cliënt.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { t: "Woonondersteuning", d: "Intensieve begeleiding in leefgroepen en studiowonen." },
+              { t: "Kortverblijf", d: "Tijdelijke opvang en respijtzorg voor wie het nodig heeft." },
+              { t: "Ambulante Hulp", d: "RTH ondersteuning aan huis of op locatie." },
+              { t: "Dagbesteding", d: "Zinvolle vrijetijdsactiviteiten en tewerkstelling." }
+            ].map((service, i) => (
+              <div key={i} className="bg-white rounded-[2.5rem] border border-black/5 shadow-premium overflow-hidden group">
+                <div className="p-8">
+                  <div className="w-12 h-12 rounded-2xl bg-brand-green/10 flex items-center justify-center mb-6 text-brand-green">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <h4 className="text-xl font-black mb-3">{service.t}</h4>
+                  <p className="text-earth-800/50 font-bold text-xs leading-relaxed">{service.d}</p>
                 </div>
-              ))}
-           </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -287,41 +287,41 @@ export default function OnePager() {
             </motion.div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             className="relative max-w-6xl mx-auto"
           >
-             <div className="relative aspect-[16/10] bg-[#1a1a1a] rounded-[3rem] p-4 border-[10px] border-[#333] shadow-inner overflow-hidden">
-                <div className="relative h-full w-full rounded-[1.8rem] overflow-hidden group">
-                   <Image src="/preview_chatbot.png" alt="Zonnehoeve Chatbot Startpagina" fill className="object-cover" />
-                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onClick={() => window.location.href = "/gids"}>
-                      <div className="bg-brand-green text-white px-12 py-5 rounded-full font-black text-xl flex items-center gap-4 shadow-2xl">
-                         <Sparkles /> Start de Chatbot
-                      </div>
-                   </div>
+            <div className="relative aspect-[16/10] bg-[#1a1a1a] rounded-[3rem] p-4 border-[10px] border-[#333] shadow-inner overflow-hidden">
+              <div className="relative h-full w-full rounded-[1.8rem] overflow-hidden group">
+                <Image src="/preview_chatbot.png" alt="Zonnehoeve Chatbot Startpagina" fill className="object-cover" />
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm cursor-pointer" onClick={() => window.location.href = "/gids"}>
+                  <div className="bg-brand-green text-white px-12 py-5 rounded-full font-black text-xl flex items-center gap-4 shadow-2xl">
+                    <Sparkles /> Start de Chatbot
+                  </div>
                 </div>
+              </div>
 
-                {/* Hotspots */}
-                <motion.div 
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 4, repeat: Infinity }}
-                  className="absolute top-1/4 left-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
-                >
-                   <p className="text-[10px] font-black text-brand-green uppercase mb-2">Smart Search</p>
-                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Vind elk protocol in minder dan een seconde.</p>
-                </motion.div>
+              {/* Hotspots */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity }}
+                className="absolute top-1/4 left-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
+              >
+                <p className="text-[10px] font-black text-brand-green uppercase mb-2">Smart Search</p>
+                <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Vind elk protocol in minder dan een seconde.</p>
+              </motion.div>
 
-                <motion.div 
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                  className="absolute bottom-1/4 right-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
-                >
-                   <p className="text-[10px] font-black text-accent-blue uppercase mb-2">Dossier Export</p>
-                   <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Exporteer notities direct naar het zorgdossier.</p>
-                </motion.div>
-             </div>
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, delay: 1 }}
+                className="absolute bottom-1/4 right-10 p-4 glass-card rounded-2xl border border-white/20 premium-shadow max-w-[200px] hidden md:block"
+              >
+                <p className="text-[10px] font-black text-accent-blue uppercase mb-2">Dossier Export</p>
+                <p className="text-[10px] font-bold text-earth-800/60 leading-tight">Exporteer notities direct naar het zorgdossier.</p>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -331,45 +331,45 @@ export default function OnePager() {
         <div className="container-wide">
           <div className="grid md:grid-cols-4 gap-20 mb-32">
             <div className="md:col-span-2">
-               <div className="flex items-center gap-5 mb-8">
-                  <div className="w-16 h-16 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
-                    <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
+              <div className="flex items-center gap-5 mb-8">
+                <div className="w-16 h-16 relative bg-white rounded-2xl p-2 shadow-sm border border-black/5">
+                  <Image src="/logo.png" alt="Zonnehoeve" fill className="object-contain" />
+                </div>
+                <span className="font-extrabold text-5xl tracking-tighter">Zonnehoeve</span>
+              </div>
+              <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm mb-12">
+                Een sociale voorziening in Eke-Nazareth voor zorg, begeleiding en tewerkstelling.
+              </p>
+              <div className="flex flex-col gap-6">
+                <span className="text-sm font-black uppercase tracking-[0.3em] text-earth-800/30">In samenwerking met</span>
+                <div className="flex items-center gap-8">
+                  <div className="w-32 h-14 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
+                    <Image src="/logo_vives.png" alt="VIVES Hogeschool" fill className="object-contain" />
                   </div>
-                  <span className="font-extrabold text-5xl tracking-tighter">Zonnehoeve</span>
-               </div>
-               <p className="text-earth-800/40 font-bold text-xl leading-relaxed max-w-sm mb-12">
-                  Een sociale voorziening in Eke-Nazareth voor zorg, begeleiding en tewerkstelling.
-               </p>
-               <div className="flex flex-col gap-6">
-                 <span className="text-sm font-black uppercase tracking-[0.3em] text-earth-800/30">In samenwerking met</span>
-                 <div className="flex items-center gap-8">
-                   <div className="w-32 h-14 relative grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all">
-                     <Image src="/logo_vives.png" alt="VIVES Hogeschool" fill className="object-contain" />
-                   </div>
-                   <div className="flex flex-col">
-                     <span className="text-sm font-bold text-earth-800/60">Kynan Melsens</span>
-                     <span className="text-sm font-bold text-earth-800/60">Aaron Vangermeersch</span>
-                   </div>
-                 </div>
-               </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold text-earth-800/60">Kynan Melsens</span>
+                    <span className="text-sm font-bold text-earth-800/60">Aaron Vangermeersch</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <div>
-               <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Afdelingen</h5>
-               <ul className="space-y-6 text-earth-800/60 font-bold">
-                  <li>Zonnehoeve|Living+</li>
-                  <li>Zonnehoeve|Production</li>
-               </ul>
+              <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Afdelingen</h5>
+              <ul className="space-y-6 text-earth-800/60 font-bold">
+                <li>Zonnehoeve|Living+</li>
+                <li>Zonnehoeve|Production</li>
+              </ul>
             </div>
             <div>
-               <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Contact</h5>
-               <ul className="space-y-6 text-earth-800/60 font-bold">
-                  <li className="flex items-center gap-3"><MapPin size={16}/> Zonnestraat 13, Eke</li>
-                  <li className="flex items-center gap-3"><Globe size={16}/> www.zonnehoeve.be</li>
-               </ul>
+              <h5 className="font-black text-xs uppercase tracking-[0.3em] mb-10 text-brand-green">Contact</h5>
+              <ul className="space-y-6 text-earth-800/60 font-bold">
+                <li className="flex items-center gap-3"><MapPin size={16} /> Zonnestraat 13, Eke</li>
+                <li className="flex items-center gap-3"><Globe size={16} /> www.zonnehoeve.be</li>
+              </ul>
             </div>
           </div>
           <div className="pt-10 border-t border-black/5 text-center">
-             <span className="text-xs font-bold text-earth-800/20 uppercase tracking-widest">© 2026 Zonnehoeve Living+ . Alle rechten voorbehouden.</span>
+            <span className="text-xs font-bold text-earth-800/20 uppercase tracking-widest">© 2026 Zonnehoeve Living+ . Alle rechten voorbehouden.</span>
           </div>
         </div>
       </footer>
