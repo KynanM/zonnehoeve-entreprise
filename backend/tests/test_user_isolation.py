@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
 from main import app
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 from database import get_db
 import uuid
 
@@ -80,6 +80,8 @@ async def test_admin_bypass_isolation(mock_db):
     mock_db.execute.return_value = mock_res
 
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.get("/api/chat/threads", headers={"x-admin-key": admin_key})
-        assert response.status_code == 200
-        assert len(response.json()) == 2
+        # Ensure the admin key is recognized by the auth helper at runtime
+        with patch("api.auth.ADMIN_API_KEY", admin_key):
+            response = await ac.get("/api/chat/threads", headers={"x-admin-key": admin_key})
+            assert response.status_code == 200
+            assert len(response.json()) == 2

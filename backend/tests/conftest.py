@@ -4,6 +4,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from dotenv import load_dotenv
 from langchain_core.documents import Document
 
+
+def make_execute_result(scalar_one=None, scalars_list=None):
+    """Helper to create a mock result for `session.execute()`.
+
+    - `scalar_one` will be returned by `scalar_one_or_none()`
+    - `scalars_list` will be returned by `scalars().all()`
+    """
+    res = MagicMock()
+    res.scalar_one_or_none.return_value = scalar_one
+    scalars_mock = MagicMock()
+    scalars_mock.all.return_value = scalars_list if scalars_list is not None else []
+    res.scalars.return_value = scalars_mock
+    return res
+
 # Laad de echte .env variabelen voor integratietesten
 load_dotenv()
 
@@ -15,6 +29,8 @@ def setup_test_db():
     mock_session.__aexit__.return_value = None
     
     mock_session.add = MagicMock() # Sync method
+    # Provide a safe default for execute() so tests that don't override it get sensible results
+    mock_session.execute.return_value = make_execute_result()
     
     mock_session_maker = MagicMock()
     mock_session_maker.return_value = mock_session
