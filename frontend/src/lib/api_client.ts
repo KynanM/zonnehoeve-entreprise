@@ -148,18 +148,36 @@ export const api = {
           }
         }
         
-        // Stuur tekst door als de buffer geen markers meer bevat
-        const MARKER_REGEX = /__log_id__:(?:\d+|None)\n|__thread_id__:[^\n]+\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g;
-        const cleanChunk = buffer.replace(MARKER_REGEX, "");
+        // Stuur tekst door, maar pas op voor onvolledige markers aan het einde van de buffer
+        let cleanChunk = buffer;
+        const lastUnderscores = cleanChunk.lastIndexOf("__");
+        const lastJson = cleanChunk.lastIndexOf("|JSON|");
+        
+        let cutOffIndex = -1;
+        if (lastUnderscores !== -1 && !cleanChunk.substring(lastUnderscores).includes("\n")) {
+            cutOffIndex = lastUnderscores;
+        }
+        if (lastJson !== -1 && !cleanChunk.substring(lastJson).includes("}")) {
+            cutOffIndex = cutOffIndex === -1 ? lastJson : Math.min(cutOffIndex, lastJson);
+        }
+
+        if (cutOffIndex !== -1) {
+            cleanChunk = cleanChunk.substring(0, cutOffIndex);
+        }
+
         if (cleanChunk) {
           onChunk(cleanChunk);
-          buffer = buffer.replace(cleanChunk, "");
+          buffer = buffer.substring(cleanChunk.length);
         }
       }
       // Final flush
-      const MARKER_REGEX = /__log_id__:(?:\d+|None)\n|__thread_id__:[^\n]+\n|__sources__:[^\n]*\n|\|JSON\|\{.*\}/g;
       if (buffer) {
-        onChunk(buffer.replace(MARKER_REGEX, ""));
+        // Verwijder eventuele overgebleven onvolledige markers voordat we flushen
+        const FINAL_MARKER_REGEX = /__(?:log_id|thread_id|sources)__:[^\n]*|\|JSON\|\{.*/g;
+        const finalChunk = buffer.replace(FINAL_MARKER_REGEX, "");
+        if (finalChunk) {
+          onChunk(finalChunk);
+        }
       }
     }
   }
