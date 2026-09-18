@@ -78,15 +78,18 @@ The system is built on a modular, service-oriented architecture to ensure scalab
    npm install
    ```
 
+4. Copy `.env.example` to `.env` and fill in your own secrets. Never commit `.env`.
+
 ### Environment Variables
 
-Configure the following variables in a `.env` file at the project root:
+Configure the following variables in a `.env` file at the project root (see `.env.example`):
 
 | Variable | Description |
 | :--- | :--- |
 | DATABASE_URL | PostgreSQL connection string (with async driver) |
 | OPENAI_API_KEY | API key for GPT and embedding services |
-| ADMIN_API_KEY | Secret key for administrative API access |
+| ADMIN_API_KEY | Secret key for administrative API access. Choose a strong unique value; do not reuse example placeholders. |
+| CORS_ORIGINS | Comma-separated allowed frontend origins (required in production) |
 | LLM_MODEL | Specified model identifier (e.g., gpt-4o-mini) |
 | EMBEDDING_MODEL | Model for vector embedding generation |
 | BACKEND_URL | Internal/External URL of the FastAPI backend |
@@ -141,7 +144,7 @@ The platform implements a multi-layer security model for administrative function
 
 - **REST API Authorization**: All endpoints under `/api/admin` and `/api/documents/upload` require the `X-Admin-Key` header.
 - **WebSocket Security**: The real-time update stream at `/ws/admin` requires the `token` query parameter.
-- **Key Management**: Both authentication methods validate against the `ADMIN_API_KEY` defined in the environment configuration.
+- **Key Management**: Both authentication methods validate against the `ADMIN_API_KEY` defined in the environment configuration. The frontend never embeds this key; admin login is verified by the backend.
 
 ## API Documentation
 

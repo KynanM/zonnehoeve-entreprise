@@ -36,12 +36,10 @@ async def test_delete_non_existent_thread():
     """Test deleting a thread that doesn't exist."""
     # Mocking get_db dependency to return a session that returns None for the thread
     from api.chat import get_db
-    from api.auth import verify_admin
     mock_session = AsyncMock()
     mock_session.get.return_value = None
     
     app.dependency_overrides[get_db] = lambda: mock_session
-    app.dependency_overrides[verify_admin] = lambda: True
     
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         response = await ac.delete("/api/chat/threads/non-existent-id")

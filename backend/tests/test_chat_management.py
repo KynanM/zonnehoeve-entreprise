@@ -1,7 +1,7 @@
 import pytest
 from httpx import AsyncClient, ASGITransport
 from main import app
-from unittest.mock import MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock, patch
 from database import get_db
 from models import ChatThread, ChatLog
 
@@ -10,13 +10,6 @@ def mock_db():
     db = AsyncMock()
     app.dependency_overrides[get_db] = lambda: db
     yield db
-    app.dependency_overrides.clear()
-
-@pytest.fixture
-def mock_admin():
-    from api.auth import verify_admin
-    app.dependency_overrides[verify_admin] = lambda: True
-    yield
     app.dependency_overrides.clear()
 
 @pytest.mark.anyio
@@ -52,19 +45,43 @@ async def test_update_thread_metadata(mock_db):
     assert mock_thread.is_pinned == 1
 
 @pytest.mark.anyio
-async def test_delete_all_threads(mock_db, mock_admin):
+async def test_delete_all_threads(mock_db):
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.delete("/api/chat/threads")
+        with patch("api.auth.ADMIN_API_KEY", "test_key"):
+            response = await ac.delete("/api/chat/threads", headers={"x-admin-key": "test_key"})
     assert response.status_code == 200
     assert mock_db.execute.called
     assert mock_db.commit.called
 
 @pytest.mark.anyio
-async def test_delete_single_thread(mock_db, mock_admin):
-    mock_thread = ChatThread(id="t1")
+async def test_delete_own_threads_as_guest(mock_db):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.delete("/api/chat/threads", headers={"X-Guest-ID": "user1"})
+    assert response.status_code == 200
+    assert mock_db.execute.called
+    assert mock_db.commit.called
+
+@pytest.mark.anyio
+async def test_delete_all_threads_unauthorized(mock_db):
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.delete("/api/chat/threads")
+    assert response.status_code == 403
+
+@pytest.mark.anyio
+async def test_delete_single_thread(mock_db):
+    mock_thread = ChatThread(id="t1", user_id="user1")
     mock_db.get.return_value = mock_thread
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        response = await ac.delete("/api/chat/threads/t1")
+        response = await ac.delete("/api/chat/threads/t1", headers={"X-Guest-ID": "user1"})
     assert response.status_code == 200
     assert mock_db.delete.called
     assert mock_db.commit.called
+
+@pytest.mark.anyio
+async def test_delete_single_thread_forbidden_for_other_guest(mock_db):
+    mock_thread = ChatThread(id="t1", user_id="user1")
+    mock_db.get.return_value = mock_thread
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+        response = await ac.delete("/api/chat/threads/t1", headers={"X-Guest-ID": "user2"})
+    assert response.status_code == 403
+    assert not mock_db.delete.called

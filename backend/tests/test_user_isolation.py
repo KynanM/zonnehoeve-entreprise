@@ -68,7 +68,7 @@ async def test_admin_bypass_isolation(mock_db):
     """
     Test dat een admin wel alle threads kan zien.
     """
-    admin_key = "REDACTED_ADMIN_KEY" # Uit conftest/config
+    admin_key = "test-admin-key"
     from models import ChatThread
     mock_threads = [
         ChatThread(id="t1", title="User 1", user_id="u1"),

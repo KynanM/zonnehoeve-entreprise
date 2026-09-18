@@ -76,6 +76,7 @@ backend/data/
 backend/backend_log.txt
 frontend/.env.local
 frontend/.next/
+frontend/coverage/
 
 # Documentation and Portfolio
 portfolio_agile_overview.md

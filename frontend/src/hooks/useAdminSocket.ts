@@ -48,8 +48,7 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
     mountedRef.current = true;
     if (!password) return;
 
-    // Bepaal de backend URL voor WebSocket.
-    // NEXT_PUBLIC_API_URL moet de volledige backend URL zijn (bijv. https://...railway.app).
+    // Bepaal de backend URL voor WebSocket via NEXT_PUBLIC_API_URL.
     // Als dit niet ingesteld is (undefined), skip WebSocket direct en ga naar polling.
     const backendApiUrl = process.env.NEXT_PUBLIC_API_URL;
     
@@ -67,7 +66,7 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
     const protocol = backendApiUrl.startsWith("https") ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${cleanHost}/ws/admin?token=${password}`;
 
-    console.log("🔌 Eenmalige WebSocket poging:", wsUrl);
+    console.log("🔌 Eenmalige WebSocket poging naar admin-kanaal");
 
     let ws: WebSocket;
     try {

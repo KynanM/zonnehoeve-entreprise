@@ -6,13 +6,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Config laden uit environment (of gebruik .env file)
-RAILWAY_URL = os.getenv("RAILWAY_URL", "http://127.0.0.1:8000")
+RAILWAY_URL = os.getenv("RAILWAY_URL")
 ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
 # Pad naar lokale PDF/Docx map
 RAW_DATA_PATH = Path("./backend/data/raw_documents")
 
 def upload_documents():
+    if not RAILWAY_URL or not ADMIN_API_KEY:
+        print("Zet RAILWAY_URL en ADMIN_API_KEY in je omgeving of .env voordat je uploadt.")
+        return
+
     if not RAW_DATA_PATH.exists():
         print(f"Directory {RAW_DATA_PATH} bestaat niet!")
         return

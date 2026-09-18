@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from database import get_db
 from models import ChatThread
-from api.auth import verify_admin
+from api import auth as api_auth
 from services.chat_service import ChatService
 
 router = APIRouter(prefix="/api/chat", tags=["Chat"])
@@ -20,9 +20,9 @@ async def get_guest_id(request: Request) -> Optional[str]:
 
 async def is_admin_request(request: Request) -> bool:
     """Controleert of het verzoek van een admin komt (bevat geldige admin key)."""
-    from api.auth import ADMIN_API_KEY
     admin_key = request.headers.get("x-admin-key")
-    return ADMIN_API_KEY is not None and admin_key == ADMIN_API_KEY
+    expected = api_auth.ADMIN_API_KEY
+    return expected is not None and admin_key == expected
 
 class Message(BaseModel):
     role: str
@@ -202,18 +202,29 @@ async def update_thread_metadata(thread_id: str, req: ThreadMetadataUpdate, requ
         await db.rollback()
         return {"id": thread_id, "status": "partial_success_or_skipped"}
 
-@router.delete("/threads", dependencies=[Depends(verify_admin)])
-async def delete_all_threads(db: AsyncSession = Depends(get_db)):
+@router.delete("/threads")
+async def delete_all_threads(request: Request, db: AsyncSession = Depends(get_db)):
     from sqlalchemy import delete
-    await db.execute(delete(ChatThread))
+    is_admin = await is_admin_request(request)
+    user_id = await get_guest_id(request)
+    if is_admin:
+        await db.execute(delete(ChatThread))
+    elif user_id:
+        await db.execute(delete(ChatThread).where(ChatThread.user_id == user_id))
+    else:
+        raise HTTPException(status_code=403, detail="Geen toegang")
     await db.commit()
     return {"status": "success", "message": "Alle gesprekken verwijderd"}
 
-@router.delete("/threads/{thread_id}", dependencies=[Depends(verify_admin)])
-async def delete_thread(thread_id: str, db: AsyncSession = Depends(get_db)):
+@router.delete("/threads/{thread_id}")
+async def delete_thread(thread_id: str, request: Request, db: AsyncSession = Depends(get_db)):
     thread = await db.get(ChatThread, thread_id)
     if not thread:
         raise HTTPException(status_code=404, detail="Thread niet gevonden")
+    is_admin = await is_admin_request(request)
+    user_id = await get_guest_id(request)
+    if not is_admin and (not user_id or thread.user_id != user_id):
+        raise HTTPException(status_code=403, detail="Geen toegang tot dit gesprek")
     await db.delete(thread)
     await db.commit()
     return {"status": "success"}

@@ -48,7 +48,7 @@ async def verify_production_readiness():
 
     # 3. Check Environment Variables
     print("\n--- 3. Environment Variables ---")
-    required_vars = ["DATABASE_URL", "OPENAI_API_KEY", "NEXT_PUBLIC_API_URL"]
+    required_vars = ["DATABASE_URL", "OPENAI_API_KEY", "ADMIN_API_KEY", "CORS_ORIGINS"]
     for var in required_vars:
         val = os.getenv(var)
         if val:

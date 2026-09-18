@@ -16,10 +16,10 @@ async def admin_websocket(
     WebSocket endpoint voor real-time admin updates.
     Beveiligd via de ADMIN_API_KEY (token query param).
     """
-    expected_token = os.getenv("ADMIN_API_KEY", "REDACTED_ADMIN_KEY")
-    
-    if token != expected_token:
-        logger.warning(f"🔒 Ongeautoriseerde WebSocket poging met token: {token}")
+    expected_token = os.getenv("ADMIN_API_KEY")
+
+    if not expected_token or not token or token != expected_token:
+        logger.warning("Ongeautoriseerde WebSocket poging")
         await websocket.close(code=1008) # Policy Violation
         return
 

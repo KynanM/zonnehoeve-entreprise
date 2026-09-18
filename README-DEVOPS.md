@@ -7,7 +7,7 @@ Dit document beschrijft hoe je de applicatie live krijgt (op Railway) en hoe je 
 Je kunt nu de hele stack (Frontend, Backend, Database) lokaal draaien in een geïsoleerde container-omgeving.
 
 ### Voorbereiding:
-Zorg dat je een `.env` bestand hebt in de root (of in de `backend/` map) met je OpenAI API Key.
+Kopieer `.env.example` naar `.env` in de root en vul minstens `OPENAI_API_KEY` en `ADMIN_API_KEY` in. Docker Compose leest `ADMIN_API_KEY` uit dat bestand.
 
 ### Commando's:
 ```powershell
@@ -36,13 +36,16 @@ docker-compose down
 3. Voeg de volgende **Variables** toe:
     - `DATABASE_URL`: Plak hier de URL van je Railway Postgres (zorg dat je `postgresql://` vervangt door `postgresql+asyncpg://` als dat nodig is voor de driver).
     - `OPENAI_API_KEY`: Je eigen API key.
+    - `ADMIN_API_KEY`: Een sterk, uniek beheerderswachtwoord (niet de voorbeeldwaarde).
+    - `CORS_ORIGINS`: De publieke URL van je frontend-service.
     - `PORT`: 8000
 
 ### Stap 3: Frontend Koppelen
 1. Voeg nog een **Service** toe vanuit GitHub.
 2. Stel de **Root Directory** in op `/frontend`.
 3. Voeg de volgende **Variables** toe:
-    - `NEXT_PUBLIC_API_URL`: De publieke URL van je Backend service (bijv. `https://backend-production-xxxx.up.railway.app`).
+    - `BACKEND_URL`: Interne of publieke URL van je backend-service.
+    - `NEXT_PUBLIC_API_URL`: De publieke URL van je backend-service (placeholder, vervang door jouw eigen URL).
 
 ---
 

@@ -26,11 +26,11 @@ const ActivityChart = dynamic(() => import("@/components/admin/ActivityChart").t
   ssr: false
 });
 
-const ADMIN_PASSWORD = "REDACTED_ADMIN_KEY";
-
 export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [qaReport, setQaReport] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
@@ -134,12 +134,19 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
+    setLoginError("");
+    setIsLoggingIn(true);
+    try {
+      await api.get("/api/admin/stats?page=1", {
+        headers: { "x-admin-key": password }
+      });
       setIsAuthenticated(true);
-    } else {
-      alert("Ongeldig wachtwoord!");
+    } catch {
+      setLoginError("Ongeldig wachtwoord!");
+    } finally {
+      setIsLoggingIn(false);
     }
   };
 
@@ -156,8 +163,10 @@ export default function AdminDashboard() {
           <input type="password" value={password} onChange={e => setPassword(e.target.value)}
             className="w-full bg-earth-50 text-earth-900 font-medium placeholder:text-earth-800/30 rounded-2xl px-5 py-4 mb-4 border-2 border-black/5 focus:border-brand-green outline-none transition-all z-10 focus:bg-white"
             placeholder="Wachtwoord..." autoFocus />
-          <button className="w-full bg-brand-green text-white font-bold rounded-2xl py-4 hover:bg-brand-green-dark transition-all z-10 active:scale-95 shadow-lg shadow-brand-green/20">
-            Inloggen
+          {loginError && <p className="text-red-500 text-sm font-bold mb-4 z-10">{loginError}</p>}
+          <button disabled={isLoggingIn || !password}
+            className="w-full bg-brand-green text-white font-bold rounded-2xl py-4 hover:bg-brand-green-dark transition-all z-10 active:scale-95 shadow-lg shadow-brand-green/20 disabled:opacity-60">
+            {isLoggingIn ? "Controleren..." : "Inloggen"}
           </button>
         </form>
       </div>

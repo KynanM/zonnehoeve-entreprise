@@ -72,7 +72,7 @@ if CORS_ORIGINS_RAW == "*" and os.getenv("ENVIRONMENT") != "development":
     print(
         "WARNING: CORS origin ingesteld op '*', dit is onveilig voor productie. Fallback naar strikte modus."
     )
-    cors_origins = ["http://localhost:3000", "http://localhost:3000"]
+    cors_origins = ["http://localhost:3000"]
 elif CORS_ORIGINS_RAW == "*" and os.getenv("ENVIRONMENT") == "development":
     cors_origins = ["*"]
 else:

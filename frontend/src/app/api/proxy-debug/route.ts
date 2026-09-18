@@ -3,10 +3,14 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 export async function GET() {
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   const rawBackendUrl = process.env.BACKEND_URL || "(niet ingesteld)";
   const cleanBackendUrl = (
-    process.env.BACKEND_URL || 
-    process.env.NEXT_PUBLIC_API_URL || 
+    process.env.BACKEND_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     "http://127.0.0.1:8000"
   ).replace(/\/$/, "");
 

@@ -322,9 +322,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
 
   const deleteThread = async (id: string) => {
     try {
-      await api.delete(`/api/chat/threads/${id}`, {
-        headers: { "x-admin-key": "REDACTED_ADMIN_KEY" }
-      });
+      await api.delete(`/api/chat/threads/${id}`);
       fetchThreads();
       if (activeThreadId === id) {
         startNewChat();
@@ -348,9 +346,7 @@ export function useDigitalGuide(initialTheme: "light" | "night" = "light", onThe
 
   const deleteAllThreads = async () => {
     try {
-      await api.delete("/api/chat/threads", {
-        headers: { "x-admin-key": "REDACTED_ADMIN_KEY" }
-      });
+      await api.delete("/api/chat/threads");
       setThreads([]);
       setMessages([]);
       setActiveThreadId(null);
