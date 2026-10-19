@@ -128,7 +128,6 @@ export function useAdminSocket(password: string, onMessage: (msg: SocketMessage)
       }
       stopPolling();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [password]); // Bewust geen reconnect dependencies — éénmalige setup
 
   useEffect(() => {

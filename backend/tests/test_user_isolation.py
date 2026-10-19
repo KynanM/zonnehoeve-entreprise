@@ -3,7 +3,6 @@ from httpx import AsyncClient, ASGITransport
 from main import app
 from unittest.mock import MagicMock, AsyncMock, patch
 from database import get_db
-import uuid
 
 @pytest.fixture
 def mock_db():
