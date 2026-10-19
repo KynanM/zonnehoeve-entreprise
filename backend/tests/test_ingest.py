@@ -3,7 +3,7 @@ from unittest.mock import patch, AsyncMock
 from services.hash_service import HashService
 from services.ingestion_service import IngestionService
 from langchain_core.documents import Document
-import ingest
+import scripts.ingest as ingest
 
 def test_compute_file_hash(tmp_path):
     """Test SHA256 file hashing via HashService."""
@@ -26,7 +26,7 @@ def test_split_text():
 @pytest.mark.anyio
 async def test_process_single_file_from_memory():
     """Test the entry point in ingest.py."""
-    with patch("ingest.IngestionService", autospec=True) as mock_service_cls:
+    with patch("scripts.ingest.IngestionService", autospec=True) as mock_service_cls:
         mock_instance = mock_service_cls.return_value
         mock_instance.process_file = AsyncMock()
         
@@ -37,7 +37,7 @@ async def test_process_single_file_from_memory():
 @pytest.mark.anyio
 async def test_ingest_main():
     """Test the CLI entry point in ingest.py."""
-    with patch("ingest.IngestionService", autospec=True) as mock_service_cls:
+    with patch("scripts.ingest.IngestionService", autospec=True) as mock_service_cls:
         mock_instance = mock_service_cls.return_value
         mock_instance.sync_local_directory = AsyncMock()
         

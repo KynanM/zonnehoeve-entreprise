@@ -1,0 +1,7 @@
+# Pin the check to pycodestyle and Pyflakes.
+# Ruff 0.17's default set also flags FastAPI `Depends()` defaults and broad handlers.
+# Line length is not enforced; the prompt strings and existing modules exceed 88 columns.
+
+[lint]
+select = ["E", "F"]
+ignore = ["E501"]

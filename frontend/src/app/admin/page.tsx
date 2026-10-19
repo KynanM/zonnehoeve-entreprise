@@ -351,7 +351,7 @@ export default function AdminDashboard() {
                         </div>
                       </>
                     ) : (
-                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.tests?.message || "Voer pytest uit om testresultaten te genereren."}</p>
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.tests?.message || "Nog geen rapport, genereer met pytest --json-report --json-report-file=pytest_results.json"}</p>
                     )}
                   </div>
 
@@ -388,7 +388,7 @@ export default function AdminDashboard() {
                         )}
                       </>
                     ) : (
-                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.coverage?.message || "Voer pytest --cov uit om coverage te meten."}</p>
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.coverage?.message || "Nog geen rapport, genereer met pytest --cov=. --cov-report=xml"}</p>
                     )}
                   </div>
 
@@ -441,7 +441,7 @@ export default function AdminDashboard() {
                         )}
                       </>
                     ) : (
-                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.lint?.message || "Voer ruff check . --output-format=json > ruff_report.json uit."}</p>
+                      <p className="text-earth-800/40 text-sm font-bold">{qaReport.lint?.message || "Nog geen rapport, genereer met ruff check . --output-format=json > ruff_report.json"}</p>
                     )}
                   </div>
                 </div>
@@ -465,7 +465,7 @@ export default function AdminDashboard() {
                     <ShieldCheck size={12} /> AI Safety & Compliance
                   </div>
                   <h2 className="text-2xl font-black mb-3">Safety-testresultaten niet beschikbaar</h2>
-                  <p className="text-white/50 text-sm max-w-lg">{qaReport?.safety?.message || "Voer 'pytest tests/test_chatbot_qa_expert.py' uit om safety-metrics te genereren."}</p>
+                  <p className="text-white/50 text-sm max-w-lg">{qaReport?.safety?.message || "Nog geen rapport, genereer met pytest tests/test_chatbot_qa_expert.py"}</p>
                 </div>
               </motion.div>
             ) : (
