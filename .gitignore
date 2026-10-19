@@ -82,6 +82,12 @@ frontend/coverage/
 scratch/
 backend/scratch/
 
+# Generated QA reports (produced locally or as CI artifacts)
+backend/coverage.xml
+backend/pytest_results.json
+backend/ruff_report.json
+backend/data/safety_test_results.json
+
 # Documentation and Portfolio
 portfolio_agile_overview.md
 portfolio_agile_overview.pdf

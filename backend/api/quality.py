@@ -31,7 +31,10 @@ def _load_coverage_report() -> dict[str, Any]:
     coverage_path = os.path.join(BASE_DIR, "coverage.xml")
 
     if not os.path.exists(coverage_path):
-        return {"available": False, "message": "Voer 'pytest' uit om coverage te genereren."}
+        return {
+            "available": False,
+            "message": "Nog geen rapport, genereer met pytest --cov=. --cov-report=xml",
+        }
 
     try:
         import xml.etree.ElementTree as ET
@@ -108,7 +111,7 @@ def _load_lint_report() -> dict[str, Any]:
     if not os.path.exists(ruff_output_path):
         return {
             "available": False,
-            "message": "Voer 'ruff check . --output-format=json > ruff_report.json' uit.",
+            "message": "Nog geen rapport, genereer met ruff check . --output-format=json > ruff_report.json",
         }
 
     try:
@@ -163,7 +166,7 @@ def _get_test_summary() -> dict[str, Any]:
     if not os.path.exists(pytest_output_path):
         return {
             "available": False,
-            "message": "Voer 'pytest --json-report --json-report-file=pytest_results.json' uit.",
+            "message": "Nog geen rapport, genereer met pytest --json-report --json-report-file=pytest_results.json",
         }
 
     try:
@@ -197,7 +200,10 @@ def _get_safety_metrics() -> dict[str, Any]:
     safety_results_path = os.path.join(BASE_DIR, "data", "safety_test_results.json")
 
     if not os.path.exists(safety_results_path):
-        return {"available": False, "message": "Voer 'pytest backend/tests/test_chatbot_qa_expert.py' uit."}
+        return {
+            "available": False,
+            "message": "Nog geen rapport, genereer met pytest tests/test_chatbot_qa_expert.py",
+        }
 
     try:
         data = _safe_load_json(safety_results_path)
