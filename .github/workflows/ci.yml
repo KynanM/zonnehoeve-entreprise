@@ -38,11 +38,26 @@ jobs:
       - name: Run Tests
         working-directory: ./backend
         run: |
-          pytest
+          pytest --cov=. --cov-report=xml --json-report --json-report-file=pytest_results.json
         env:
           DATABASE_URL: postgresql+asyncpg://user:password@localhost:5432/zonnehoeve
           OPENAI_API_KEY: sk-test-fake-key
           ADMIN_API_KEY: test-admin-key
+      - name: Write lint report
+        working-directory: ./backend
+        run: |
+          ruff check . --output-format=json > ruff_report.json
+      - name: Upload QA reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-reports
+          if-no-files-found: warn
+          path: |
+            backend/coverage.xml
+            backend/pytest_results.json
+            backend/ruff_report.json
+            backend/data/safety_test_results.json
 
   frontend-test:
     runs-on: ubuntu-latest
