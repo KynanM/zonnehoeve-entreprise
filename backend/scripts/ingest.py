@@ -7,7 +7,7 @@ from services.ingestion_service import IngestionService
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "data", "raw_documents"))
+RAW_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "raw_documents"))
 
 async def process_single_file_from_memory(filename: str, content: bytes) -> None:
     """Entry point for processing a single file (used by API background tasks)."""

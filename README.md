@@ -136,7 +136,7 @@ zonnehoeve-entreprise/
 ### Backend
 - `pytest`: Execute all backend tests.
 - `uvicorn main:app --reload`: Start backend development server.
-- `python ingest.py`: Trigger document ingestion and indexing process.
+- `python -m scripts.ingest`: Trigger document ingestion and indexing process.
 
 ## Administrative Authentication
 
@@ -170,19 +170,22 @@ To update the dashboard metrics, run the following commands in the `backend` dir
 
 ## Database Maintenance & Optimization
 
-Several specialized scripts are available in the `backend` directory for managing the data layer:
+Run these from the `backend` directory:
 
-- `init_db.py`: Initializes the PostgreSQL schema and ensures the `pgvector` extension is active.
-- `optimize_db.py`: Analyzes table statistics and recreates vector indices (HNSW/IVFFlat) for optimal search performance.
-- `migrate_metadata.py`: Synchronizes document metadata across the SQL database and the vector store.
-- `inspect_db.py`: Provides a high-level overview of table sizes and record counts.
+- `python -m scripts.init_db`: Initializes the PostgreSQL schema and ensures the `pgvector` extension is active.
+- `python -m scripts.optimize_db`: Adds query indexes, converts `retrieved_sources` to JSONB, and sets `ON DELETE CASCADE` on chat logs.
+- `python -m scripts.migrate_metadata`: Adds `outline` and `summary` columns to `document_metadata` when they are missing.
+- `python -m scripts.migrate_user_id`: Adds `user_id` to `chat_threads` when it is missing.
+- `python -m scripts.inspect_db`: Prints table columns and indexes.
+
+From the repository root, `python scripts/upload_to_railway.py` uploads local PDF and DOCX files in `backend/data/raw_documents`. Set `RAILWAY_URL` and `ADMIN_API_KEY` first.
 
 ## Document Ingestion Workflow
 
 Documents can be added to the system using two primary methods:
 
 1. **Admin Dashboard (API)**: Upload files directly via the UI. This triggers an asynchronous background task using `IngestionService` for parsing, chunking, and vectorization.
-2. **CLI Ingestion**: Use `python ingest.py` for bulk processing of documents stored in the `data/raw_documents` directory.
+2. **CLI Ingestion**: From `backend`, run `python -m scripts.ingest` for bulk processing of documents stored in `backend/data/raw_documents`.
 
 ### Hybrid Search Logic
 The system uses a two-stage retrieval process:

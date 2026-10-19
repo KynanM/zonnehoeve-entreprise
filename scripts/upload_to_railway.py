@@ -9,8 +9,8 @@ load_dotenv()
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
-# Pad naar lokale PDF/Docx map
-RAW_DATA_PATH = Path("./backend/data/raw_documents")
+# Pad naar lokale PDF/Docx map, onafhankelijk van de werkmap
+RAW_DATA_PATH = Path(__file__).resolve().parent.parent / "backend" / "data" / "raw_documents"
 
 def upload_documents():
     if not RAILWAY_URL or not ADMIN_API_KEY:
